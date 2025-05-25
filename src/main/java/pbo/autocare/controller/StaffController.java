@@ -5,11 +5,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/technician")
-public class TechnicianController {
+@RequestMapping("/staff")
+public class StaffController {
 
     @GetMapping("/dashboard")
-    public String technicianDashboard() {
-        return "technician_dashboard"; // Mengarahkan ke technician_dashboard.html
+    public String staffDashboard() {
+        return "staff_dashboard"; // Mengarahkan ke staff_dashboard.html
     }
 }
+
