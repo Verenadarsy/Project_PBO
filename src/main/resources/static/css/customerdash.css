@@ -1,0 +1,360 @@
+/* Reset dan Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('/img/bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #ffffff;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* Top Header untuk Logo dan Welcome Message */
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+/* Logo Area */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.logo-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ff6b35;
+}
+
+/* Welcome Message - Dipindah ke kanan atas */
+.welcome-message {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #fff;
+    background: rgba(255, 107, 53, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+/* Container untuk layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6rem 2rem 2rem; /* Tambah padding top untuk header fixed */
+}
+
+/* Header Styling */
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #ff6b35, #ff8c42);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+}
+
+/* Subtitle */
+.subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 3rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 20px;
+    border-radius: 25px;
+    backdrop-filter: blur(px);
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Navigation Menu Styling */
+ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+li {
+    background: rgba(130, 130, 130, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 107, 53, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+}
+
+li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+li:hover::before {
+    left: 100%;
+}
+
+li:hover {
+    transform: translateY(-5px);
+    border-color: #ff6b35;
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Link Styling */
+a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: block;
+    width: 100%;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #ff6b35;
+}
+
+a::after {
+    content: '→';
+    position: absolute;
+    right: 0;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+a:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Form dan Button Styling untuk Logout */
+form {
+    margin: 0;
+    width: 100%;
+}
+
+button {
+    width: 100%;
+    background: linear-gradient(45deg, #ff6b35, #ff8c42);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+    background: linear-gradient(45deg, #ff8c42, #ff6b35);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Icons untuk setiap menu item */
+li:nth-child(1) a::before {
+    content: '🚗';
+    margin-right: 1rem;
+    font-size: 1.3rem;
+}
+
+li:nth-child(2) a::before {
+    content: '📋';
+    margin-right: 1rem;
+    font-size: 1.3rem;
+}
+
+li:nth-child(3) a::before {
+    content: '➕';
+    margin-right: 1rem;
+    font-size: 1.3rem;
+}
+
+li:nth-child(4) button::before {
+    content: '🚪';
+    margin-right: 1rem;
+    font-size: 1.3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .top-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .logo img {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .logo-text {
+        font-size: 1rem;
+    }
+    
+    .welcome-message {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    
+    .container {
+        padding: 5rem 1rem 2rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    ul {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+    
+    li {
+        padding: 1.2rem;
+        min-height: 100px;
+    }
+    
+    a, button {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-header {
+        padding: 0.5rem;
+    }
+    
+    .logo-text {
+        display: none; /* Hide logo text on very small screens */
+    }
+    
+    .welcome-message {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    li {
+        padding: 1rem;
+        min-height: 90px;
+    }
+    
+    button {
+        padding: 0.7rem 1.2rem;
+    }
+}
+
+/* Animasi masuk halaman */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container > * {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.container > *:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.container > *:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* Top header animation */
+.top-header {
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Efek partikel latar belakang */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 140, 66, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}

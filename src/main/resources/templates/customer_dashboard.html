@@ -1,18 +1,46 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Pelanggan - AutoCare Pro</title>
+    <link rel="stylesheet" href="/css/customerdash.css">
 </head>
 <body>
-    <h1 th:text="'Selamat Datang, ' + ${username} + '!'"></h1>
-    <p>Ini adalah dashboard pribadi Anda.</p>
-    <ul>
-        <li><a th:href="@{/customer/my-vehicles}">Kendaraan Saya</a></li>
-        <li><a th:href="@{/customer/my-transactions}">Riwayat Transaksi Saya</a></li>
-        <li><a th:href="@{/customer/new-transaction}">Buat Transaksi Baru</a></li>
-        <li><form th:action="@{/logout}" method="post"><button type="submit">Logout</button></form></li>
-    </ul>
+    <!-- Top Header dengan Logo dan Welcome Message -->
+    <div class="top-header">
+        <div class="logo">
+            <img src="/img/logo.png" alt="AutoCare Pro Logo">
+            <span class="logo-text">AutoCare Pro</span>
+        </div>
+        <div class="welcome-message" th:text="'Selamat Datang, ' + ${username} + '!'">
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Dashboard Pelanggan</h1>
+            <p class="subtitle">Ini adalah dashboard pribadi Anda. Silakan pilih menu di bawah.</p>
+        </header>
+
+        <main>
+            <ul class="dashboard-menu">
+                <li>
+                    <a th:href="@{/customer/my-vehicles}">Kendaraan Saya</a>
+                </li>
+                <li>
+                    <a th:href="@{/customer/my-transactions}">Riwayat Transaksi Saya</a>
+                </li>
+                <li>
+                    <a th:href="@{/customer/new-transaction}">Buat Reservasi Baru</a>
+                </li>
+                <li>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </main>
+    </div>
 </body>
 </html>
