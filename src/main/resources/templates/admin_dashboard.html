@@ -4,15 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - AutoCare Pro</title>
+    <link rel="stylesheet" href="/css/admin_dashboard.css">
 </head>
 <body>
-    <h1>Selamat Datang, Admin!</h1>
-    <p>Ini adalah dashboard manajemen Anda.</p>
-    <ul>
-        <li><a href="/admin/customers">Kelola Pelanggan</a></li>
-        <li><a href="/admin/vehicles">Kelola Kendaraan</a></li>
-        <li><a href="/admin/serviceorders">Kelola Pesanan Layanan</a></li>
-        <li><a href="/logout">Logout</a></li>
-    </ul>
+    <div class="floating-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Selamat Datang, Admin!</h1>
+            <p>Dashboard Manajemen AutoCare Pro</p>
+            <span class="admin-badge">Administrator</span>
+        </div>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number">150</div>
+                <div class="stat-label">Total Pelanggan</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">25</div>
+                <div class="stat-label">Teknisi Aktif</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Staff</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">89</div>
+                <div class="stat-label">Pesanan Bulan Ini</div>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <a href="/admin/customers" class="menu-card">
+                <div class="menu-icon">👥</div>
+                <h3>Daftar Pelanggan</h3>
+                <p>Kelola data dan informasi pelanggan</p>
+            </a>
+
+            <a href="/admin/technician" class="menu-card">
+                <div class="menu-icon">🔧</div>
+                <h3>Daftar Teknisi</h3>
+                <p>Manajemen teknisi dan jadwal kerja</p>
+            </a>
+
+            <a href="/admin/staff" class="menu-card">
+                <div class="menu-icon">👤</div>
+                <h3>Daftar Staff</h3>
+                <p>Kelola karyawan dan admin system</p>
+            </a>
+
+            <a href="/admin/serviceorders" class="menu-card">
+                <div class="menu-icon">📋</div>
+                <h3>Kelola Pesanan Layanan</h3>
+                <p>Monitor dan kelola semua pesanan</p>
+            </a>
+
+            <a href="/admin/newstaff" class="menu-card">
+                <div class="menu-icon">➕</div>
+                <h3>Tambah Staff</h3>
+                <p>Daftarkan karyawan atau admin baru</p>
+            </a>
+
+            <a href="/admin/reports" class="menu-card">
+                <div class="menu-icon">📊</div>
+                <h3>Laporan & Analitik</h3>
+                <p>Lihat statistik dan laporan bisnis</p>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
 </body>
 </html>

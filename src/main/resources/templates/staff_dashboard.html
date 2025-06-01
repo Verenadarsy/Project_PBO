@@ -1,1 +1,69 @@
-<P>oyyy</P>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AutoCare Pro</title>
+    <link rel="stylesheet" href="/css/admin_dashboard.css">
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="welcome-message" th:text="'Selamat Datang, ' + ${username} + '!'">
+            <p>Dashboard Manajemen AutoCare Pro</p>
+            <span class="admin-badge">Staff</span>
+        </div>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number">150</div>
+                <div class="stat-label">Total Pelanggan</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">25</div>
+                <div class="stat-label">Teknisi Aktif</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">89</div>
+                <div class="stat-label">Pesanan Bulan Ini</div>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <a href="/admin/customers" class="menu-card">
+                <div class="menu-icon">👥</div>
+                <h3>Daftar Pelanggan</h3>
+                <p>Kelola data dan informasi pelanggan</p>
+            </a>
+
+            <a href="/admin/technician" class="menu-card">
+                <div class="menu-icon">🔧</div>
+                <h3>Daftar Teknisi</h3>
+                <p>Manajemen teknisi dan jadwal kerja</p>
+            </a>
+
+            <a href="/admin/serviceorders" class="menu-card">
+                <div class="menu-icon">📋</div>
+                <h3>Kelola Pesanan Layanan</h3>
+                <p>Monitor dan kelola semua pesanan</p>
+            </a>
+
+            <a href="/admin/newstech" class="menu-card">
+                <div class="menu-icon">➕</div>
+                <h3>Tambah Teknisi</h3>
+                <p>Daftarkan teknisi baru</p>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

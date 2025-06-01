@@ -1,4 +1,6 @@
-package pbo.autocare.service; // Perhatikan package name Anda, saya akan pakai pbo.autocare.service
+// src/main/java/pbo/autocare/service/UserServiceImpl.java
+
+package pbo.autocare.service;
 
 import pbo.autocare.model.Admin;
 import pbo.autocare.model.Customer;
@@ -13,13 +15,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional; // Tetap import karena userRepository.findByUsername() mengembalikan Optional
+import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService { // PERBAIKI NAMA KELAS DI SINI!
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -29,7 +30,6 @@ public class UserServiceImpl implements UserService, UserDetailsService { // PER
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Ini adalah metode utama yang harus diimplementasikan dari UserDetailsService
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
@@ -46,17 +46,13 @@ public class UserServiceImpl implements UserService, UserDetailsService { // PER
         );
     }
 
-    // Ini adalah implementasi dari interface UserService yang Anda buat
     @Override
     public Customer registerNewCustomer(Customer customer) {
-        // Enkripsi password sebelum menyimpan
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         return userRepository.save(customer);
     }
 
-    // Metode untuk membuat superakun (admin, technician, staff) secara programatis
     public void createSuperUser(String username, String rawPassword, String userType) {
-        // Cek apakah user sudah ada sebelum membuat
         if (userRepository.existsByUsername(username)) {
             System.out.println("Super user '" + username + "' already exists. Skipping creation.");
             return;
@@ -83,13 +79,32 @@ public class UserServiceImpl implements UserService, UserDetailsService { // PER
         System.out.println("Super user '" + username + "' with type '" + userType + "' created successfully.");
     }
 
-    // Metode opsional jika Anda perlu mengambil User entity secara langsung dari Service
     public Optional<User> findUserEntityByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    @Override // Penting: Ini implementasi dari interface UserService
+    @Override
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+
+    @Override
+    public List<User> getAllStaff() {
+        // Implementasi logika untuk mendapatkan semua staf di sini
+        // Ini akan memanggil metode findByUserType dari repository Anda
+        return userRepository.findByUserType("STAFF");
+    }
+
+    @Override
+    public List<User> getAllTechnicians() {
+        // Implementasi logika untuk mendapatkan semua teknisi
+        // Asumsi Technician adalah subclass dari User, dan ada user_type "TECHNICIAN"
+        return userRepository.findByUserType("TECHNICIAN");
     }
 }

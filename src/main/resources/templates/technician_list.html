@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Teknisi</title>
+    <style>
+        /* CSS dasar untuk tabel, bisa disamakan dengan staff_list.html */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 80%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Daftar Teknisi</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Nama Lengkap</th>
+                <th>Nomor Telepon</th>
+                <th>Spesialisasi</th> </tr>
+        </thead>
+        <tbody>
+            <tr th:each="technician : ${technicians}">
+                <td th:text="${technician.id}"></td>
+                <td th:text="${technician.username}"></td>
+                <td th:text="${technician.email}"></td>
+                <td th:text="${technician.fullName}"></td>
+                <td th:text="${technician.phoneNumber}"></td>
+                <td th:text="${technician.specialization != null ? technician.specialization.description : 'Tidak Ditentukan'}"></td>
+            </tr>
+            <tr th:if="${technicians.empty}">
+                <td colspan="6">Tidak ada data Teknisi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+    <a href="/admin/dashboard">Kembali ke Halaman Utama</a>
+</body>
+</html>
