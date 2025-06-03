@@ -16,4 +16,5 @@ public interface ServiceOrderService {
     Optional<ServiceOrder> findById(Long id); // Jika ditambahkan
     List<ServiceOrder> findAll(); // Jika ditambahkan
     void deleteById(Long id); // Jika ditambahkan
+    void saveOrder(ServiceOrder serviceOrder);
 }

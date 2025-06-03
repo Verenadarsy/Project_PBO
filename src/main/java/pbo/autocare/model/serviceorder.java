@@ -36,8 +36,8 @@ public class ServiceOrder {
     private String licensePlate;
 
     @ManyToOne
-    @JoinColumn(name = "service_id", nullable = false)
-    private ServiceItem service; // Relasi ke Service (bisa GeneralService/SpecializedService)
+    @JoinColumn(name = "service_name", referencedColumnName = "service_name") // kolom FK = service_name, referensi ke service_items.name
+    private ServiceItem service;
 
     @Column(name = "final_price", nullable = false)
     private double finalPrice; // Gunakan BigDecimal untuk mata uang
@@ -60,12 +60,26 @@ public class ServiceOrder {
         PENDING, IN_PROGRESS, COMPLETED, CANCELLED
     }
 
-    // Default constructor diperlukan oleh JPA
+    // Default constructor diperlukan oleh JPA dan PENTING untuk Spring Forms!
     public ServiceOrder() {
-        // Inisialisasi default
+        // Inisialisasi default properti ServiceOrder
         this.orderStatus = OrderStatus.PENDING;
         this.createdAt = new Timestamp(System.currentTimeMillis());
         this.updatedAt = new Timestamp(System.currentTimeMillis());
+
+        // --- INI BARIS KRITIS YANG HILANG ATAU BELUM ANDA TERAPKAN ---
+        // Karena User, Vehicle, dan ServiceItem adalah kelas abstract,
+        // Anda harus menginisialisasikannya dengan *instance* dari *sub-kelas konkret* mereka.
+        // Ganti 'Customer()', 'Vehicle()', dan 'GeneralService()' dengan nama sub-kelas konkret Anda yang sesuai.
+
+        // this.user = new Customer(); // <-- GANTI 'Customer' dengan sub-kelas konkret dari User yang Anda miliki
+        //                             // Contoh: new Admin(), new Staff(), new Technician(), atau new Customer()
+
+        // this.vehicleType = new Vehicle(); // <-- GANTI 'Vehicle' dengan sub-kelas konkret dari Vehicle jika Vehicle abstract.
+        //                                  // Jika Vehicle *bukan* abstract, maka 'new Vehicle()' sudah benar.
+
+        // this.service = new Generalservice(); // <-- GANTI 'GeneralService' dengan sub-kelas konkret dari ServiceItem yang Anda miliki.
+                                            // Contoh: new SpecializedService() atau new GeneralService()
     }
 
     // Constructor untuk membuat Order baru (tanpa ID, ID akan di-generate DB)

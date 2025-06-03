@@ -37,15 +37,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserServiceImpl userService) throws Exception {
         http
+            .authenticationProvider(authenticationProvider(userService))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll() // Halaman publik
-                .requestMatchers("/admin/**").hasRole("ADMIN") // Hanya admin
-                .requestMatchers("/technician/**").hasRole("TECHNICIAN") // Hanya teknisi
-                .requestMatchers("/staff/**").hasRole("STAFF") // Hanya staff (jika ada)
-                .requestMatchers("/customer/**").hasRole("CUSTOMER") // Hanya customer yang login
-                .anyRequest().authenticated() // Semua request lain harus terotentikasi
+                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/technician/**").hasRole("TECHNICIAN")
+                .requestMatchers("/staff/**").hasRole("STAFF")
+                .requestMatchers("/customer/**").hasRole("CUSTOMER")
+                .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
@@ -53,12 +54,14 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutSuccessUrl("/") // Redirect ke halaman beranda setelah logout
+                .logoutSuccessUrl("/")
                 .permitAll()
             )
-            .csrf(csrf -> csrf.disable()); // Nonaktifkan CSRF untuk kemudahan pengembangan (jangan di produksi)
+            .csrf(csrf -> csrf.disable());
+
         return http.build();
     }
+
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {

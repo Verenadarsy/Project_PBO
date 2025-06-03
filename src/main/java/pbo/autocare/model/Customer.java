@@ -11,15 +11,6 @@ import jakarta.validation.constraints.Size; // Import ini
 @DiscriminatorValue("CUSTOMER")
 public class Customer extends User {
 
-    // Tambahkan validasi untuk username dan password di User.java juga jika diperlukan.
-    // Contohnya di User.java:
-    // @NotBlank(message = "Username tidak boleh kosong")
-    // @Size(min = 4, max = 50, message = "Username harus antara 4 dan 50 karakter")
-    // private String username;
-    // @NotBlank(message = "Password tidak boleh kosong")
-    // @Size(min = 6, message = "Password minimal 6 karakter")
-    // private String password;
-
     @NotBlank(message = "Nama lengkap tidak boleh kosong")
     @Size(min = 3, max = 100, message = "Nama lengkap harus antara 3 dan 100 karakter")
     private String fullName;

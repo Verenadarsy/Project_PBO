@@ -12,7 +12,7 @@ public abstract class ServiceItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id; 
 
-    @Column(name = "service_name")
+    @Column(name = "service_name", unique = true, nullable = false)
     protected String serviceName;
 
     @Column(name = "service_category")

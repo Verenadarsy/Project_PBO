@@ -68,4 +68,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     public void deleteById(Long id) {
         serviceOrderRepository.deleteById(id);
     }
+
+    @Override
+    public void saveOrder(ServiceOrder serviceOrder) {
+        saveServiceOrder(serviceOrder);
+    }
 }

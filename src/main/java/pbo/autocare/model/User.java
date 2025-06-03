@@ -3,10 +3,15 @@ package pbo.autocare.model;
 import jakarta.persistence.*; // Pastikan ini jakarta.persistence jika SB 3+
 import java.sql.Timestamp;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 @Entity
 @Table(name = "users") // Nama tabel di database sesuai screenshot kamu
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING) // Kolom untuk membedakan tipe user
+@EntityListeners(AuditingEntityListener.class)
 public abstract class User { // Kelas abstrak untuk konsep umum
 
     @Id
@@ -32,10 +37,12 @@ public abstract class User { // Kelas abstrak untuk konsep umum
     // di subclass. Jadi, kita tidak perlu mendeklarasikan field 'userType' di sini.
     // public String userType; <-- HAPUS FIELD INI
 
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at")
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
 
@@ -129,10 +136,6 @@ public abstract class User { // Kelas abstrak untuk konsep umum
 
     public Timestamp getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     // Metode untuk mendapatkan userType (role) secara dinamis
