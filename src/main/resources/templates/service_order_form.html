@@ -3,7 +3,7 @@
 <head>
     <title>Tambah Service Order</title>
     <style>
-        /* Styling from previous answer */
+        /* Styling dari jawaban sebelumnya */
         body { font-family: Arial, sans-serif; margin: 20px; }
         h1 { color: #333; }
         form { max-width: 600px; margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
@@ -42,6 +42,16 @@
             margin-bottom: 10px;
             display: block;
         }
+        .service-detail-section {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .service-detail-section p {
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -54,13 +64,7 @@
         <span th:text="${successMessage}"></span>
     </div>
 
-    <form th:action="@{/serviceorders/save}" th:object="${serviceOrderFormDTO}" method="post">
-        <label>User:</label>
-        <select th:field="*{userId}" required> <option value="">-- Pilih User --</option>
-            <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.username}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}" class="validation-error"></span>
-        <br>
+    <form th:action="@{/customer/save-reservation}" th:object="${serviceOrderFormDTO}" method="post">
 
         <label>Nama Customer:</label>
         <input type="text" th:field="*{customerName}" required />
@@ -81,8 +85,10 @@
         <br>
 
         <label>Jenis Kendaraan:</label>
-        <select th:field="*{vehicleTypeId}" required> <option value="">-- Pilih Jenis Kendaraan --</option>
-            <option th:each="v : ${vehicles}" th:value="${v.id}" th:text="${v.vehicleType}"></option> </select>
+        <select id="vehicleTypeId" th:field="*{vehicleTypeId}" required>
+            <option value="">-- Pilih Jenis Kendaraan --</option>
+            <option th:each="v : ${vehicles}" th:value="${v.id}" th:text="${v.vehicleType}"></option>
+        </select>
         <span th:if="${#fields.hasErrors('vehicleTypeId')}" th:errors="*{vehicleTypeId}" class="validation-error"></span>
         <br>
 
@@ -92,18 +98,30 @@
         <br>
 
         <label>Layanan:</label>
-        <select id="serviceId" name="serviceId" th:field="*{serviceId}" class="form-control">
-        <option value="">Pilih Layanan</option> <option th:each="svc : ${services}" 
-                th:value="${svc.id}" 
-                th:text="${svc.serviceName}">
-        </option>
+        <select id="serviceId" th:field="*{serviceId}" class="form-control">
+            <option value="">Pilih Layanan</option>
+            <option th:each="svc : ${services}"
+                    th:value="${svc.id}"
+                    th:text="${svc.serviceName}">
+            </option>
         </select>
         <span th:if="${#fields.hasErrors('serviceId')}" th:errors="*{serviceId}" class="validation-error"></span>
         <br>
 
-        <label>Harga Akhir:</label>
-        <input type="number" step="0.01" th:field="*{finalPrice}" required />
-        <span th:if="${#fields.hasErrors('finalPrice')}" th:errors="*{finalPrice}" class="validation-error"></span>
+        <div id="serviceDetails" class="service-detail-section" style="display: none;">
+            <h3>Detail Layanan Terpilih</h3>
+            <p><strong>Tipe Layanan:</strong> <span id="serviceType"></span></p>
+            <p><strong>Kategori Layanan:</strong> <span id="serviceCategory"></span></p> 
+            <p><strong>Harga Dasar:</strong> Rp <span id="basePrice"></span></p>
+
+            <label for="durationDays">Pilih Durasi (Hari):</label>
+            <input type="number" id="durationDays" th:field="*{durationDays}" min="1" required />
+            <span class="validation-error" id="durationError" style="display: none;"></span>
+            <br>
+        </div>
+
+        <label>Harga Akhir :</label>
+        <span id="finalPriceDisplay" class="form-control" style="font-weight: bold; display: block; margin-bottom: 15px;">Rp 0.00</span>
         <br>
 
         <label>Catatan:</label>
@@ -111,5 +129,134 @@
 
         <button type="submit">Simpan</button>
     </form>
+
+    <script th:inline="javascript">
+        // Mendapatkan data services dan vehicles dari model Thymeleaf ke JavaScript
+        const allServices = /*[[${services}]]*/ [];
+        const allVehicles = /*[[${vehicles}]]*/ []; // Perbaiki ini: Pastikan Anda mengambil semua vehicles
+
+        const serviceSelect = document.getElementById('serviceId');
+        const vehicleSelect = document.getElementById('vehicleTypeId'); // Perbaiki ini: ID harus sesuai
+        const serviceDetailsDiv = document.getElementById('serviceDetails');
+        const serviceTypeSpan = document.getElementById('serviceType');
+        const serviceCategorySpan = document.getElementById('serviceCategory');
+        const basePriceSpan = document.getElementById('basePrice');
+        const durationDaysInput = document.getElementById('durationDays');
+        const durationErrorSpan = document.getElementById('durationError');
+        const finalPriceDisplay = document.getElementById('finalPriceDisplay'); // Elemen untuk menampilkan harga akhir
+
+        // Fungsi untuk mengupdate detail layanan dan durasi
+        function updateServiceDetails() {
+            const selectedServiceId = serviceSelect.value;
+            if (selectedServiceId) {
+                const selectedService = allServices.find(svc => svc.id == selectedServiceId);
+
+                if (selectedService) {
+                    serviceDetailsDiv.style.display = 'block';
+                    serviceTypeSpan.textContent = selectedService.serviceType || 'N/A';
+                    serviceCategorySpan.textContent = selectedService.serviceCategory; // MENAMPILKAN KATEGORI
+                    basePriceSpan.textContent = parseFloat(selectedService.basePrice).toLocaleString('id-ID'); // Format mata uang
+
+                    let minDuration = selectedService.generalDurationDaysMin;
+                    let maxDuration = selectedService.generalDurationDaysMax;
+
+                    // Anda bisa menambahkan logika di sini jika `serviceType` atau properti lain
+                    // mengindikasikan apakah ini 'SPECIALIZED' atau 'GENERAL'
+                    // Misalnya:
+                    if (selectedService.serviceType === 'SPECIALIZED') {
+                         minDuration = selectedService.specialDurationDaysMin;
+                         maxDuration = selectedService.specialDurationDaysMax;
+                    }
+
+                    durationDaysInput.min = minDuration;
+                    durationDaysInput.max = maxDuration;
+                    durationDaysInput.value = minDuration; // Set nilai default ke min
+                    durationDaysInput.setCustomValidity(''); // Reset validasi
+
+                    durationDaysInput.oninput = function() {
+                        const enteredValue = parseInt(this.value);
+                        if (isNaN(enteredValue) || enteredValue < minDuration || enteredValue > maxDuration) {
+                            durationErrorSpan.textContent = `Durasi harus antara ${minDuration} dan ${maxDuration} hari.`;
+                            durationErrorSpan.style.display = 'block';
+                            this.setCustomValidity(`Durasi harus antara ${minDuration} dan ${maxDuration} hari.`);
+                        } else {
+                            durationErrorSpan.style.display = 'none';
+                            this.setCustomValidity('');
+                        }
+                        updateFinalPriceDisplay(); // Panggil update harga setelah durasi diubah
+                    };
+                } else {
+                    console.error('Service details not found for ID:', selectedServiceId);
+                    hideServiceDetails();
+                }
+            } else {
+                hideServiceDetails();
+            }
+            updateFinalPriceDisplay(); // Panggil update harga setelah detail layanan diperbarui
+        }
+
+        // Fungsi untuk mengupdate tampilan harga akhir
+        function updateFinalPriceDisplay() {
+            const selectedServiceId = serviceSelect.value;
+            const selectedVehicleId = vehicleSelect.value;
+
+            if (selectedServiceId && selectedVehicleId) {
+                const selectedService = allServices.find(svc => svc.id == selectedServiceId);
+                const currentVehicle = allVehicles.find(v => v.id == selectedVehicleId); // Gunakan allVehicles
+
+                if (selectedService && currentVehicle) {
+                    const basePrice = parseFloat(selectedService.basePrice);
+                    const multiplier = parseFloat(currentVehicle.baseServiceCostMultiplier);
+
+                    if (!isNaN(basePrice) && !isNaN(multiplier)) {
+                        let calculatedPrice = basePrice * multiplier;
+
+                        // Tambahkan logika jika durasi memengaruhi harga di frontend
+                        // (Meskipun Anda harus mengkonfirmasi apakah durasi memengaruhi harga secara fungsional)
+                        // Contoh: jika ada biaya per hari tambahan:
+                        // const duration = parseInt(durationDaysInput.value);
+                        // if (!isNaN(duration) && duration > 0) {
+                        //     calculatedPrice += (duration * 5000); // Contoh: 5000 per hari tambahan
+                        // }
+
+                        finalPriceDisplay.textContent = 'Rp ' + calculatedPrice.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    } else {
+                        finalPriceDisplay.textContent = 'Rp 0.00';
+                    }
+                } else {
+                    finalPriceDisplay.textContent = 'Rp 0.00';
+                }
+            } else {
+                finalPriceDisplay.textContent = 'Rp 0.00';
+            }
+        }
+
+        function hideServiceDetails() {
+            serviceDetailsDiv.style.display = 'none';
+            serviceTypeSpan.textContent = '';
+            serviceCategorySpan.textContent = '';
+            basePriceSpan.textContent = '';
+            durationDaysInput.value = '';
+            durationDaysInput.min = '';
+            durationDaysInput.max = '';
+            durationErrorSpan.textContent = '';
+            durationErrorSpan.style.display = 'none';
+        }
+
+        // Event listener saat pilihan layanan atau kendaraan berubah
+        serviceSelect.addEventListener('change', updateServiceDetails); // Memanggil detail layanan dan kemudian harga
+        vehicleSelect.addEventListener('change', updateFinalPriceDisplay); // Hanya memanggil update harga
+
+        // Panggil saat halaman dimuat jika ada nilai awal yang terpilih
+        document.addEventListener('DOMContentLoaded', () => {
+            if (serviceSelect.value) {
+                updateServiceDetails(); // Panggil ini untuk mengisi detail dan harga awal
+            }
+            // Juga panggil updateFinalPriceDisplay jika kendaraan sudah terpilih
+            if (vehicleSelect.value) {
+                updateFinalPriceDisplay();
+            }
+        });
+    </script>
 </body>
 </html>

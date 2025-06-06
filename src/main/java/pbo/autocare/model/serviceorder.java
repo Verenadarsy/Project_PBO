@@ -3,6 +3,7 @@ package pbo.autocare.model;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.math.BigDecimal; // Tambahkan ini
 
 @Entity
 @Table(name = "service_orders")
@@ -12,9 +13,9 @@ public class ServiceOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne // Relasi Many-to-One ke User
-    @JoinColumn(name = "user_id") // Kolom FK di tabel service_orders
-    private User user; // Bisa berupa User, Admin, Customer, dll. (polimorfik)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "customer_name", nullable = false)
     private String customerName;
@@ -30,21 +31,44 @@ public class ServiceOrder {
 
     @ManyToOne
     @JoinColumn(name = "vehicle_type_id", nullable = false)
-    private Vehicle vehicleType; // Relasi ke Vehicle
+    private Vehicle vehicleType;
 
     @Column(name = "license_plate", nullable = false, length = 20)
     private String licensePlate;
 
     @ManyToOne
-    @JoinColumn(name = "service_name", referencedColumnName = "service_name") // kolom FK = service_name, referensi ke service_items.name
-    private ServiceItem service;
+    @JoinColumn(name = "service_id", nullable = false)
+    private ServiceItem service; // <-- Objek ServiceItem yang terelasi
 
-    @Column(name = "final_price", nullable = false)
-    private double finalPrice; // Gunakan BigDecimal untuk mata uang
+    // Ubah double ke BigDecimal untuk finalPrice
+    @Column(name = "final_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal finalPrice; // <-- UBAH double ke BigDecimal
 
-    @Enumerated(EnumType.STRING) // Simpan ENUM sebagai String di DB
+    @Column(name = "selected_duration_days") // Nama kolom di database, bisa disesuaikan
+    private Integer selectedDurationDays;
+
+    public Integer getSelectedDurationDays() {
+        return selectedDurationDays;
+    }
+
+    public void setSelectedDurationDays(Integer selectedDurationDays) {
+        this.selectedDurationDays = selectedDurationDays;
+    }
+
+    @Column(name = "service_name", nullable = false, length = 255) // Ini adalah kolom biasa, bukan FK lagi
+    private String serviceName; 
+    
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
-    private OrderStatus orderStatus; // Gunakan Enum untuk status
+    private OrderStatus orderStatus;
 
     @Column(name = "order_notes", columnDefinition = "TEXT")
     private String orderNotes;
@@ -55,46 +79,29 @@ public class ServiceOrder {
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
-    // Enum untuk OrderStatus
     public enum OrderStatus {
         PENDING, IN_PROGRESS, COMPLETED, CANCELLED
     }
 
-    // Default constructor diperlukan oleh JPA dan PENTING untuk Spring Forms!
     public ServiceOrder() {
-        // Inisialisasi default properti ServiceOrder
         this.orderStatus = OrderStatus.PENDING;
         this.createdAt = new Timestamp(System.currentTimeMillis());
         this.updatedAt = new Timestamp(System.currentTimeMillis());
-
-        // --- INI BARIS KRITIS YANG HILANG ATAU BELUM ANDA TERAPKAN ---
-        // Karena User, Vehicle, dan ServiceItem adalah kelas abstract,
-        // Anda harus menginisialisasikannya dengan *instance* dari *sub-kelas konkret* mereka.
-        // Ganti 'Customer()', 'Vehicle()', dan 'GeneralService()' dengan nama sub-kelas konkret Anda yang sesuai.
-
-        // this.user = new Customer(); // <-- GANTI 'Customer' dengan sub-kelas konkret dari User yang Anda miliki
-        //                             // Contoh: new Admin(), new Staff(), new Technician(), atau new Customer()
-
-        // this.vehicleType = new Vehicle(); // <-- GANTI 'Vehicle' dengan sub-kelas konkret dari Vehicle jika Vehicle abstract.
-        //                                  // Jika Vehicle *bukan* abstract, maka 'new Vehicle()' sudah benar.
-
-        // this.service = new Generalservice(); // <-- GANTI 'GeneralService' dengan sub-kelas konkret dari ServiceItem yang Anda miliki.
-                                            // Contoh: new SpecializedService() atau new GeneralService()
     }
 
-    // Constructor untuk membuat Order baru (tanpa ID, ID akan di-generate DB)
+    // Constructor untuk membuat Order baru
     public ServiceOrder(User user, String customerName, String customerContact, String customerAddress,
                         String vehicleModelName, Vehicle vehicleType, String licensePlate,
-                        ServiceItem service, double finalPrice, String orderNotes) {
-                        this(null, user, customerName, customerContact, customerAddress,
-                            vehicleModelName, vehicleType, licensePlate, service, finalPrice,
-                            OrderStatus.PENDING, orderNotes, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
-                        }
+                        ServiceItem service, BigDecimal finalPrice, String orderNotes) { // <-- UBAH double ke BigDecimal
+        this(null, user, customerName, customerContact, customerAddress,
+             vehicleModelName, vehicleType, licensePlate, service, finalPrice,
+             OrderStatus.PENDING, orderNotes, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
+    }
 
-    // Constructor lengkap (untuk memuat dari DB)
+    // Constructor lengkap
     public ServiceOrder(Long id, User user, String customerName, String customerContact, String customerAddress,
                         String vehicleModelName, Vehicle vehicleType, String licensePlate,
-                        ServiceItem service, double finalPrice, OrderStatus orderStatus, String orderNotes,
+                        ServiceItem service, BigDecimal finalPrice, OrderStatus orderStatus, String orderNotes, // <-- UBAH double ke BigDecimal
                         Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.user = user;
@@ -131,8 +138,8 @@ public class ServiceOrder {
     public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
     public ServiceItem getService() { return service; }
     public void setService(ServiceItem service) { this.service = service; }
-    public double getFinalPrice() { return finalPrice; }
-    public void setFinalPrice(double finalPrice) { this.finalPrice = finalPrice; }
+    public BigDecimal getFinalPrice() { return finalPrice; } // <-- UBAH double ke BigDecimal
+    public void setFinalPrice(BigDecimal finalPrice) { this.finalPrice = finalPrice; } // <-- UBAH double ke BigDecimal
     public OrderStatus getOrderStatus() { return orderStatus; }
     public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
     public String getOrderNotes() { return orderNotes; }

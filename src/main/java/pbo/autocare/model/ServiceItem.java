@@ -2,6 +2,7 @@ package pbo.autocare.model;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.math.BigDecimal; // <-- Tambahkan ini jika menggunakan BigDecimal
 
 @Entity
 @Table(name = "services")
@@ -10,7 +11,7 @@ import java.sql.Timestamp;
 public abstract class ServiceItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id; 
+    protected Long id;
 
     @Column(name = "service_name", unique = true, nullable = false)
     protected String serviceName;
@@ -18,8 +19,9 @@ public abstract class ServiceItem {
     @Column(name = "service_category")
     protected String serviceCategory;
 
-    @Column(name = "base_price")
-    protected double basePrice; 
+    // Gunakan BigDecimal untuk basePrice
+    @Column(name = "base_price", precision = 10, scale = 2) // Contoh presisi dan skala
+    protected BigDecimal basePrice; // <-- UBAH double ke BigDecimal
 
     @Column(name = "general_duration_days_min")
     protected int generalDurationDaysMin;
@@ -43,12 +45,15 @@ public abstract class ServiceItem {
     @Column(name = "updated_at")
     protected Timestamp updatedAt;
 
+    public abstract String getServiceType(); // <--- TAMBAHKAN INI
+
     public ServiceItem() {}
 
-    public ServiceItem(Long id, String serviceName, String serviceCategory, double basePrice, // <--- UBAH double ke BigDecimal
-                   int generalDurationDaysMin, int generalDurationDaysMax,
-                   int specialDurationDaysMin, int specialDurationDaysMax,
-                   Specialization requiredSpecialization) {
+    // Constructor: Perhatikan perubahan tipe data basePrice ke BigDecimal
+    public ServiceItem(Long id, String serviceName, String serviceCategory, BigDecimal basePrice, // <--- UBAH double ke BigDecimal
+                       int generalDurationDaysMin, int generalDurationDaysMax,
+                       int specialDurationDaysMin, int specialDurationDaysMax,
+                       Specialization requiredSpecialization) {
         this.id = id;
         this.serviceName = serviceName;
         this.serviceCategory = serviceCategory;
@@ -60,17 +65,19 @@ public abstract class ServiceItem {
         this.requiredSpecialization = requiredSpecialization;
     }
 
-    public abstract double calculateFinalPrice(Vehicle vehicle); 
+    // Abstract method untuk perhitungan harga akhir
+    public abstract BigDecimal calculateFinalPrice(Vehicle vehicle); // <-- UBAH double ke BigDecimal
     public abstract String getEstimatedDuration();
 
-    public Long getId() { return id; } 
-    public void setId(Long id) { this.id = id; } 
+    // Getters dan Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getServiceName() { return serviceName; }
     public void setServiceName(String serviceName) { this.serviceName = serviceName; }
     public String getServiceCategory() { return serviceCategory; }
     public void setServiceCategory(String serviceCategory) { this.serviceCategory = serviceCategory; }
-    public double getBasePrice() { return basePrice; } 
-    public void setBasePrice(double basePrice) { this.basePrice = basePrice; }
+    public BigDecimal getBasePrice() { return basePrice; } // <-- UBAH double ke BigDecimal
+    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; } // <-- UBAH double ke BigDecimal
     public int getGeneralDurationDaysMin() { return generalDurationDaysMin; }
     public void setGeneralDurationDaysMin(int generalDurationDaysMin) { this.generalDurationDaysMin = generalDurationDaysMin; }
     public int getGeneralDurationDaysMax() { return generalDurationDaysMax; }
@@ -86,7 +93,7 @@ public abstract class ServiceItem {
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     public Timestamp getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; } 
+    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 
     @Override
     public String toString() {

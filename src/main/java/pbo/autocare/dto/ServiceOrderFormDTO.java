@@ -1,6 +1,8 @@
 // src/main/java/pbo/autocare.dto/ServiceOrderFormDTO.java
 package pbo.autocare.dto;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,8 +36,18 @@ public class ServiceOrderFormDTO {
     @NotNull(message = "Layanan harus dipilih")
     private Long serviceId; // Hanya ID layanan
 
+    @NotNull(message = "Durasi hari diperlukan.") // Tambahkan validasi jika perlu
+    private Integer durationDays;
+
+    public Integer getDurationDays() {
+        return durationDays;
+    }
+
+    public void setDurationDays(Integer durationDays) {
+        this.durationDays = durationDays;
+    }
     @Min(value = 0, message = "Harga akhir tidak boleh negatif")
-    private double finalPrice;
+    private BigDecimal finalPrice;
 
     private String orderNotes; // Opsional
 
@@ -59,8 +71,8 @@ public class ServiceOrderFormDTO {
     public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
     public Long getServiceId() { return serviceId; }
     public void setServiceId(Long serviceId) { this.serviceId = serviceId; }
-    public double getFinalPrice() { return finalPrice; }
-    public void setFinalPrice(double finalPrice) { this.finalPrice = finalPrice; }
+    public BigDecimal getFinalPrice() { return finalPrice; }
+    public void setFinalPrice(BigDecimal finalPrice) { this.finalPrice = finalPrice; }
     public String getOrderNotes() { return orderNotes; }
     public void setOrderNotes(String orderNotes) { this.orderNotes = orderNotes; }
 }

@@ -1,5 +1,7 @@
 package pbo.autocare.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -11,7 +13,7 @@ public class Generalservice extends ServiceItem {
         super();
     }
 
-    public Generalservice(Long id, String serviceName, String serviceCategory, double basePrice,
+    public Generalservice(Long id, String serviceName, String serviceCategory, BigDecimal basePrice,
                           int generalDurationDaysMin, int generalDurationDaysMax,
                           Specialization requiredSpecialization) {
         super(id, serviceName, serviceCategory, basePrice,
@@ -21,7 +23,7 @@ public class Generalservice extends ServiceItem {
               requiredSpecialization);
     }
 
-    public Generalservice(String serviceName, String serviceCategory, double basePrice,
+    public Generalservice(String serviceName, String serviceCategory, BigDecimal basePrice,
                           int generalDurationDaysMin, int generalDurationDaysMax,
                           Specialization requiredSpecialization) {
         super(null, serviceName, serviceCategory, basePrice,
@@ -32,12 +34,22 @@ public class Generalservice extends ServiceItem {
     }
 
     @Override
-    public double calculateFinalPrice(Vehicle vehicle) {
-        return this.getBasePrice() * vehicle.getBaseServiceCostMultiplier();
+    public BigDecimal calculateFinalPrice(Vehicle vehicle) {
+        // Logika perhitungan untuk General Service
+        // basePrice * baseServiceCostMultiplier
+        if (this.getBasePrice() == null || vehicle == null || vehicle.getBaseServiceCostMultiplier() == null) {
+            return BigDecimal.ZERO; // Atau throw exception jika data tidak lengkap
+        }
+        return this.getBasePrice().multiply(vehicle.getBaseServiceCostMultiplier());
     }
 
     @Override
     public String getEstimatedDuration() {
         return this.getGeneralDurationDaysMin() + " - " + this.getGeneralDurationDaysMax() + " hari";
+    }
+
+    @Override
+    public String getServiceType() {
+        return "General"; // Kembalikan tipe layanan sebagai "General"
     }
 }

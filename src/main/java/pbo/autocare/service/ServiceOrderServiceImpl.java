@@ -3,6 +3,7 @@ package pbo.autocare.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.User;
 import pbo.autocare.model.Vehicle;
@@ -45,16 +46,6 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     }
 
     @Override
-    public ServiceOrder saveServiceOrder(ServiceOrder serviceOrder) {
-        if (serviceOrder.getId() == null) {
-            serviceOrder.setOrderStatus(ServiceOrder.OrderStatus.PENDING);
-            serviceOrder.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-        }
-        serviceOrder.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        return serviceOrderRepository.save(serviceOrder);
-    }
-
-    @Override
     public Optional<ServiceOrder> findById(Long id) {
         return serviceOrderRepository.findById(id);
     }
@@ -67,6 +58,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public void deleteById(Long id) {
         serviceOrderRepository.deleteById(id);
+    }
+
+    @Transactional // <-- Pastikan ini ada di sini
+    public ServiceOrder saveServiceOrder(ServiceOrder serviceOrder) {
+        if (serviceOrder.getId() == null) {
+            serviceOrder.setOrderStatus(ServiceOrder.OrderStatus.PENDING);
+            serviceOrder.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        }
+        serviceOrder.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        return serviceOrderRepository.save(serviceOrder);
     }
 
     @Override
