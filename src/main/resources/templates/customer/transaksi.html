@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="id">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/transaksi.css">
+
+<head>
+    <title>Tambah Service Order</title>
+</head>
+<body>
+<script th:inline="javascript">
+// Custom Popup Functions
+function createPopup(type, title, message) {
+    // Remove existing popup if any
+    const existingPopup = document.querySelector('.popup-overlay');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    // Create popup overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    
+    // Determine icon based on type
+    const icon = type === 'success' ? '✓' : '⚠';
+    const iconClass = type === 'success' ? 'success' : 'error';
+    
+    // Create popup HTML
+    overlay.innerHTML = `
+        <div class="popup">
+            <button class="popup-close" onclick="closePopup()">&times;</button>
+            <div class="popup-icon ${iconClass}">
+                ${icon}
+            </div>
+            <h3>${title}</h3>
+            <p>${message}</p>
+            <button class="popup-button" onclick="closePopup()">OK</button>
+        </div>
+    `;
+    
+    // Add to body
+    document.body.appendChild(overlay);
+    
+    // Show popup with animation
+    setTimeout(() => {
+        overlay.classList.add('show');
+    }, 10);
+    
+    // Auto close after 5 seconds for success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            closePopup();
+        }, 5000);
+    }
+}
+
+function closePopup() {
+    const overlay = document.querySelector('.popup-overlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+            overlay.remove();
+        }, 300);
+    }
+}
+
+// Close popup when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('popup-overlay')) {
+        closePopup();
+    }
+});
+
+// Close popup with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closePopup();
+    }
+});
+
+// Replace the original script with this improved version
+document.addEventListener('DOMContentLoaded', function() { 
+    const successMessage = /*[[${successMessage}]]*/ null; 
+    if (successMessage) { 
+        createPopup('success', 'Reservasi Berhasil!', successMessage + '\n\nTerima kasih atas reservasi Anda!');
+    } 
+ 
+    const errorMessage = /*[[${errorMessage}]]*/ null; 
+    if (errorMessage) { 
+        createPopup('error', 'Terjadi Kesalahan', errorMessage);
+    } 
+});
+</script>
+</body>
+</html>

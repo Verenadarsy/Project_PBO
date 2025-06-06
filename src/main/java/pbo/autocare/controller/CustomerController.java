@@ -118,12 +118,12 @@ public class CustomerController {
                 serviceOrder.setFinalPrice(finalPrice);
                 serviceOrder.setOrderNotes(serviceOrderFormDTO.getOrderNotes());
 
-                // serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getDurationDays()); // Jika ingin menyimpan durasi juga
+                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getDurationDays()); // Jika ingin menyimpan durasi juga
 
                 serviceOrderService.saveServiceOrder(serviceOrder);
 
                 redirectAttributes.addFlashAttribute("successMessage", "Reservasi berhasil dibuat!");
-                return "redirect:/customer/dashboard";
+                return "redirect:/customer/list-reservations"; // Redirect ke halaman daftar reservasi
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Error: Kendaraan atau Layanan tidak ditemukan. Mohon coba lagi.");
                 redirectAttributes.addFlashAttribute("vehicles", serviceOrderService.getAllVehicles());
@@ -137,5 +137,10 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("services", serviceOrderService.getAllServices());
             return "redirect:/customer/new-reservation";
         }
+    }
+
+    @GetMapping("/list-reservations")
+    public String customerListReservations() {
+        return "customer/transaksi";
     }
 }

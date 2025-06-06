@@ -36,7 +36,8 @@ public class ServiceOrderFormDTO {
     @NotNull(message = "Layanan harus dipilih")
     private Long serviceId; // Hanya ID layanan
 
-    @NotNull(message = "Durasi hari diperlukan.") // Tambahkan validasi jika perlu
+    @NotNull(message = "Durasi hari diperlukan.")
+    @Min(value = 1, message = "Durasi minimal 1 hari.") // Tambahkan ini
     private Integer durationDays;
 
     public Integer getDurationDays() {
