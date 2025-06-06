@@ -1,8 +1,14 @@
 // src/main/java/pbo/autocare/model/Vehicle.java (Contoh)
 package pbo.autocare.model;
 
-import jakarta.persistence.*;
-import java.math.BigDecimal; // Tambahkan ini
+import java.math.BigDecimal;
+
+import jakarta.persistence.Column; // Tambahkan ini
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "vehicles") // Asumsi nama tabel adalah 'vehicles'
