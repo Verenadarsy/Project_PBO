@@ -3,6 +3,7 @@
 package pbo.autocare.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired; // Tambahkan import ini
@@ -43,6 +44,9 @@ public class CustomerController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private pbo.autocare.repository.ServiceOrderRepository serviceOrderRepository;
 
     @GetMapping("/dashboard")
     public String customerDashboard(Authentication authentication, Model model) {
@@ -138,8 +142,23 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/list-reservations")
-    public String customerListReservations() {
-        return "customer/transaksi";
+     @GetMapping("/list-reservations")
+    public String customerListReservations(Authentication authentication, Model model) {
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+            Optional<User> userOptional = userRepository.findByUsername(username);
+
+            if (userOptional.isPresent()) {
+                User currentUser = userOptional.get();
+                List<ServiceOrder> customerOrders = serviceOrderRepository.findByUser(currentUser);
+                model.addAttribute("orders", customerOrders);
+            } else {
+                model.addAttribute("orders", new java.util.ArrayList<ServiceOrder>());
+                model.addAttribute("errorMessage", "Data pengguna tidak ditemukan.");
+            }
+        } else {
+            return "redirect:/login";
+        }
+        return "customer/orderlist"; // Mengarahkan ke customer/orderlist.html
     }
 }

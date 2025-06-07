@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="id">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/orderlist.css">
+
+<head>
+    <title>Tambah Service Order</title>
+</head>
+<body>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <h2 class="mt-4">Riwayat Pesanan Servis Anda</h2>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Pelanggan</th>
+                    <th>Kontak Pelanggan</th>
+                    <th>Alamat Pelanggan</th>
+                    <th>Model Kendaraan</th>
+                    <th>Tipe Kendaraan</th>
+                    <th>Plat Nomor</th>
+                    <th>Layanan</th>
+                    <th>Harga Akhir</th>
+                    <th>Durasi (Hari)</th>
+                    <th>Status Pesanan</th>
+                    <th>Catatan</th>
+                    <th>Dibuat Pada</th>
+                    <th>Diperbarui Pada</th>
+                    <th>Transaksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order, iterStat : ${orders}">
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${order.customerName}"></td>
+                    <td th:text="${order.customerContact}"></td>
+                    <td th:text="${order.customerAddress}"></td>
+                    <td th:text="${order.vehicleModelName}"></td>
+                    <td th:text="${order.vehicleType.vehicleType}"></td>
+                    <td th:text="${order.licensePlate}"></td>
+                    <td th:text="${order.service.serviceName}"></td>
+                    <td th:text="${order.finalPrice}"></td>
+                    <td th:text="${order.selectedDurationDays}"></td>
+                    <td th:text="${order.orderStatus}"></td>
+                    <td th:text="${order.orderNotes}"></td>
+                    <td th:text="${#dates.format(order.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                    <td th:text="${#dates.format(order.updatedAt, 'dd-MM-yyyy HH:mm')}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(orders)}">
+                    <td colspan="14" class="text-center">Tidak ada pesanan servis yang ditemukan.</td>
+                </tr>
+            </tbody>
+        </table>
+        <a th:href="@{/customer/new-reservation}" class="btn btn-primary mt-3">Buat Reservasi Baru</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script th:inline="javascript">
+    // Custom Popup Functions
+    function createPopup(type, title, message) {
+        // Remove existing popup if any
+        const existingPopup = document.querySelector('.popup-overlay');
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+
+        // Create popup overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'popup-overlay';
+        
+        // Determine icon based on type
+        const icon = type === 'success' ? '✓' : '⚠';
+        const iconClass = type === 'success' ? 'success' : 'error';
+        
+        // Create popup HTML
+        overlay.innerHTML = `
+            <div class="popup">
+                <button class="popup-close" onclick="closePopup()">&times;</button>
+                <div class="popup-icon ${iconClass}">
+                    ${icon}
+                </div>
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <button class="popup-button" onclick="closePopup()">OK</button>
+            </div>
+        `;
+        
+        // Add to body
+        document.body.appendChild(overlay);
+        
+        // Show popup with animation
+        setTimeout(() => {
+            overlay.classList.add('show');
+        }, 10);
+        
+        // Auto close after 5 seconds for success messages
+        if (type === 'success') {
+            setTimeout(() => {
+                closePopup();
+            }, 5000);
+        }
+    }
+
+    function closePopup() {
+        const overlay = document.querySelector('.popup-overlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+            setTimeout(() => {
+                overlay.remove();
+            }, 300);
+        }
+    }
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('popup-overlay')) {
+            closePopup();
+        }
+    });
+
+    // Close popup with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePopup();
+        }
+    });
+
+    // Replace the original script with this improved version
+    document.addEventListener('DOMContentLoaded', function() { 
+        const successMessage = /*[[${successMessage}]]*/ null; 
+        if (successMessage) { 
+            createPopup('success', 'Reservasi Berhasil!', successMessage + '\n\nTerima kasih atas reservasi Anda!');
+        } 
+    
+        const errorMessage = /*[[${errorMessage}]]*/ null; 
+        if (errorMessage) { 
+            createPopup('error', 'Terjadi Kesalahan', errorMessage);
+        } 
+    });
+    </script>
+</body>
+</html>
