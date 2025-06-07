@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${customerFormDTO.id == null ? 'Tambah Pelanggan Baru' : 'Edit Pelanggan'}"></title>
+    <link rel="stylesheet" th:href="@{/css/EditCustomerForm.css}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title" th:text="${customerFormDTO.id == null ? 'Tambah Pelanggan Baru' : 'Edit Pelanggan'}"></h1>
+
+        <div th:if="${errorMessage}" class="error-message">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${successMessage}" class="success-message">
+            <span th:text="${successMessage}"></span>
+        </div>
+        
+        <form th:action="@{/admin/customers/save}" th:object="${customerFormDTO}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" th:field="*{username}" 
+                       placeholder="Masukkan username unik (3-50 karakter)" required />
+                <span class="hint-message">Min. 3, Max. 50 karakter, harus unik dan tidak boleh mengandung spasi.</span>
+                <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" th:field="*{password}" 
+                       th:placeholder="${customerFormDTO.id == null ? 'Masukkan password minimal 6 karakter' : 'Biarkan kosong jika tidak mengubah password'}" 
+                       th:required="${customerFormDTO.id == null}" />
+                <span class="hint-message" th:text="${customerFormDTO.id == null ? 'Min. 6 karakter, kombinasi huruf dan angka untuk keamanan.' : 'Min. 6 karakter. Biarkan kosong jika tidak ingin mengubah password.'}"></span>
+                <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" th:field="*{email}" 
+                       placeholder="contoh: pelanggan@email.com" required />
+                <span class="hint-message">Alamat email valid dan unik, akan digunakan untuk komunikasi dan reset password.</span>
+                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="fullName">Nama Lengkap</label>
+                <input type="text" id="fullName" th:field="*{fullName}" 
+                       placeholder="Masukkan nama lengkap pelanggan" required />
+                <span class="hint-message">Min. 3, Max. 100 karakter, sesuai dengan identitas resmi.</span>
+                <span th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Nomor Telepon</label>
+                <input type="text" id="phoneNumber" th:field="*{phoneNumber}" 
+                       placeholder="081234567890" required />
+                <span class="hint-message">Hanya angka, 10-15 digit, dimulai dengan 08 atau +62.</span>
+                <span th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}" class="validation-error"></span>
+            </div>
+
+            <div class="button-container">
+                <button type="submit" th:text="${customerFormDTO.id == null ? 'Tambah Pelanggan' : 'Update Pelanggan'}"></button>
+                <a th:href="@{/admin/customers}" class="btn-back">Kembali</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation delay to form groups
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach((group, index) => {
+                group.style.animationDelay = (index * 0.1) + 's';
+            });
+
+            // Phone number input formatting
+            const phoneInput = document.getElementById('phoneNumber');
+            phoneInput.addEventListener('input', function(e) {
+                // Remove non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            // Form validation feedback
+            const inputs = document.querySelectorAll('input[required]');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('valid');
+                    } else {
+                        this.classList.remove('valid');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

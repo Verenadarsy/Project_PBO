@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import pbo.autocare.dto.CustomerFormDto; // Import CustomerFormDto
+import pbo.autocare.dto.CustomerFormDTO;
 import pbo.autocare.model.Customer;      // Import Customer
 import pbo.autocare.model.User;         // Import User
 
@@ -45,13 +45,13 @@ public interface UserService extends UserDetailsService {
     List<Customer> getAllCustomers();
 
     // Metode untuk menyimpan/menambah Pelanggan baru dari DTO
-    Customer saveNewCustomer(CustomerFormDto customerDto);
+    Customer saveNewCustomer(CustomerFormDTO customerDTO);
 
     // Metode untuk mendapatkan satu Pelanggan berdasarkan ID
     Optional<Customer> getCustomerById(Long id);
 
     // Metode untuk memperbarui data Pelanggan dari DTO
-    Customer updateCustomer(Long id, CustomerFormDto customerDto);
+    Customer updateCustomer(Long id, CustomerFormDTO customerDTO);
 
     // Metode untuk menghapus Pelanggan berdasarkan ID
     void deleteCustomer(Long id);

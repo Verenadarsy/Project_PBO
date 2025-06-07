@@ -3,39 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Teknisi - AutoCare Pro</title>
-    <link rel="stylesheet" th:href="@{/css/admin_dashboard.css}">
     <link rel="stylesheet" th:href="@{/css/customer_list.css}">
-</head>
+    <title>Daftar Pelanggan</title>
 </head>
 <body>
-    <h1>Daftar Pelanggan</h1>
+    <div class="container">
+        <h1 class="page-title">Daftar Akun Pelanggan</h1>
+        <div class="section-block">
+            <a th:href="@{/admin/customers/new}" class="btn-add">Tambah Pelanggan Baru</a> <br><br>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Nama Lengkap</th>
-                <th>Nomor Telepon</th>
-                </tr>
-        </thead>
-        <tbody>
-            <tr th:each="customer : ${customers}">
-                <td th:text="${customer.id}"></td>
-                <td th:text="${customer.username}"></td>
-                <td th:text="${customer.email}"></td>
-                <td th:text="${customer.fullName}"></td>
-                <td th:text="${customer.phoneNumber}"></td>
-                </tr>
-            <tr th:if="${customers.empty}">
-                <td colspan="5">Tidak ada data customer.</td>
-            </tr>
-        </tbody>
-    </table>
+            <div th:if="${errorMessage}" class="error-message">
+                <span th:text="${errorMessage}"></span>
+            </div>
+            <div th:if="${successMessage}" class="success-message">
+                <span th:text="${successMessage}"></span>
+            </div>
 
-    <br>
-    <a href="/admin/dashboard">Kembali ke Halaman Utama</a>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Nama Lengkap</th>
+                        <th>Nomor Telepon</th>
+                        <th>Aksi</th> </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="customer, customerStat : ${customers}">
+                        <td th:text="${customerStat.index + 1}"></td>
+                        <td th:text="${customer.id}"></td>
+                        <td th:text="${customer.username}"></td>
+                        <td th:text="${customer.email}"></td>
+                        <td th:text="${customer.fullName}"></td>
+                        <td th:text="${customer.phoneNumber}"></td>
+                        <td>
+                            <a th:href="@{/admin/customers/edit/{id}(id=${customer.id})}" class="btn-edit">Edit</a>
+                            <form th:action="@{/admin/customers/delete/{id}(id=${customer.id})}" method="post" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus pelanggan ini?');">
+                                <button type="submit" class="btn-delete">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${customers.empty}" class="no-data">
+                        <td colspan="7">Tidak ada data Pelanggan.</td> </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <a href="/admin/dashboard" class="btn-back">Kembali ke Halaman Utama</a>
+    </div>
 </body>
 </html>

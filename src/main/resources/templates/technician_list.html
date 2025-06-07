@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Teknisi - AutoCare Pro</title>
-    <link rel="stylesheet" th:href="@{/css/admin_dashboard.css}">
     <link rel="stylesheet" th:href="@{/css/technician_list.css}">
 </head>
 <body>
-    <div class="container"> <h1 class="page-title">Daftar Teknisi</h1> <div class="section-block"> <table class="data-table"> <thead>
+    <div class="container"> <h1 class="page-title">Daftar Akun Teknisi</h1> <div class="section-block"> <table class="data-table"> <thead>
                     <tr>
+                        <th>No</th>
                         <th>ID</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Nama Lengkap</th>
                         <th>Nomor Telepon</th>
                         <th>Spesialisasi</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="technician : ${technicians}">
+                    <tr th:each="technician, technicianStat : ${technicians}">
+                        <td th:text="${technicianStat.index + 1}"></td>
                         <td th:text="${technician.id}"></td>
                         <td th:text="${technician.username}"></td>
                         <td th:text="${technician.email}"></td>

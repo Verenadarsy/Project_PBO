@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import pbo.autocare.dto.CustomerFormDto; // Pastikan Anda memiliki DTO ini
+import pbo.autocare.dto.CustomerFormDTO; // Pastikan Anda memiliki DTO ini
 import pbo.autocare.model.Admin;
 import pbo.autocare.model.Customer;
 import pbo.autocare.model.Staff;
@@ -189,30 +189,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     /**
      * Menyimpan Customer baru dari Data Transfer Object (DTO).
      * Melakukan validasi duplikasi username dan email.
-     * @param customerDto DTO yang berisi data Customer baru.
+     * @param CustomerDTO DTO yang berisi data Customer baru.
      * @return Objek Customer yang sudah disimpan.
      * @throws ResponseStatusException Jika username atau email sudah digunakan.
      */
     @Override
     @Transactional // Operasi tulis, memerlukan transaksi.
-    public Customer saveNewCustomer(CustomerFormDto customerDto) {
+    public Customer saveNewCustomer(CustomerFormDTO CustomerDTO) {
         // Cek duplikasi username untuk customer baru
-        if (userRepository.existsByUsername(customerDto.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username '" + customerDto.getUsername() + "' sudah digunakan. Pilih username lain.");
+        if (userRepository.existsByUsername(CustomerDTO.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username '" + CustomerDTO.getUsername() + "' sudah digunakan. Pilih username lain.");
         }
         // Cek duplikasi email untuk customer baru
         // Asumsi: findByEmail mengembalikan Optional<User>
-        if (userRepository.findByEmail(customerDto.getEmail()).isPresent()) {
-             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email '" + customerDto.getEmail() + "' sudah terdaftar. Gunakan email lain.");
+        if (userRepository.findByEmail(CustomerDTO.getEmail()).isPresent()) {
+             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email '" + CustomerDTO.getEmail() + "' sudah terdaftar. Gunakan email lain.");
         }
 
         // Membuat objek Customer dari DTO dan meng-encode password
         Customer customer = new Customer(
-            customerDto.getUsername(),
-            passwordEncoder.encode(customerDto.getPassword()), // Encode password dari DTO
-            customerDto.getEmail(),
-            customerDto.getFullName(),
-            customerDto.getPhoneNumber()
+            CustomerDTO.getUsername(),
+            passwordEncoder.encode(CustomerDTO.getPassword()), // Encode password dari DTO
+            CustomerDTO.getEmail(),
+            CustomerDTO.getFullName(),
+            CustomerDTO.getPhoneNumber()
         );
         // created_at dan updated_at akan otomatis terisi oleh JPA Auditing
 
@@ -237,13 +237,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * Memperbarui data Customer yang sudah ada dari DTO.
      * Melakukan validasi duplikasi username dan email jika diubah.
      * @param id ID Customer yang akan diperbarui.
-     * @param customerDto DTO yang berisi data pembaruan.
+     * @param CustomerDTO DTO yang berisi data pembaruan.
      * @return Objek Customer yang sudah diperbarui.
      * @throws ResponseStatusException Jika Customer tidak ditemukan, bukan Customer, atau ada duplikasi data.
      */
     @Override
     @Transactional // Operasi tulis, memerlukan transaksi.
-    public Customer updateCustomer(Long id, CustomerFormDto customerDto) {
+    public Customer updateCustomer(Long id, CustomerFormDTO CustomerDTO) {
         // Mencari user berdasarkan ID
         return userRepository.findById(id)
             .map(existingUser -> {
@@ -254,28 +254,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 Customer existingCustomer = (Customer) existingUser;
 
                 // Cek duplikasi username jika username diubah
-                if (!existingCustomer.getUsername().equals(customerDto.getUsername())) {
-                    if (userRepository.existsByUsername(customerDto.getUsername())) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username '" + customerDto.getUsername() + "' sudah digunakan.");
+                if (!existingCustomer.getUsername().equals(CustomerDTO.getUsername())) {
+                    if (userRepository.existsByUsername(CustomerDTO.getUsername())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username '" + CustomerDTO.getUsername() + "' sudah digunakan.");
                     }
                 }
                 // Cek duplikasi email jika email diubah
-                if (!existingCustomer.getEmail().equals(customerDto.getEmail())) {
-                    Optional<User> userWithSameEmail = userRepository.findByEmail(customerDto.getEmail());
+                if (!existingCustomer.getEmail().equals(CustomerDTO.getEmail())) {
+                    Optional<User> userWithSameEmail = userRepository.findByEmail(CustomerDTO.getEmail());
                     if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(id)) { // Pastikan email bukan milik user yang sama
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email '" + customerDto.getEmail() + "' sudah terdaftar.");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email '" + CustomerDTO.getEmail() + "' sudah terdaftar.");
                     }
                 }
 
                 // Perbarui properti Customer
-                existingCustomer.setUsername(customerDto.getUsername());
+                existingCustomer.setUsername(CustomerDTO.getUsername());
                 // Password hanya diperbarui jika ada password baru di form DTO
-                if (customerDto.getPassword() != null && !customerDto.getPassword().isEmpty()) {
-                    existingCustomer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
+                if (CustomerDTO.getPassword() != null && !CustomerDTO.getPassword().isEmpty()) {
+                    existingCustomer.setPassword(passwordEncoder.encode(CustomerDTO.getPassword()));
                 }
-                existingCustomer.setFullName(customerDto.getFullName());
-                existingCustomer.setEmail(customerDto.getEmail());
-                existingCustomer.setPhoneNumber(customerDto.getPhoneNumber());
+                existingCustomer.setFullName(CustomerDTO.getFullName());
+                existingCustomer.setEmail(CustomerDTO.getEmail());
+                existingCustomer.setPhoneNumber(CustomerDTO.getPhoneNumber());
 
                 return userRepository.save(existingCustomer); // Simpan perubahan Customer
             })

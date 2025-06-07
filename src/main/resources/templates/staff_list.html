@@ -3,43 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Staff</title>
-    <style>
-        /* CSS dasar untuk tabel */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 80%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/customer_list.css}">
 </head>
 <body>
-    <h1>Daftar Staff</h1>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Nama Lengkap</th>
-                <th>Nomor Telepon</th>
-                </tr>
-        </thead>
-        <tbody>
-            <tr th:each="staff : ${staffs}">
-                <td th:text="${staff.id}"></td>
-                <td th:text="${staff.username}"></td>
-                <td th:text="${staff.email}"></td>
-                <td th:text="${staff.fullName}"></td>
-                <td th:text="${staff.phoneNumber}"></td>
-                </tr>
-            <tr th:if="${staffs.empty}">
-                <td colspan="5">Tidak ada data Staff.</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <br>
-    <a href="/admin/dashboard">Kembali ke Halaman Utama</a>
+    <div class="container">
+        <h1 class="page-title">Daftar Akun Staff</h1>
+        <div class="section-block">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>No</th> 
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Nama Lengkap</th>
+                        <th>Nomor Telepon</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="staff, staffStat : ${staffs}">
+                        <td th:text="${staffStat.index + 1}"></td> <td th:text="${staff.id}"></td>
+                        <td th:text="${staff.username}"></td>
+                        <td th:text="${staff.email}"></td>
+                        <td th:text="${staff.fullName}"></td>
+                        <td th:text="${staff.phoneNumber}"></td>
+                        <td>Aksi</td> </tr>
+                    <tr th:if="${staffs.empty}" class="no-data">
+                        <td colspan="7">Tidak ada data Staff.</td> </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <a href="/admin/dashboard" class="btn-back">Kembali ke Halaman Utama</a>
+    </div>
 </body>
 </html>

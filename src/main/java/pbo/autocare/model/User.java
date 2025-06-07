@@ -38,7 +38,6 @@ public abstract class User { // Kelas abstrak untuk konsep umum
     @Column(unique = true, nullable = false)
     private String username;
 
-    @NotBlank(message = "Password tidak boleh kosong") // <-- TAMBAHKAN VALIDASI INI
     @Column(nullable = false)
     private String password; // Password akan disimpan ter-enkripsi
 

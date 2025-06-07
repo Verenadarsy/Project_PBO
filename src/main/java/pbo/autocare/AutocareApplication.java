@@ -14,7 +14,7 @@ public class AutocareApplication {
     public static void main(String[] args) {
         SpringApplication.run(AutocareApplication.class, args);
     }
-
+ 
     @Bean
     public CommandLineRunner demoData(UserServiceImpl userService, UserRepository userRepository) { // UserRepository DIINJEK DI SINI
         return args -> {
