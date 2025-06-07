@@ -4,31 +4,36 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("STAFF") // Harus sesuai dengan nilai di kolom user_type di database
+@DiscriminatorValue("STAFF") // Nilai yang akan disimpan di kolom 'user_type' saat objek Staff disimpan
 public class Staff extends User {
 
-    // Constructor default diperlukan oleh JPA
+    // Constructor default diperlukan oleh JPA untuk membuat instance objek dari database.
     public Staff() {
-        super(); // Memanggil konstruktor default User
+        super(); // Memanggil konstruktor default dari kelas User (induk)
     }
 
-    // Konstruktor dengan username dan password (jika hanya itu yang diisi)
+    // Constructor dasar untuk membuat objek Staff hanya dengan username dan password.
+    // Properti lain (email, fullName, phoneNumber) akan diisi melalui setters atau Auditing (createdAt, updatedAt).
     public Staff(String username, String password) {
-        super(username, password); // Memanggil konstruktor User(String, String)
-        // Atribut lain (email, fullName, phoneNumber) akan null jika tidak diisi
+        super(username, password); // Memanggil konstruktor User dengan username dan password
     }
 
-    // Konstruktor yang lebih lengkap untuk Staff
+    /**
+     * Constructor lengkap untuk membuat objek Staff dengan semua properti dasar User.
+     * Ini digunakan oleh UserServiceImpl.createSuperUser() untuk mengisi semua kolom NOT NULL.
+     * @param username Username dari Staff.
+     * @param password Password Staff (harus sudah di-encode sebelum dipanggil).
+     * @param email Email Staff.
+     * @param fullName Nama lengkap Staff.
+     * @param phoneNumber Nomor telepon Staff.
+     */
     public Staff(String username, String password, String email, String fullName, String phoneNumber) {
-        super(username, password, email, fullName, phoneNumber); // Memanggil konstruktor User(String,String,String,String,String)
+        super(username, password, email, fullName, phoneNumber); // Memanggil konstruktor 5 parameter di kelas User
     }
 
-    // Konstruktor paling lengkap, termasuk ID (untuk loading dari DB)
-    public Staff(Long id, String username, String password, String email, String fullName, String phoneNumber) {
-        super(id, username, password, email, fullName, phoneNumber);
-    }
-
-    // Staff tidak memiliki atribut spesifik di sini,
-    // jadi tidak ada getter/setter tambahan untuk Staff.
-    // Jika nanti ada atribut khusus Staff, bisa ditambahkan di sini.
+    // Anda dapat menambahkan properti atau metode spesifik untuk Staff di sini jika diperlukan.
+    // Contoh:
+    // private String department;
+    // public String getDepartment() { return department; }
+    // public void setDepartment(String department) { this.department = department; }
 }

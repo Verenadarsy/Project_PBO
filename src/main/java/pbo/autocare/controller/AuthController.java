@@ -1,14 +1,15 @@
 package pbo.autocare.controller;
 
-import pbo.autocare.model.Customer;
-import pbo.autocare.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import jakarta.validation.Valid; // Import ini
-import org.springframework.validation.BindingResult; // Import ini
+
+import jakarta.validation.Valid;
+import pbo.autocare.model.Customer; // Import ini
+import pbo.autocare.service.UserService; // Import ini
 
 @Controller
 public class AuthController {
@@ -56,7 +57,7 @@ public class AuthController {
         } catch (Exception e) {
             // 3. Tangani kesalahan tak terduga saat menyimpan ke database
             model.addAttribute("error", "Registrasi gagal karena kesalahan sistem. Silakan coba lagi.");
-            e.printStackTrace(); // SANGAT PENTING: Cetak stack trace ke konsol untuk debugging!
+            //e.printStackTrace(); // SANGAT PENTING: Cetak stack trace ke konsol untuk debugging!
             return "register"; // Kembali ke halaman registrasi dengan pesan error
         }
     }

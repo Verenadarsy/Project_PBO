@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Teknisi - AutoCare Pro</title>
+    <link rel="stylesheet" th:href="@{/css/admin_dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/customer_list.css}">
+</head>
+</head>
+<body>
+    <h1>Daftar Pelanggan</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Nama Lengkap</th>
+                <th>Nomor Telepon</th>
+                </tr>
+        </thead>
+        <tbody>
+            <tr th:each="customer : ${customers}">
+                <td th:text="${customer.id}"></td>
+                <td th:text="${customer.username}"></td>
+                <td th:text="${customer.email}"></td>
+                <td th:text="${customer.fullName}"></td>
+                <td th:text="${customer.phoneNumber}"></td>
+                </tr>
+            <tr th:if="${customers.empty}">
+                <td colspan="5">Tidak ada data customer.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+    <a href="/admin/dashboard">Kembali ke Halaman Utama</a>
+</body>
+</html>

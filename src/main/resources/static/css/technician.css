@@ -1,0 +1,273 @@
+/* technician_dashboard.css (atau admin_dashboard.css) */
+
+/* --- General Body & Page Layout --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* Light gray background */
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll from floating shapes */
+}
+
+/* --- Floating Background Elements --- */
+.floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1; /* Send to background */
+}
+
+.floating-shape {
+    position: absolute;
+    background: rgba(40, 167, 69, 0.1); /* Light green, semi-transparent */
+    border-radius: 50%;
+    animation: float 15s infinite ease-in-out;
+}
+
+.floating-shape:nth-child(1) {
+    width: 200px;
+    height: 200px;
+    top: 10%;
+    left: 5%;
+    animation-duration: 18s;
+    animation-delay: 0s;
+    background: rgba(60, 200, 80, 0.15);
+}
+
+.floating-shape:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 50%;
+    right: 10%;
+    animation-duration: 20s;
+    animation-delay: 2s;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.floating-shape:nth-child(3) {
+    width: 250px;
+    height: 250px;
+    bottom: 5%;
+    left: 30%;
+    animation-duration: 22s;
+    animation-delay: 4s;
+    background: rgba(60, 200, 80, 0.1);
+}
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+    50% { transform: translateY(-20px) rotate(30deg); opacity: 0.6; }
+    100% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+}
+
+
+/* --- Dashboard Container --- */
+.dashboard-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-radius: 12px;
+}
+
+/* --- Dashboard Header (Welcome Message) --- */
+.dashboard-header {
+    background-color: #28a745; /* Green for technician/admin feel */
+    color: #fff;
+    padding: 25px 30px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: relative; /* For badge positioning */
+}
+
+.dashboard-header .welcome-message {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.dashboard-header .welcome-message p {
+    font-size: 1.2rem;
+    font-weight: normal;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+.admin-badge { /* Used for Technician badge as per HTML */
+    background-color: #1e7e34; /* Darker green */
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+/* --- Dashboard Stats Cards --- */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background-color: #e6ffe6; /* Very light green */
+    border: 1px solid #c2e6c2;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.stat-number {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Menu Grid --- */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.menu-card {
+    background-color: #f7fcf7; /* Lighter green tint */
+    border: 1px solid #d4edda;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.menu-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    background-color: #e9f5e9; /* Slightly darker tint on hover */
+}
+
+.menu-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #28a745;
+}
+
+.menu-card h3 {
+    font-size: 1.4rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #28a745;
+}
+
+.menu-card p {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+/* --- Logout Section --- */
+.logout-section {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.logout-btn {
+    display: inline-block;
+    background-color: #dc3545; /* Red for logout */
+    color: #fff;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logout-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-3px);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .dashboard-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    .dashboard-header .welcome-message {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+    .admin-badge {
+        margin-top: 10px;
+    }
+    .dashboard-stats, .menu-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    .stat-number {
+        font-size: 2.8rem;
+    }
+    .menu-icon {
+        font-size: 2.5rem;
+    }
+    .menu-card h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-container {
+        width: 95%;
+        padding: 15px;
+    }
+    .dashboard-stats, .menu-grid {
+        grid-template-columns: 1fr; /* Stack columns on small screens */
+    }
+    .stat-card, .menu-card {
+        padding: 20px;
+    }
+    .logout-btn {
+        width: 80%;
+    }
+}

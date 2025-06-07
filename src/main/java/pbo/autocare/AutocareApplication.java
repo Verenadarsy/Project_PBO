@@ -1,11 +1,12 @@
 package pbo.autocare;
 
-import pbo.autocare.service.UserServiceImpl;
-import pbo.autocare.repository.UserRepository; // Pastikan ini diimport
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringApplication; // Pastikan ini diimport
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import pbo.autocare.repository.UserRepository;
+import pbo.autocare.service.UserServiceImpl;
 
 @SpringBootApplication
 public class AutocareApplication {

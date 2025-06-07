@@ -1,0 +1,154 @@
+/* technician_list.css */
+
+/* --- General Body & Page Layout (konsisten dengan tema AutoCare Pro) --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%); /* Ambil dari body utama */
+    color: #ffffff; /* Teks putih */
+    line-height: 1.6;
+}
+
+/* --- Main Container (opsional, jika ingin mengelilingi seluruh konten) --- */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto; /* Margin lebih besar */
+    background-color: #1a1a1a; /* Background container gelap */
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 107, 53, 0.2); /* Border aksen */
+}
+
+/* --- Page Title / Header (opsional, jika ingin tampilan lebih menarik) --- */
+.page-title {
+    background: linear-gradient(45deg, #ffffff, #ff6b35); /* Gradient teks */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.2rem;
+    margin-top: 30px;
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: 2px solid #333; /* Border abu-abu gelap */
+    padding-bottom: 15px;
+}
+
+/* --- Section Block (opsional, untuk membungkus tabel) --- */
+.section-block {
+    background-color: #212121; /* Background block gelap */
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255, 107, 53, 0.1); /* Border aksen */
+}
+
+/* --- Table Styling for Technician List --- */
+.data-table { /* Menggunakan kelas ini untuk tabel teknisi */
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #444; /* Border lebih gelap */
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle;
+    color: #ffffff; /* Teks putih */
+}
+
+.data-table th {
+    background-color: #333; /* Background header gelap */
+    font-weight: bold;
+    color: #ff6b35; /* Teks oranye */
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #2a2a2a; /* Warna background baris genap lebih gelap */
+}
+
+.data-table tbody tr:hover {
+    background-color: #383838; /* Background hover lebih gelap */
+    cursor: pointer;
+}
+
+.data-table td {
+    font-size: 0.95rem;
+    color: #e0e0e0; /* Warna teks terang */
+}
+
+/* --- Styling for "Tidak ada data Teknisi." message --- */
+.data-table tbody tr.no-data td {
+    text-align: center;
+    font-style: italic;
+    color: #cccccc; /* Teks terang */
+    padding: 20px;
+    background-color: #333; /* Background lebih gelap */
+}
+
+
+/* --- Back Button Styling --- */
+.btn-back {
+    display: inline-block;
+    background: linear-gradient(45deg, #ff6b35, #f7931e); /* Gradient oranye */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px; /* Lebih bulat */
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 10px rgba(255, 107, 53, 0.2);
+}
+
+.btn-back:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(255, 107, 53, 0.3);
+}
+
+/* --- Responsive Design (opsional, jika belum ada di CSS utama) --- */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        margin: 10px auto;
+        padding: 15px;
+    }
+    .data-table {
+        font-size: 0.85rem;
+    }
+    .data-table th, .data-table td {
+        padding: 8px 10px;
+    }
+    .page-title {
+        font-size: 1.8rem;
+    }
+    .btn-back {
+        width: 100%;
+        text-align: center;
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+    .section-block {
+        overflow-x: auto;
+    }
+    .data-table {
+        min-width: 600px;
+    }
+}

@@ -2,45 +2,69 @@ package pbo.autocare.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model; // Pastikan ini di-import
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PostMapping; // Tetap sertakan jika ada @PostMapping
 import org.springframework.web.bind.annotation.RequestMapping;
-import pbo.autocare.model.User;
-import pbo.autocare.service.UserService;
-import org.springframework.ui.Model;
 
+import pbo.autocare.model.Customer; // Import Customer
+import pbo.autocare.model.User;    // Import User
+import pbo.autocare.service.UserServiceImpl; // Menggunakan UserServiceImpl
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
+    private final UserServiceImpl userService;
+
+    public AdminController(UserServiceImpl userService) { // Constructor injection
+        this.userService = userService;
+    }
 
     @GetMapping("/dashboard")
     public String adminDashboard() {
         return "admin_dashboard";
     }
 
+    // --- METODE INI ADALAH SATU-SATUNYA UNTUK MENAMPILKAN DAFTAR PELANGGAN ---
+    // PASTIKAN ANDA MENGHAPUS METHOD LAIN DENGAN @GetMapping("/customers") DARI FILE INI
     @GetMapping("/customers")
-    public String listCustomer() {
-        return "costumer_list";
+    public String listCustomers(Model model) {
+        List<Customer> customers = userService.getAllCustomers(); // Memanggil metode getAllCustomers dari UserServiceImpl
+        model.addAttribute("customers", customers); // Menambahkan daftar pelanggan ke model
+
+        // Atribut untuk penyesuaian tampilan HTML (seperti judul halaman, judul header, link kembali)
+        model.addAttribute("pageTitle", "Daftar Pelanggan (Admin)");
+        model.addAttribute("headerTitle", "Daftar Pelanggan (Admin)");
+        model.addAttribute("backLink", "/admin/dashboard");
+        model.addAttribute("backText", "Kembali ke Dashboard Admin");
+
+        return "admin/customer_list"; // Merujuk ke templates/admin/customer_list.html
     }
+    // --- AKHIR DARI METODE LIST CUSTOMERS YANG BENAR ---
+
 
     @GetMapping("/technician")
     public String listTech(Model model) {
         List<User> techList = userService.getAllTechnicians();
         model.addAttribute("technicians", techList);
-        return "technician_list";
+        model.addAttribute("pageTitle", "Daftar Teknisi (Admin)");
+        model.addAttribute("headerTitle", "Daftar Teknisi (Admin)");
+        model.addAttribute("backLink", "/admin/dashboard");
+        model.addAttribute("backText", "Kembali ke Dashboard Admin");
+        return "technician_list"; // Merujuk ke templates/technician_list.html
     }
-
-    @Autowired
-    private UserService userService;
 
     @GetMapping("/staff")
     public String listStaff(Model model) {
         List<User> staffList = userService.getAllStaff();
         model.addAttribute("staffs", staffList);
-        return "staff_list";
+        model.addAttribute("pageTitle", "Daftar Staff (Admin)");
+        model.addAttribute("headerTitle", "Daftar Staff (Admin)");
+        model.addAttribute("backLink", "/admin/dashboard");
+        model.addAttribute("backText", "Kembali ke Dashboard Admin");
+        return "staff_list"; // Merujuk ke templates/staff_list.html
     }
 
     @GetMapping("/newstaff")
@@ -53,29 +77,23 @@ public class AdminController {
         return "service_order_detail";
     }
     
-
-    // Tambahkan endpoint untuk kelola transaksi (CRUD)
     @GetMapping("/transactions")
     public String manageTransactions() {
-        // Logika untuk menampilkan daftar transaksi
-        return "admin_transactions"; // Contoh: admin_transactions.html
+        return "admin_transactions";
     }
 
     @PostMapping("/transactions/add")
     public String addTransaction() {
-        // Logika untuk menambahkan transaksi baru
-        return "redirect:/admin/transactions"; // Redirect ke daftar transaksi setelah penambahan
+        return "redirect:/admin/transactions";
     }
 
     @PostMapping("/transactions/edit")
     public String editTransaction() {
-        // Logika untuk mengedit transaksi yang sudah ada
-        return "redirect:/admin/transactions"; // Redirect ke daftar transaksi setelah pengeditan
+        return "redirect:/admin/transactions";
     }
 
     @PostMapping("/transactions/delete")
     public String deleteTransaction() {
-        // Logika untuk menghapus transaksi
-        return "redirect:/admin/transactions"; // Redirect ke daftar transaksi setelah penghapusan
+        return "redirect:/admin/transactions";
     }
 }

@@ -2,32 +2,31 @@
 
 package pbo.autocare.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired; // Tambahkan import ini
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails; // Tambahkan import ini
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import pbo.autocare.dto.ServiceOrderFormDTO;
-import pbo.autocare.model.ServiceOrder;
-import pbo.autocare.model.ServiceItem;
-import pbo.autocare.model.Vehicle;
-import pbo.autocare.model.User;
-import pbo.autocare.repository.ServiceItemRepository;
-import pbo.autocare.repository.VehicleRepository;
-import pbo.autocare.repository.UserRepository;
-import pbo.autocare.service.ServiceOrderService;
-
 import jakarta.validation.Valid;
-import org.springframework.validation.BindingResult;
-
-import java.util.Optional;
-import java.math.BigDecimal;
+import pbo.autocare.dto.ServiceOrderFormDTO;
+import pbo.autocare.model.ServiceItem;
+import pbo.autocare.model.ServiceOrder;
+import pbo.autocare.model.User;
+import pbo.autocare.model.Vehicle;
+import pbo.autocare.repository.ServiceItemRepository;
+import pbo.autocare.repository.UserRepository;
+import pbo.autocare.repository.VehicleRepository;
+import pbo.autocare.service.ServiceOrderService;
 
 @Controller
 @RequestMapping("/customer")
@@ -131,7 +130,7 @@ public class CustomerController {
                 return "redirect:/customer/new-reservation";
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Terjadi kesalahan server: " + e.getMessage());
             redirectAttributes.addFlashAttribute("vehicles", serviceOrderService.getAllVehicles());
             redirectAttributes.addFlashAttribute("services", serviceOrderService.getAllServices());
