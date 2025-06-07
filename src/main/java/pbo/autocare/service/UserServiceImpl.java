@@ -1,10 +1,15 @@
 package pbo.autocare.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +27,7 @@ import pbo.autocare.model.Customer;
 import pbo.autocare.model.Staff;
 import pbo.autocare.model.Technician;
 import pbo.autocare.model.User;
+import pbo.autocare.repository.ServiceOrderRepository;
 import pbo.autocare.repository.UserRepository; // Pastikan Anda memiliki UserRepository ini
 
 @Service
@@ -296,5 +302,36 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer with ID " + id + " not found or is not a Customer.");
         }
         userRepository.deleteById(id); // Menghapus Customer
+    }
+
+    @Override
+    public long countCustomers() {
+        return userRepository.countByUserType("CUSTOMER"); // Asumsi ada method ini di UserRepository
+    }
+
+    @Override
+    public long countTechnicians() {
+        return userRepository.countByUserType("TECHNICIAN");
+    }
+
+    @Override
+    public long countStaff() {
+        return userRepository.countByUserType("STAFF");
+    }
+
+    @Autowired
+    private ServiceOrderRepository serviceOrderRepository;
+    
+    // Method untuk menghitung pesanan bulan ini
+    public long countOrdersThisMonth() {
+        // Ambil awal bulan ini
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        
+        // Konversi LocalDateTime ke Timestamp untuk query JPA
+        Date startDate = Date.from(startOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+
+        // Anda perlu method di ServiceOrderRepository, misal findByCreatedAtAfter
+        return serviceOrderRepository.countByCreatedAtAfter(new Timestamp(startDate.getTime()));
     }
 }

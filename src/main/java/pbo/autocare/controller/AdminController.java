@@ -35,7 +35,18 @@ public class AdminController {
     }
 
     @GetMapping("/dashboard")
-    public String adminDashboard() {
+    public String adminDashboard(Model model) {
+
+        long totalCustomers = userService.countCustomers();
+        long totalTechnicians = userService.countTechnicians();
+        long totalStaff = userService.countStaff();
+        long ordersThisMonth = userService.countOrdersThisMonth();
+
+        model.addAttribute("totalCustomers", totalCustomers);
+        model.addAttribute("totalTechnicians", totalTechnicians);
+        model.addAttribute("totalStaff", totalStaff);
+        model.addAttribute("ordersThisMonth", ordersThisMonth);
+
         return "admin_dashboard";
     }
 

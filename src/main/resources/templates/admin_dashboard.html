@@ -22,20 +22,16 @@
 
         <div class="dashboard-stats">
             <div class="stat-card">
-                <div class="stat-number">150</div>
-                <div class="stat-label">Total Pelanggan</div>
+                <div class="stat-number" th:text="${totalCustomers}">150</div> <div class="stat-label">Total Pelanggan</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">25</div>
-                <div class="stat-label">Teknisi Aktif</div>
+                <div class="stat-number" th:text="${totalTechnicians}">25</div> <div class="stat-label">Teknisi Aktif</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">12</div>
-                <div class="stat-label">Staff</div>
+                <div class="stat-number" th:text="${totalStaff}">12</div> <div class="stat-label">Total Staff</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">89</div>
-                <div class="stat-label">Pesanan Bulan Ini</div>
+                <div class="stat-number" th:text="${ordersThisMonth}">89</div> <div class="stat-label">Pesanan Bulan Ini</div>
             </div>
         </div>
 

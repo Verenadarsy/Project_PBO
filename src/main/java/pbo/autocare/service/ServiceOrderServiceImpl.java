@@ -1,6 +1,9 @@
 package pbo.autocare.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,5 +77,21 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public void saveOrder(ServiceOrder serviceOrder) {
         saveServiceOrder(serviceOrder);
+    }
+
+    @Override
+    public long countOrdersThisMonth() {
+        // Mendapatkan tanggal dan waktu saat ini di zona waktu sistem
+        LocalDateTime now = LocalDateTime.now();
+        
+        // Mendapatkan awal bulan saat ini (tanggal 1, jam 00:00:00)
+        LocalDateTime startOfMonth = now.with(TemporalAdjusters.firstDayOfMonth())
+                                        .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        
+        // Konversi LocalDateTime ke Timestamp untuk digunakan dalam query JPA
+        Timestamp startOfMonthTimestamp = Timestamp.from(startOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+
+        // Panggil metode dari repository untuk menghitung order setelah tanggal ini
+        return serviceOrderRepository.countByCreatedAtAfter(startOfMonthTimestamp);
     }
 }

@@ -20,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT * FROM users WHERE user_type = ?1", nativeQuery = true)
     List<User> findByUserType(String userType);
+
+    long countByUserType(String userType);
 }

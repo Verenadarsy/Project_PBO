@@ -55,4 +55,8 @@ public interface UserService extends UserDetailsService {
 
     // Metode untuk menghapus Pelanggan berdasarkan ID
     void deleteCustomer(Long id);
+
+    long countCustomers();
+    long countTechnicians();
+    long countStaff();
 }

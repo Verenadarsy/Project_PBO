@@ -67,6 +67,16 @@ public abstract class User { // Kelas abstrak untuk konsep umum
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
+    @Column(name = "user_type", insertable = false, updatable = false) // 'insertable=false' dan 'updatable=false' agar Hibernate tidak mencoba mengelola kolom ini secara manual, karena sudah dikelola oleh @DiscriminatorColumn.
+    private String userType;
+
+    public User(String userType) {
+        this.userType = userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
 
     // Constructor default diperlukan oleh JPA
     public User() {}

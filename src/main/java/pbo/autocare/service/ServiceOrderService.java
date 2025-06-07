@@ -5,6 +5,7 @@ import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.User;
 import pbo.autocare.model.Vehicle;
 import pbo.autocare.model.ServiceItem;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -17,4 +18,5 @@ public interface ServiceOrderService {
     List<ServiceOrder> findAll(); // Jika ditambahkan
     void deleteById(Long id); // Jika ditambahkan
     void saveOrder(ServiceOrder serviceOrder);
+    long countOrdersThisMonth();
 }

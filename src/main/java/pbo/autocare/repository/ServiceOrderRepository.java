@@ -9,6 +9,7 @@ import pbo.autocare.model.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -33,4 +34,5 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long
     List<ServiceOrder> findByUserIdAndOrderStatus(Long userId, OrderStatus orderStatus);
     List<ServiceOrder> findByService(ServiceItem service);
     List<ServiceOrder> findByVehicleType(Vehicle vehicleType);
+    long countByCreatedAtAfter(Timestamp startOfMonthTimestamp);
 }
