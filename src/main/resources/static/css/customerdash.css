@@ -38,8 +38,8 @@ body {
 }
 
 .logo img {
-    width: 40px;
-    height: 40px;
+    width: auto;
+    height: 60px;
     object-fit: contain;
 }
 
@@ -107,17 +107,24 @@ ul {
 }
 
 li {
-    background: rgba(130, 130, 130, 0.5);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.3);       /* Warna latar belakang dan transparansi */
+    backdrop-filter: blur(10px);         /* Efek blur */
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 107, 53, 0.2);
     border-radius: 16px;
     padding: 1.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Pertahankan ini */
     min-height: 120px;
     display: flex;
+    /* Untuk konten di tengah (seperti ikon dan teks) */
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    text-align: center;
+    color: white; /* Pastikan teks tetap terlihat jelas */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Tambahkan sedikit shadow untuk definisi */
 }
 
 li::before {
@@ -127,7 +134,8 @@ li::before {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.1), transparent);
+    /* Gradient yang sedikit transparan untuk efek kilauan */
+    background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.05), transparent); /* Kurangi opacity gradient jika perlu */
     transition: left 0.5s;
 }
 
@@ -138,8 +146,11 @@ li:hover::before {
 li:hover {
     transform: translateY(-5px);
     border-color: #ff6b35;
-    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
-    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4); /* Tingkatkan shadow saat hover */
+    /* Saat hover, Anda bisa memberikan sedikit warna latar belakang atau tetap transparan */
+    background: rgba(255, 255, 255, 0.05); /* Sedikit warna putih transparan saat hover */
+    backdrop-filter: blur(60px); /* Bisa tingkatkan blur saat hover */
+    -webkit-backdrop-filter: blur(60px);
 }
 
 /* Link Styling */
@@ -206,7 +217,7 @@ button:active {
 
 /* Icons untuk setiap menu item */
 li:nth-child(1) a::before {
-    content: '🚗';
+    content: '👤';
     margin-right: 1rem;
     font-size: 1.3rem;
 }

@@ -11,7 +11,7 @@
     <div class="top-header">
         <div class="logo">
             <img src="/img/logo.png" alt="AutoCare Pro Logo">
-            <span class="logo-text">AutoCare Pro</span>
+            <!--<span class="logo-text">AutoCare Pro</span>-->
         </div>
         <div class="welcome-message" th:text="'Selamat Datang, ' + ${username} + '!'">
         </div>
@@ -26,7 +26,7 @@
         <main>
             <ul class="dashboard-menu">
                 <li>
-                    <a th:href="@{/customer/my-vehicles}">Kendaraan Saya</a>
+                    <a th:href="@{/customer/profile}">Informasi Saya</a>
                 </li>
                 <li>
                     <a th:href="@{/customer/list-reservations}">Riwayat Reservasi Saya</a>

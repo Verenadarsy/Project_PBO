@@ -127,6 +127,14 @@ h2.mt-4 {
 }
 
 /* --- Button Styling --- */
+.button-container {
+    display: flex; /* Mengaktifkan Flexbox */
+    justify-content: space-between; /* Memisahkan item ke ujung yang berlawanan */
+    align-items: center; /* Meratakan item secara vertikal di tengah */
+    margin-bottom: 30px; /* Memberi sedikit jarak dari judul di bawahnya */
+    padding: 0 20px; /* Menambahkan padding horizontal jika diperlukan */
+}
+
 .btn {
     display: inline-block !important;
     font-weight: bold !important;

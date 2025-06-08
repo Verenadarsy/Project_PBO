@@ -103,6 +103,24 @@ textarea {
     min-height: 100px;
 }
 
+.btn-back {
+position: absolute; /* Memposisikan tombol secara absolut */
+top: 20px; /* Jarak dari atas */
+left: 20px; /* Jarak dari kiri */
+background-color: #555555; /* Warna tombol kembali */
+border-color: #555555;
+color: #ffffff;
+padding: 8px 15px;
+border-radius: 5px;
+text-decoration: none; /* Menghilangkan underline pada link */
+transition: background-color 0.3s ease;
+}
+.btn-back:hover {
+background-color: #777777; /* Warna hover */
+border-color: #777777;
+color: #ffffff;
+}
+
 button[type="submit"] {
     width: 100%;
     padding: 18px;

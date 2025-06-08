@@ -32,6 +32,8 @@
         // Pindahkan script utama Anda ke sini jika belum di body bagian bawah
     </script>
 
+     <a th:href="@{/customer/dashboard}" class="btn-back">Kembali ke Dashboard</a>
+     
     <form th:action="@{/customer/save-reservation}" th:object="${serviceOrderFormDTO}" method="post">
 
         <label>Nama Customer:</label>
