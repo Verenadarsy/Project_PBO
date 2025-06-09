@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teknisi Dashboard - AutoCare Pro</title>
-    <link rel="stylesheet" href="/css/admin_dashboard.css">
+    <link rel="stylesheet" href="/css/technician.css">
 </head>
 <body>
     <div class="floating-elements">
@@ -15,71 +15,169 @@
 
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <div class="welcome-message" th:text="'Selamat Datang, ' + ${username} + '!'">
-            <p>Dashboard Manajemen AutoCare Pro</p>
-            <span class="admin-badge">Technician</span>
+            <h1>Dashboard Teknisi</h1>
+            <div class="welcome-message">
+                <p>Selamat Datang, Ahmad Fauzi!</p>
+                <span class="tech-badge">Teknisi Senior</span>
+            </div>
         </div>
 
         <div class="dashboard-stats">
             <div class="stat-card">
-                <div class="stat-number">150</div>
-                <div class="stat-label">Total Pelanggan</div>
+                <div class="stat-number">8</div>
+                <div class="stat-label">Service Hari Ini</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">25</div>
-                <div class="stat-label">Teknisi Aktif</div>
+                <div class="stat-number">24</div>
+                <div class="stat-label">Service Bulan Ini</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">12</div>
-                <div class="stat-label">Staff</div>
+                <div class="stat-number">3</div>
+                <div class="stat-label">Dalam Progress</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">89</div>
-                <div class="stat-label">Pesanan Bulan Ini</div>
+                <div class="stat-number">5</div>
+                <div class="stat-label">Selesai Hari Ini</div>
             </div>
         </div>
 
-        <div class="menu-grid">
-            <a href="/admin/customers" class="menu-card">
-                <div class="menu-icon">👥</div>
-                <h3>Daftar Pelanggan</h3>
-                <p>Kelola data dan informasi pelanggan</p>
-            </a>
-
-            <a href="/admin/technician" class="menu-card">
-                <div class="menu-icon">🔧</div>
-                <h3>Daftar Teknisi</h3>
-                <p>Manajemen teknisi dan jadwal kerja</p>
-            </a>
-
-            <a href="/admin/staff" class="menu-card">
-                <div class="menu-icon">👤</div>
-                <h3>Daftar Staff</h3>
-                <p>Kelola karyawan dan admin system</p>
-            </a>
-
-            <a href="/admin/serviceorders" class="menu-card">
-                <div class="menu-icon">📋</div>
-                <h3>Kelola Pesanan Layanan</h3>
-                <p>Monitor dan kelola semua pesanan</p>
-            </a>
-
-            <a href="/admin/newstaff" class="menu-card">
-                <div class="menu-icon">➕</div>
-                <h3>Tambah Staff</h3>
-                <p>Daftarkan karyawan atau admin baru</p>
-            </a>
-
-            <a href="/admin/reports" class="menu-card">
-                <div class="menu-icon">📊</div>
-                <h3>Laporan & Analitik</h3>
-                <p>Lihat statistik dan laporan bisnis</p>
-            </a>
+        <div class="table-section">
+            <h2 class="section-title">Daftar Service Orders</h2>
+            <div class="table-container">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Pelanggan</th>
+                            <th>Kendaraan</th>
+                            <th>Plat Nomor</th>
+                            <th>Layanan</th>
+                            <th>Status</th>
+                            <th>Durasi</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Budi Santoso</td>
+                            <td>Honda Civic 2020</td>
+                            <td>B 1234 ABC</td>
+                            <td>Service Berkala</td>
+                            <td><span class="status-progress">Dalam Progress</span></td>
+                            <td>2 Hari</td>
+                            <td>10-06-2025</td>
+                            <td>
+                                <button class="btn-action btn-update">Update Status</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Siti Aminah</td>
+                            <td>Toyota Avanza 2019</td>
+                            <td>B 5678 DEF</td>
+                            <td>Ganti Oli</td>
+                            <td><span class="status-pending">Menunggu</span></td>
+                            <td>1 Hari</td>
+                            <td>10-06-2025</td>
+                            <td>
+                                <button class="btn-action btn-start">Mulai Service</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Agus Wijaya</td>
+                            <td>Suzuki Ertiga 2021</td>
+                            <td>B 9012 GHI</td>
+                            <td>Tune Up</td>
+                            <td><span class="status-completed">Selesai</span></td>
+                            <td>3 Hari</td>
+                            <td>09-06-2025</td>
+                            <td>
+                                <button class="btn-action btn-view">Lihat Detail</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Maya Sari</td>
+                            <td>Mitsubishi Xpander 2022</td>
+                            <td>B 3456 JKL</td>
+                            <td>AC Service</td>
+                            <td><span class="status-progress">Dalam Progress</span></td>
+                            <td>1 Hari</td>
+                            <td>10-06-2025</td>
+                            <td>
+                                <button class="btn-action btn-update">Update Status</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Dedi Kurniawan</td>
+                            <td>Daihatsu Xenia 2020</td>
+                            <td>B 7890 MNO</td>
+                            <td>Brake Service</td>
+                            <td><span class="status-pending">Menunggu</span></td>
+                            <td>2 Hari</td>
+                            <td>11-06-2025</td>
+                            <td>
+                                <button class="btn-action btn-start">Mulai Service</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Rina Pratiwi</td>
+                            <td>Nissan Grand Livina 2018</td>
+                            <td>B 2468 PQR</td>
+                            <td>Engine Check</td>
+                            <td><span class="status-progress">Dalam Progress</span></td>
+                            <td>3 Hari</td>
+                            <td>09-06-2025</td>
+                            <td>
+                                <button class="btn-action btn-update">Update Status</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="logout-section">
-            <a href="/logout" class="logout-btn">Logout</a>
+            <a href="/logout" class="logout-btn">
+                <span>🔓</span>
+                Logout
+            </a>
         </div>
     </div>
+
+    <script>
+        // Simple interaction for demo
+        document.querySelectorAll('.btn-action').forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`${action} akan diproses untuk service ini.`);
+            });
+        });
+
+        // Add some animation to stats
+        document.addEventListener('DOMContentLoaded', function() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalNumber = parseInt(stat.textContent);
+                let currentNumber = 0;
+                const increment = finalNumber / 20;
+                
+                const timer = setInterval(() => {
+                    currentNumber += increment;
+                    if (currentNumber >= finalNumber) {
+                        stat.textContent = finalNumber;
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(currentNumber);
+                    }
+                }, 50);
+            });
+        });
+    </script>
 </body>
 </html>

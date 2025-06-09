@@ -2,6 +2,8 @@
 package pbo.autocare.service;
 
 import pbo.autocare.model.ServiceOrder;
+import pbo.autocare.model.ServiceOrder.OrderStatus;
+import pbo.autocare.model.Technician;
 import pbo.autocare.model.User;
 import pbo.autocare.model.Vehicle;
 import pbo.autocare.model.ServiceItem;
@@ -24,4 +26,8 @@ public interface ServiceOrderService {
     Optional<ServiceOrder> getServiceOrderById(Long id);
     void deleteServiceOrder(Long id);
     ServiceOrder updateServiceOrder(Long id, ServiceOrder updatedServiceOrder);
+    Object getAllTechnicians();
+    Optional<ServiceOrder> assignTechnicianToOrder(Long orderId, Long technicianId);
+    List<Technician> getTechniciansByServiceSpecialization(Long id);
+    Optional<ServiceOrder> updateOrderStatus(Long id, OrderStatus newStatus);
 }

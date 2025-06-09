@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Pesanan Servis</title>
+    <link rel="stylesheet" href="/css/serviceOrderDetail.css">
+</head>
+<body>
+    <!-- Floating decorative elements -->
+    <div class="floating-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="container">
+        <h1>Detail Pesanan Servis #<span th:text="${order.id}"></span></h1>
+
+        <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
+        <div class="order-detail">
+            <p><strong>Nama Pelanggan:</strong> <span th:text="${order.customerName}"></span></p>
+            <p><strong>Kontak Pelanggan:</strong> <span th:text="${order.customerContact}"></span></p>
+            <p><strong>Alamat:</strong> <span th:text="${order.customerAddress}"></span></p>
+            <p><strong>Model Kendaraan:</strong> <span th:text="${order.vehicleModelName}"></span></p>
+            <p><strong>Tipe Kendaraan:</strong> <span th:text="${order.vehicleType.vehicleType}"></span></p>
+            <p><strong>Plat Nomor:</strong> <span th:text="${order.licensePlate}"></span></p>
+            <p><strong>Jenis Servis:</strong> <span th:text="${order.serviceName}"></span></p>
+            <p><strong>Spesialisasi Servis:</strong> <span th:text="${order.service.requiredSpecialization != null ? order.service.requiredSpecialization.description : 'Tidak ada'}"></span></p>
+            <p><strong>Harga Akhir:</strong> <span th:text="${#numbers.formatCurrency(order.finalPrice)}"></span></p>
+            <p><strong>Status Saat Ini:</strong> <span th:text="${order.orderStatus}"></span></p>
+            <p><strong>Teknisi Ditugaskan:</strong>
+                <span th:if="${order.assignedTechnician}" th:text="${order.assignedTechnician.fullName}"></span>
+                <span th:unless="${order.assignedTechnician}">Belum Ditugaskan</span>
+            </p>
+            <p><strong>Catatan Order:</strong> <span th:text="${order.orderNotes ?: '-'}"></span></p>
+            <p><strong>Dibuat Pada:</strong> <span th:text="${#dates.format(order.createdAt, 'dd-MM-yyyy HH:mm')}"></span></p>
+            <p><strong>Diupdate Pada:</strong> <span th:text="${#dates.format(order.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
+        </div>
+
+        <h2>⚙️ Ubah Status Order</h2>
+        <form th:action="@{/staff/orders/update-status/{id}(id=${order.id})}" method="post">
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option th:each="status : ${orderStatuses}"
+                        th:value="${status}"
+                        th:text="${status}"
+                        th:selected="${order.orderStatus == status}">
+                </option>
+            </select>
+            <button type="submit">Update Status</button>
+        </form>
+
+        <h2>👨‍🔧 Tugaskan Teknisi</h2>
+        <form th:action="@{/staff/orders/assign-technician/{orderId}(orderId=${order.id})}" method="post">
+            <label for="technician">Pilih Teknisi (sesuai spesialisasi):</label>
+            <select id="technician" name="technicianId">
+                <option value="">-- Pilih Teknisi --</option>
+                <option th:each="tech : ${availableTechnicians}"
+                        th:value="${tech.id}"
+                        th:text="${tech.fullName + ' (' + (tech.specialization != null ? tech.specialization.code : 'N/A') + ')'}"
+                        th:selected="${order.assignedTechnician != null and order.assignedTechnician.id == tech.id}">
+                </option>
+                <option th:if="${#lists.isEmpty(availableTechnicians)}" value="" disabled>Tidak ada teknisi yang sesuai</option>
+            </select>
+            <button type="submit">Tugaskan Teknisi</button>
+        </form>
+
+        <a th:href="@{/staff/orders}" class="back-link">← Kembali ke Daftar Pesanan</a>
+    </div>
+</body>
+</html>

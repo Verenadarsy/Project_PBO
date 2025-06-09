@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Pesanan Servis (Staff)</title>
+    <link rel="stylesheet" href="/css/serviceOrders.css">
+</head>
+<body>
+    <!-- Floating decorative elements -->
+    <div class="floating-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="container">
+        <h1>Daftar Pesanan Servis</h1>
+
+        <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
+        <a href="/staff/dashboard" class="btn-back">← Kembali ke Dashboard</a>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Order</th>
+                        <th>Pelanggan</th>
+                        <th>Kontak</th>
+                        <th>Kendaraan</th>
+                        <th>Plat Nomor</th>
+                        <th>Jenis Servis</th>
+                        <th>Harga Akhir</th>
+                        <th>Status</th>
+                        <th>Teknisi Ditugaskan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td data-label="ID Order" th:text="${order.id}"></td>
+                        <td data-label="Pelanggan" th:text="${order.customerName}"></td>
+                        <td data-label="Kontak" th:text="${order.customerContact}"></td>
+                        <td data-label="Kendaraan" th:text="${order.vehicleModelName} + ' (' + ${order.vehicleType.vehicleType} + ')'"></td>
+                        <td data-label="Plat Nomor" th:text="${order.licensePlate}"></td>
+                        <td data-label="Jenis Servis" th:text="${order.serviceName}"></td>
+                        <td data-label="Harga Akhir" th:text="${#numbers.formatCurrency(order.finalPrice)}"></td>
+                        <td data-label="Status" class="action-buttons">
+                            <form th:action="@{/staff/orders/update-status/{id}(id=${order.id})}" method="post">
+                                <select name="status" onchange="this.form.submit()">
+                                    <option th:each="status : ${orderStatuses}"
+                                            th:value="${status}"
+                                            th:text="${status}"
+                                            th:selected="${order.orderStatus == status}">
+                                    </option>
+                                </select>
+                            </form>
+                        </td>
+                        <td data-label="Teknisi Ditugaskan">
+                            <span th:if="${order.assignedTechnician}" th:text="${order.assignedTechnician.fullName}"></span>
+                            <span th:unless="${order.assignedTechnician}">Belum Ditugaskan</span>
+                        </td>
+                        <td data-label="Aksi" class="action-buttons">
+                            <a th:href="@{/staff/orders/detail/{id}(id=${order.id})}" class="button-link">Detail & Tugas Teknisi</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

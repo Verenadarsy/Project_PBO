@@ -83,6 +83,18 @@ public class ServiceOrder {
         PENDING, IN_PROGRESS, COMPLETED, CANCELLED
     }
 
+     @ManyToOne
+    @JoinColumn(name = "assigned_technician_id") // Kolom FK ke tabel teknisi
+    private Technician assignedTechnician;
+
+    public Technician getAssignedTechnician() {
+        return assignedTechnician;
+    }
+
+     public void setAssignedTechnician(Technician assignedTechnician) {
+         this.assignedTechnician = assignedTechnician;
+     }
+
     public ServiceOrder() {
         this.orderStatus = OrderStatus.PENDING;
         this.createdAt = new Timestamp(System.currentTimeMillis());

@@ -24,7 +24,7 @@ public class TechnicianController {
 
     @GetMapping("/dashboard")
     public String technicianDashboard() {
-        return "technician/dashboard"; // Mengarahkan ke templates/technician/dashboard.html
+        return "technician_dashboard"; // Mengarahkan ke templates/technician/dashboard.html
     }
 
     @GetMapping("/list") // Endpoint untuk menampilkan daftar Teknisi
