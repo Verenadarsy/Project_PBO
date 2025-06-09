@@ -23,4 +23,5 @@ public interface ServiceOrderService {
     void createServiceOrder(ServiceOrder serviceOrder);
     Optional<ServiceOrder> getServiceOrderById(Long id);
     void deleteServiceOrder(Long id);
+    ServiceOrder updateServiceOrder(Long id, ServiceOrder updatedServiceOrder);
 }

@@ -105,7 +105,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
 
     public void createServiceOrder(ServiceOrder serviceOrder) {
     serviceOrderRepository.save(serviceOrder); // Call save, but don't return its result
-}
+    }
 
     public ServiceOrder updateServiceOrder(Long id, ServiceOrder updatedServiceOrder) {
         return serviceOrderRepository.findById(id)

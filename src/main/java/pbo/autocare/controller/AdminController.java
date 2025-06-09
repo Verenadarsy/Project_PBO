@@ -1,36 +1,48 @@
 package pbo.autocare.controller;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model; // Pastikan ini di-import
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping; // Tetap sertakan jika ada @PostMapping
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import pbo.autocare.dto.AdminServiceOrderFormDTO;
 import pbo.autocare.dto.CustomerFormDTO;
 import pbo.autocare.dto.TechnicianFormDTO;
 import pbo.autocare.model.Customer;
-// import pbo.autocare.model.ServiceOrder;
+import pbo.autocare.model.ServiceItem;
+import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.Specialization;
 import pbo.autocare.model.Staff;
 import pbo.autocare.model.Technician;
-import pbo.autocare.model.User; 
+import pbo.autocare.model.User;
+import pbo.autocare.model.Vehicle;
+import pbo.autocare.repository.ServiceOrderRepository;
 import pbo.autocare.repository.SpecializationRepository;
 import pbo.autocare.repository.UserRepository;
 import pbo.autocare.service.CustomerService;
-// import pbo.autocare.service.ServiceItemService;
-// import pbo.autocare.service.ServiceOrderService;
+import pbo.autocare.service.ServiceItemService;
+import pbo.autocare.service.ServiceOrderService;
 import pbo.autocare.service.UserServiceImpl;
-// import pbo.autocare.service.VehicleService; 
+import pbo.autocare.service.VehicleService; 
 
 @Controller
 @RequestMapping("/admin")
@@ -434,18 +446,23 @@ public class AdminController {
         return "redirect:/admin/staff";
     }
 
-    // @Autowired
-    // private ServiceOrderService serviceOrderService;
+    @Autowired
+    private ServiceOrderService serviceOrderService;
 
-    // @Autowired
-    // private VehicleService vehicleService;
+    @Autowired
+    private VehicleService vehicleService;
     
-    // @Autowired
-    // private ServiceItemService serviceItemService;
+    @Autowired
+    private ServiceItemService serviceItemService;
 
-    @GetMapping("/service-orders")
-    public String managementService() {
-        return "ServiceOrderList"; // Ganti dengan nama template yang sesuaiq
+    @Autowired
+    private ServiceOrderRepository serviceOrderRepository;
+
+    @GetMapping("/service-orders") // Or whatever path maps to this list
+    public String listServiceOrders(Model model) {
+        List<ServiceOrder> serviceOrders = serviceOrderRepository.findAllWithVehicleTypeAndService();
+        model.addAttribute("orders", serviceOrders); // Pastikan nama atribut sama dengan di Thymeleaf
+        return "admin/ServiceOrderList";
     }
     
     @GetMapping("/transactions")
@@ -453,57 +470,155 @@ public class AdminController {
         return "admin_transactions";
     }
 
-    // // Show form for creating a new service order
-    // // @GetMapping("/service-orders/new")
-    // // public String showCreateForm(Model model) {
-    // //         model.addAttribute("serviceOrder", new ServiceOrder());
-    // //     // Add lists of existing Users, Vehicles, and ServiceItems to populate dropdowns
-    // //         model.addAttribute("users", userService.getAllCustomers());
-    // //         model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
-    // //         model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
-    // //     return "ServiceOrderForm"; // Corresponds to src/main/resources/templates/service-orders/form.html
-    // // }
+    @GetMapping("/service-orders/new")
+    public String showAdminCreateForm(Model model) {
+        AdminServiceOrderFormDTO dto = new AdminServiceOrderFormDTO(); // Gunakan DTO baru
+        model.addAttribute("serviceOrderFormDTO", dto); // Nama atribut di model tetap sama
+        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
+        model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
+        return "admin/EditServiceOrderForm";
+    }
 
-    // // Handle creation of a new service order
-    // @PostMapping("/save")
-    // public String saveServiceOrder(@ModelAttribute("serviceOrder") ServiceOrder serviceOrder) {
-    //     // Important: You'll need to set the related User, Vehicle, and ServiceItem objects
-    //     // based on the IDs submitted from the form. This usually involves fetching them
-    //     // from their respective services.
-    //     // Example:
-    //     // User user = userService.getUserById(serviceOrder.getUser().getId()).orElseThrow(...);
-    //     // serviceOrder.setUser(user);
+    // For editing:
+    @PostMapping("/service-orders/save")
+    public String saveServiceOrder(@ModelAttribute("serviceOrderFormDTO") @Valid AdminServiceOrderFormDTO serviceOrderFormDTO,
+                                   BindingResult bindingResult,
+                                   RedirectAttributes redirectAttributes,
+                                   Model model) { // Tambahkan Model model di sini untuk re-add attributes jika ada error
 
-    //     serviceOrderService.createServiceOrder(serviceOrder);
-    //     return "redirect:/service-orders"; // Redirect to the list page
-    // }
+        // 1. Validasi DTO
+        if (bindingResult.hasErrors()) {
+            // Jika ada error validasi, tambahkan kembali data yang dibutuhkan form
+            model.addAttribute("users", userService.getAllUsers());
+            model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
+            model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
+            return "admin/EditServiceOrderForm"; // Kembali ke form dengan pesan error
+        }
 
-    // // Show form for editing an existing service order
-    // @GetMapping("/edit/{id}")
-    // public String showEditForm(@PathVariable Long id, Model model) {
-    //     Optional<ServiceOrder> serviceOrder = serviceOrderService.getServiceOrderById(id);
-    //     if (serviceOrder.isPresent()) {
-    //         model.addAttribute("serviceOrder", serviceOrder.get());
-    //         // Add lists of existing Users, Vehicles, and ServiceItems to populate dropdowns
-    //         // model.addAttribute("users", userService.getAllUsers());
-    //         // model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
-    //         // model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
-    //         return "service-orders/form";
-    //     }
-    //     return "redirect:/service-orders"; // Not found, redirect to list
-    // }
+        try {
+            // Mengambil User dari ID yang dipilih di form (tanpa sesi login)
+            User selectedUser = userService.getCustomerById(serviceOrderFormDTO.getUserId())
+                                        .orElseThrow(() -> new IllegalArgumentException("User dengan ID " + serviceOrderFormDTO.getUserId() + " tidak ditemukan."));
 
-    // // Handle updating an existing service order
-    // // @PostMapping("/update/{id}") // or you can use a single /save and check for ID
-    // // public String updateServiceOrder(@PathVariable Long id, @ModelAttribute("serviceOrder") ServiceOrder serviceOrder) {
-    // //     serviceOrderService.updateServiceOrder(id, serviceOrder);
-    // //     return "redirect:/service-orders";
-    // // }
+            Optional<Vehicle> vehicleOptional = vehicleService.getVehicleById(serviceOrderFormDTO.getVehicleTypeId());
+            Optional<ServiceItem> serviceOptional = serviceItemService.getServiceItemById(serviceOrderFormDTO.getServiceId());
 
-    // // Handle deletion of a service order
-    // @GetMapping("/delete/{id}") // Often done with POST/DELETE requests in REST, but GET for simplicity in web
-    // public String deleteServiceOrder(@PathVariable Long id) {
-    //     serviceOrderService.deleteServiceOrder(id);
-    //     return "redirect:/service-orders";
-    // }
+            if (vehicleOptional.isPresent() && serviceOptional.isPresent()) {
+                ServiceItem selectedServiceItem = serviceOptional.get();
+                Vehicle selectedVehicle = vehicleOptional.get();
+
+                // Lakukan perhitungan harga akhir
+                BigDecimal finalPrice = selectedServiceItem.calculateFinalPrice(selectedVehicle);
+                // Set harga akhir ke DTO agar bisa disimpan (jika finalPrice di DTO digunakan untuk submit)
+                serviceOrderFormDTO.setFinalPrice(finalPrice);
+
+
+                ServiceOrder serviceOrder = new ServiceOrder();
+                // Jika ini mode edit, set ID dari DTO agar ServiceOrderService tahu itu update
+                if (serviceOrderFormDTO.getId() != null) {
+                    serviceOrder.setId(serviceOrderFormDTO.getId());
+                }
+
+                serviceOrder.setUser(selectedUser); // Set user dari pilihan dropdown
+                serviceOrder.setCustomerName(serviceOrderFormDTO.getCustomerName());
+                serviceOrder.setCustomerContact(serviceOrderFormDTO.getCustomerContact());
+                serviceOrder.setCustomerAddress(serviceOrderFormDTO.getCustomerAddress());
+                serviceOrder.setVehicleModelName(serviceOrderFormDTO.getVehicleModelName());
+                serviceOrder.setVehicleType(selectedVehicle);
+                serviceOrder.setLicensePlate(serviceOrderFormDTO.getLicensePlate());
+                serviceOrder.setService(selectedServiceItem);
+                serviceOrder.setServiceName(selectedServiceItem.getServiceName()); // Mengambil dari DTO
+                serviceOrder.setFinalPrice(finalPrice); // Menggunakan harga yang dihitung di backend
+                serviceOrder.setOrderNotes(serviceOrderFormDTO.getOrderNotes());
+                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getSelectedDurationDays()); // Menggunakan field dari DTO
+
+                // Handle creation vs. update
+                if (serviceOrder.getId() == null) {
+                    serviceOrder.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+                    serviceOrder.setOrderStatus(ServiceOrder.OrderStatus.PENDING); // Set status awal
+                    serviceOrderService.createServiceOrder(serviceOrder);
+                    redirectAttributes.addFlashAttribute("successMessage", "Order Servis berhasil dibuat!");
+                } else {
+                    // Ketika update, pastikan field-field yang tidak ada di DTO (misal created_at)
+                    // dipertahankan dari objek asli sebelum update.
+                    // Anda mungkin perlu mengambil ServiceOrder asli terlebih dahulu.
+                    ServiceOrder existingOrder = serviceOrderService.getServiceOrderById(serviceOrder.getId())
+                                                                  .orElseThrow(() -> new IllegalArgumentException("Order Servis tidak ditemukan untuk update."));
+                    serviceOrder.setCreatedAt(existingOrder.getCreatedAt()); // Pertahankan created_at
+                    serviceOrder.setOrderStatus(existingOrder.getOrderStatus()); // Pertahankan status jika tidak diubah di form
+                    serviceOrder.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+                    serviceOrderService.updateServiceOrder(serviceOrder.getId(), serviceOrder);
+                    redirectAttributes.addFlashAttribute("successMessage", "Order Servis berhasil diupdate!");
+                }
+
+
+                return "redirect:/admin/service-orders"; // Redirect ke halaman daftar admin
+            } else {
+                // Jika kendaraan atau layanan tidak ditemukan (meskipun harusnya sudah divalidasi oleh @NotNull di DTO)
+                // Ini adalah fallback untuk kasus data tidak konsisten.
+                redirectAttributes.addFlashAttribute("errorMessage", "Error: Kendaraan atau Layanan tidak ditemukan. Mohon coba lagi.");
+                return "redirect:/admin/service-orders/new"; // Atau kembali ke form dengan data sebelumnya
+            }
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Kesalahan data: " + e.getMessage());
+            // Jika ada error, kembali ke form dengan data yang sudah diisi
+            model.addAttribute("users", userService.getAllUsers());
+            model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
+            model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
+            return "admin/EditServiceOrderForm"; // Kembali ke form dengan pesan error
+        } catch (Exception e) {
+            e.printStackTrace(); // Penting untuk debugging
+            redirectAttributes.addFlashAttribute("errorMessage", "Terjadi kesalahan server: " + e.getMessage());
+            // Redirect ke halaman daftar admin atau error page
+            return "redirect:/admin/service-orders";
+        }
+    }
+
+    // Endpoint untuk menampilkan form edit Service Order (Admin)
+    @GetMapping("/service-orders/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        ServiceOrder serviceOrder = serviceOrderService.getServiceOrderById(id)
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Service Order not found"));
+
+        // Konversi ServiceOrder entity ke AdminServiceOrderFormDTO
+        AdminServiceOrderFormDTO dto = convertServiceOrderToAdminDto(serviceOrder); // Implementasi ini
+
+        model.addAttribute("serviceOrderFormDTO", dto);
+        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
+        model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
+        return "admin/EditServiceOrderForm";
+    }
+
+    // Metode konversi dari ServiceOrder ke AdminServiceOrderFormDTO
+    private AdminServiceOrderFormDTO convertServiceOrderToAdminDto(ServiceOrder serviceOrder) {
+        AdminServiceOrderFormDTO dto = new AdminServiceOrderFormDTO();
+        dto.setId(serviceOrder.getId());
+        dto.setUserId(serviceOrder.getUser() != null ? serviceOrder.getUser().getId() : null);
+        dto.setCustomerName(serviceOrder.getCustomerName());
+        dto.setCustomerContact(serviceOrder.getCustomerContact());
+        dto.setCustomerAddress(serviceOrder.getCustomerAddress());
+        dto.setVehicleModelName(serviceOrder.getVehicleModelName());
+        dto.setVehicleTypeId(serviceOrder.getVehicleType() != null ? serviceOrder.getVehicleType().getId() : null);
+        dto.setLicensePlate(serviceOrder.getLicensePlate());
+        dto.setServiceId(serviceOrder.getService() != null ? serviceOrder.getService().getId() : null);
+        dto.setServiceName(serviceOrder.getServiceName()); // Ambil serviceName dari entity
+        dto.setSelectedDurationDays(serviceOrder.getSelectedDurationDays()); // Ambil selectedDurationDays dari entity
+        dto.setFinalPrice(serviceOrder.getFinalPrice());
+        dto.setOrderNotes(serviceOrder.getOrderNotes());
+        return dto;
+    }
+
+    // Endpoint untuk menghapus Service Order (Admin)
+    @DeleteMapping("/service-orders/delete/{id}")
+    public String deleteServiceOrder(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            serviceOrderService.deleteServiceOrder(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Order Servis berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error menghapus order servis: " + e.getMessage());
+        }
+        return "redirect:/admin/service-orders";
+    }
 }

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<head>
+    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${serviceOrderFormDTO.id} ? 'Edit Service Order' : 'Buat Service Order Baru'"></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/reservasi.css"> <script th:inline="javascript">
+        window.onload = function() {
+            const successMessage = /*[[${successMessage}]]*/ null;
+            if (successMessage) {
+                // Pesan sukses dari backend + pesan lokal
+                alert(successMessage + '\nReservasi berhasil disimpan/diubah!');
+            }
+
+            const errorMessage = /*[[${errorMessage}]]*/ null;
+            if (errorMessage) {
+                alert('Error: ' + errorMessage);
+            }
+        };
+    </script>
+</head>
+<body>
+<div class="container my-4">
+    <h1 class="mb-4" th:text="${serviceOrderFormDTO.id} ? 'Edit Service Order' : 'Form Buat Service Order Baru'"></h1>
+
+    <a th:href="@{/admin/service-orders}" class="btn btn-secondary mb-3">Kembali ke Daftar Order</a>
+
+    <form th:action="@{/admin/service-orders/save}" th:object="${serviceOrderFormDTO}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="form-group">
+            <label for="userId">Customer/User:</label>
+            <select id="userId" th:field="*{userId}" class="form-control" required>
+                <option value="">-- Pilih Customer/User --</option>
+                <option th:each="userOption : ${users}"
+                        th:value="${userOption.id}"
+                        th:text="${userOption.username != null ? userOption.username : userOption.name}">
+                </option>
+            </select>
+            <span th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="customerName">Nama Customer:</label>
+            <input type="text" id="customerName" th:field="*{customerName}" class="form-control" required />
+            <span th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="customerContact">Kontak Customer:</label>
+            <input type="text" id="customerContact" th:field="*{customerContact}" class="form-control" required />
+            <span th:if="${#fields.hasErrors('customerContact')}" th:errors="*{customerContact}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="customerAddress">Alamat Customer:</label>
+            <textarea id="customerAddress" th:field="*{customerAddress}" class="form-control"></textarea>
+            <span th:if="${#fields.hasErrors('customerAddress')}" th:errors="*{customerAddress}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="vehicleModelName">Model Kendaraan:</label>
+            <input type="text" id="vehicleModelName" th:field="*{vehicleModelName}" class="form-control" required />
+            <span th:if="${#fields.hasErrors('vehicleModelName')}" th:errors="*{vehicleModelName}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="vehicleTypeId">Jenis Kendaraan:</label>
+            <select id="vehicleTypeId" th:field="*{vehicleTypeId}" class="form-control" required>
+                <option value="">-- Pilih Jenis Kendaraan --</option>
+                <option th:each="v : ${vehicleTypes}" th:value="${v.id}" th:text="${v.vehicleType}"></option>
+            </select>
+            <span th:if="${#fields.hasErrors('vehicleTypeId')}" th:errors="*{vehicleTypeId}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="licensePlate">Plat Nomor:</label>
+            <input type="text" id="licensePlate" th:field="*{licensePlate}" class="form-control" required />
+            <span th:if="${#fields.hasErrors('licensePlate')}" th:errors="*{licensePlate}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="serviceId">Layanan:</label>
+            <select id="serviceId" th:field="*{serviceId}" class="form-control" required>
+                <option value="">Pilih Layanan</option>
+                <option th:each="svc : ${serviceItems}"
+                        th:value="${svc.id}"
+                        th:text="${svc.serviceName + ' (Rp' + #numbers.formatDecimal(svc.basePrice, 0, 'COMMA', 2, 'POINT') + ')'}">
+                </option>
+            </select>
+            <span th:if="${#fields.hasErrors('serviceId')}" th:errors="*{serviceId}" class="text-danger validation-error"></span>
+        </div>
+
+        <div id="serviceDetails" class="service-detail-section alert alert-info" style="display: none;">
+            <h4>Detail Layanan Terpilih</h4>
+            <p><strong>Tipe Layanan:</strong> <span id="serviceType"></span></p>
+            <p><strong>Kategori Layanan:</strong> <span id="serviceCategory"></span></p>
+            <p><strong>Harga Dasar:</strong> Rp <span id="basePrice"></span></p>
+            <p><strong>Durasi Estimasi:</strong> <span id="estimatedDuration"></span></p>
+        </div>
+
+        <div class="form-group">
+            <label for="serviceName">Nama Servis (Diisi Manual):</label>
+            <input type="text" id="serviceName" th:field="*{serviceName}" class="form-control" required/>
+            <small class="form-text text-muted">Isi ini meskipun sudah memilih Item Servis di atas.</small>
+            <span th:if="${#fields.hasErrors('serviceName')}" th:errors="*{serviceName}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="selectedDurationDays">Pilih Durasi (Hari):</label>
+            <input type="number" id="selectedDurationDays" th:field="*{selectedDurationDays}" class="form-control" required />
+            <span class="text-danger validation-error" id="durationError" style="display: none;"></span>
+            <span th:if="${#fields.hasErrors('selectedDurationDays')}" th:errors="*{selectedDurationDays}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Harga Akhir:</label>
+            <span id="finalPriceDisplay" class="form-control font-weight-bold" style="display: block; margin-bottom: 5px;">Rp 0.00</span>
+            <input type="hidden" id="finalPriceHidden" th:field="*{finalPrice}" />
+            <span th:if="${#fields.hasErrors('finalPrice')}" th:errors="*{finalPrice}" class="text-danger validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="orderNotes">Catatan:</label>
+            <textarea id="orderNotes" th:field="*{orderNotes}" class="form-control"></textarea>
+            <span th:if="${#fields.hasErrors('orderNotes')}" th:errors="*{orderNotes}" class="text-danger validation-error"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Simpan Order</button>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    // Data dari Model Spring yang di-pass ke JavaScript
+    const allServices = /*[[${serviceItems}]]*/ []; // Menggunakan nama atribut 'serviceItems' dari controller
+    const allVehicles = /*[[${vehicleTypes}]]*/ []; // Menggunakan nama atribut 'vehicleTypes' dari controller
+
+    // Dapatkan elemen DOM
+    const serviceSelect = document.getElementById('serviceId');
+    const vehicleSelect = document.getElementById('vehicleTypeId');
+    const serviceDetailsDiv = document.getElementById('serviceDetails');
+    const serviceTypeSpan = document.getElementById('serviceType');
+    const serviceCategorySpan = document.getElementById('serviceCategory');
+    const basePriceSpan = document.getElementById('basePrice');
+    const estimatedDurationSpan = document.getElementById('estimatedDuration'); // Tambah span untuk durasi estimasi
+
+    const selectedDurationDaysInput = document.getElementById('selectedDurationDays'); // SESUAIKAN ID KE DTO FIELD
+    const durationErrorSpan = document.getElementById('durationError');
+    const finalPriceDisplay = document.getElementById('finalPriceDisplay');
+    const finalPriceHiddenInput = document.getElementById('finalPriceHidden'); // Hidden input untuk finalPrice
+
+    // Fungsi untuk memperbarui detail layanan dan rentang durasi
+    function updateServiceDetails() {
+        const selectedServiceId = serviceSelect.value;
+        if (selectedServiceId) {
+            const selectedService = allServices.find(svc => svc.id == selectedServiceId);
+
+            if (selectedService) {
+                serviceDetailsDiv.style.display = 'block';
+                serviceTypeSpan.textContent = selectedService.serviceType || 'N/A'; // Pastikan ServiceItem memiliki getServiceType()
+                serviceCategorySpan.textContent = selectedService.serviceCategory || 'N/A';
+                basePriceSpan.textContent = parseFloat(selectedService.basePrice).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                estimatedDurationSpan.textContent = selectedService.estimatedDuration || 'N/A'; // Pastikan ServiceItem memiliki getEstimatedDuration()
+
+                let minDuration = selectedService.generalDurationDaysMin;
+                let maxDuration = selectedService.generalDurationDaysMax;
+
+                // Logika untuk menentukan durasi min/max berdasarkan tipe layanan
+                if (selectedService.serviceType === 'Spesialis') { // Gunakan nilai discriminator yang sesuai ('Spesialis' atau 'Special')
+                    minDuration = selectedService.specialDurationDaysMin;
+                    maxDuration = selectedService.specialDurationDaysMax;
+                }
+
+                // Validasi dan set default untuk min/max durasi
+                minDuration = parseInt(minDuration);
+                maxDuration = parseInt(maxDuration);
+
+                if (isNaN(minDuration) || minDuration < 0) { // Durasi min tidak boleh negatif
+                    minDuration = 0; // Default min
+                }
+                if (isNaN(maxDuration) || maxDuration < minDuration) {
+                    maxDuration = minDuration + 7; // Default max jika tidak valid
+                }
+
+                selectedDurationDaysInput.min = minDuration;
+                selectedDurationDaysInput.max = maxDuration;
+                // Atur nilai input durasi ke min jika tidak ada nilai atau di luar rentang
+                let currentInputValue = parseInt(selectedDurationDaysInput.value);
+                if (isNaN(currentInputValue) || currentInputValue < minDuration || currentInputValue > maxDuration) {
+                    selectedDurationDaysInput.value = minDuration;
+                }
+
+                selectedDurationDaysInput.setCustomValidity(''); // Hapus validasi kustom browser
+
+                // Event listener untuk validasi durasi saat input berubah
+                selectedDurationDaysInput.oninput = function() {
+                    const enteredValue = parseInt(this.value);
+                    if (isNaN(enteredValue) || enteredValue < minDuration || enteredValue > maxDuration) {
+                        durationErrorSpan.textContent = `Durasi harus antara ${minDuration} dan ${maxDuration} hari.`;
+                        durationErrorSpan.style.display = 'block';
+                        this.setCustomValidity(`Durasi harus antara ${minDuration} dan ${maxDuration} hari.`);
+                    } else {
+                        durationErrorSpan.style.display = 'none';
+                        this.setCustomValidity('');
+                    }
+                    updateFinalPriceDisplay(); // Update harga saat durasi berubah
+                };
+            } else {
+                console.error('Service details not found for ID:', selectedServiceId);
+                hideServiceDetails();
+            }
+        } else {
+            hideServiceDetails();
+        }
+        updateFinalPriceDisplay(); // Selalu panggil ini untuk memperbarui harga
+    }
+
+    // Fungsi untuk memperbarui tampilan harga akhir
+    function updateFinalPriceDisplay() {
+        const selectedServiceId = serviceSelect.value;
+        const selectedVehicleId = vehicleSelect.value;
+
+        let calculatedPrice = 0;
+
+        if (selectedServiceId && selectedVehicleId) {
+            const selectedService = allServices.find(svc => svc.id == selectedServiceId);
+            const currentVehicle = allVehicles.find(v => v.id == selectedVehicleId);
+
+            if (selectedService && currentVehicle) {
+                const basePrice = parseFloat(selectedService.basePrice);
+                const multiplier = parseFloat(currentVehicle.baseServiceCostMultiplier); // Asumsi Vehicle punya ini
+
+                if (!isNaN(basePrice) && !isNaN(multiplier)) {
+                    calculatedPrice = basePrice * multiplier;
+                    // Jika ada logika harga khusus berdasarkan durasi, tambahkan di sini
+                    // Misalnya: calculatedPrice += (selectedDurationDaysInput.value * 1000);
+                }
+            }
+        }
+
+        finalPriceDisplay.textContent = 'Rp ' + calculatedPrice.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        finalPriceHiddenInput.value = calculatedPrice.toFixed(2); // Set nilai ke hidden input untuk submit
+    }
+
+    // Fungsi untuk menyembunyikan detail layanan
+    function hideServiceDetails() {
+        serviceDetailsDiv.style.display = 'none';
+        serviceTypeSpan.textContent = '';
+        serviceCategorySpan.textContent = '';
+        basePriceSpan.textContent = '';
+        estimatedDurationSpan.textContent = '';
+        selectedDurationDaysInput.value = ''; // Kosongkan nilai durasi
+        selectedDurationDaysInput.min = '';
+        selectedDurationDaysInput.max = '';
+        durationErrorSpan.textContent = '';
+        durationErrorSpan.style.display = 'none';
+        selectedDurationDaysInput.value = parseInt(selectedDurationDaysInput.min || '0'); // Set default ke 0 atau min
+    }
+
+    // Event Listeners
+    serviceSelect.addEventListener('change', updateServiceDetails);
+    vehicleSelect.addEventListener('change', updateFinalPriceDisplay);
+
+    // Initial load logic
+    document.addEventListener('DOMContentLoaded', () => {
+        // Jika form sedang dalam mode edit dan service/vehicle sudah terpilih
+        if (serviceSelect.value) {
+            updateServiceDetails();
+        } else {
+            // Jika tidak ada layanan yang dipilih secara default,
+            // pastikan input durasi memiliki nilai default yang valid (misal, 0 atau nilai min)
+            selectedDurationDaysInput.value = parseInt(selectedDurationDaysInput.min || '0');
+        }
+        updateFinalPriceDisplay(); // Selalu panggil ini untuk harga awal
+    });
+</script>
+</body>
+</html>

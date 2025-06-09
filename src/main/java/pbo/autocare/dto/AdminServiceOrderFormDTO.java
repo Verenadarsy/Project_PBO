@@ -1,26 +1,18 @@
-// src/main/java/pbo/autocare.dto/ServiceOrderFormDTO.java
+// pbo.autocare.dto.AdminServiceOrderFormDTO.java
 package pbo.autocare.dto;
 
 import java.math.BigDecimal;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public class ServiceOrderFormDTO {
+public class AdminServiceOrderFormDTO {
 
-    private Long id; // ID untuk update, tidak perlu diisi saat membuat baru
+    private Long id; // Diperlukan untuk mode edit pada admin form
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
     @NotNull(message = "User harus dipilih")
-    private Long userId; // Hanya ID user yang diterima dari form
+    private Long userId; // Admin memilih user dari dropdown
 
     @NotBlank(message = "Nama customer tidak boleh kosong")
     @Size(min = 3, max = 100, message = "Nama customer harus antara 3 dan 100 karakter")
@@ -36,47 +28,35 @@ public class ServiceOrderFormDTO {
     private String vehicleModelName;
 
     @NotNull(message = "Jenis kendaraan harus dipilih")
-    private Integer vehicleTypeId; // Hanya ID jenis kendaraan
+    private Integer vehicleTypeId; // Pastikan ini Long untuk ID entity
 
     @NotBlank(message = "Plat nomor tidak boleh kosong")
     @Size(min = 3, max = 20, message = "Plat nomor harus antara 3 dan 20 karakter")
     private String licensePlate;
 
     @NotNull(message = "Layanan harus dipilih")
-    private Long serviceId; // Hanya ID layanan
+    private Long serviceId;
 
-    @NotNull(message = "Durasi hari diperlukan.")
-    @Min(value = 1, message = "Durasi minimal 1 hari.") // Tambahkan ini
-    private Integer durationDays;
-
-    public Integer getDurationDays() {
-        return durationDays;
-    }
-
-    public void setDurationDays(Integer durationDays) {
-        this.durationDays = durationDays;
-    }
-
-      // ADD THIS FIELD - serviceName from your HTML form
+    // Pastikan nama field ini: 'serviceName' untuk form admin
     @NotBlank(message = "Nama servis tidak boleh kosong")
-    private String serviceName;
-    
-    public String getServiceName() {
-        return serviceName;
-    }
+    private String serviceName; // Field baru untuk admin form
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+    // Pastikan nama field ini: 'selectedDurationDays' untuk form admin
+    @NotNull(message = "Durasi hari diperlukan.")
+    @Min(value = 0, message = "Durasi minimal 0 hari.") // Atau 1, sesuai kebutuhan admin
+    private Integer selectedDurationDays;
+
     @Min(value = 0, message = "Harga akhir tidak boleh negatif")
-    private BigDecimal finalPrice;
+    private BigDecimal finalPrice; // Diperlukan karena ada hidden input dan JS mengupdate ini
 
     private String orderNotes; // Opsional
 
-    // Konstruktor default
-    public ServiceOrderFormDTO() {}
+    // Constructor default
+    public AdminServiceOrderFormDTO() {}
 
-    // Getters and Setters
+    // Getters and Setters untuk semua field ini
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
     public String getCustomerName() { return customerName; }
@@ -93,6 +73,10 @@ public class ServiceOrderFormDTO {
     public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
     public Long getServiceId() { return serviceId; }
     public void setServiceId(Long serviceId) { this.serviceId = serviceId; }
+    public String getServiceName() { return serviceName; }
+    public void setServiceName(String serviceName) { this.serviceName = serviceName; }
+    public Integer getSelectedDurationDays() { return selectedDurationDays; }
+    public void setSelectedDurationDays(Integer selectedDurationDays) { this.selectedDurationDays = selectedDurationDays; }
     public BigDecimal getFinalPrice() { return finalPrice; }
     public void setFinalPrice(BigDecimal finalPrice) { this.finalPrice = finalPrice; }
     public String getOrderNotes() { return orderNotes; }

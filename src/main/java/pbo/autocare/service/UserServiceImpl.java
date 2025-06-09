@@ -356,4 +356,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void deleteStaff(Long id) {
         userRepository.deleteById(id); // UserRepository dapat menghapus Staff berdasarkan ID
     }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll(); // Mengambil semua User dari database
+    }
 }

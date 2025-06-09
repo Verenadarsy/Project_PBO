@@ -34,6 +34,8 @@ public interface UserService extends UserDetailsService {
     // Metode pemeriksaan keberadaan username
     boolean existsByUsername(String username);
 
+    List<User> getAllUsers();
+
     // Metode untuk mendapatkan semua user bertipe Staff
     List<User> getAllStaff();
 

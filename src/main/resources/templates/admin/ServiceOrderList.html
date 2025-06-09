@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="id">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/orderlist.css"> <head>
+    <title>Daftar Pesanan Servis</title> </head>
+<body>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    </head>
+<body>
+    <div class="container">
+
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class="button-container">
+            <a th:href="@{/admin/dashboard}" class="btn btn-secondary mt-3">Kembali ke Dashboard</a>
+            <a th:href="@{/admin/service-orders/new}" class="btn btn-primary mt-3">Buat Reservasi Baru</a>
+        </div>
+        <h2 class="mt-4">Riwayat Pesanan Servis Anda</h2>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Kontak Pelanggan</th>
+                        <th>Alamat Pelanggan</th>
+                        <th>Model Kendaraan</th>
+                        <th>Tipe Kendaraan</th>
+                        <th>Plat Nomor</th>
+                        <th>Layanan</th>
+                        <th>Harga Akhir</th>
+                        <th>Durasi (Hari)</th>
+                        <th>Status Pesanan</th>
+                        <th>Catatan</th>
+                        <th>Dibuat Pada</th>
+                        <th>Diperbarui Pada</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order, iterStat : ${orders}">
+                        <td th:text="${iterStat.index + 1}"></td>
+                        <td th:text="${order.customerName}"></td>
+                        <td th:text="${order.customerContact}"></td>
+                        <td th:text="${order.customerAddress}"></td>
+                        <td th:text="${order.vehicleModelName}"></td>
+                        <td th:text="${order.vehicleType.vehicleType}"></td>
+                        <td th:text="${order.licensePlate}"></td>
+                        <td th:text="${order.service.serviceName}"></td>
+                        <td th:text="${order.finalPrice}"></td>
+                        <td th:text="${order.selectedDurationDays}"></td>
+                        <td th:text="${order.orderStatus}"></td>
+                        <td th:text="${order.orderNotes}"></td>
+                        <td th:text="${#dates.format(order.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                        <td th:text="${#dates.format(order.updatedAt, 'dd-MM-yyyy HH:mm')}"></td>
+                        <td>
+                            <a th:href="@{/admin/service-orders/{id}(id=${order.id})}" class="btn btn-info btn-sm">Detail</a>
+                            <a th:href="@{/admin/service-orders/edit/{id}(id=${order.id})}" class="btn btn-warning btn-sm">Edit</a>
+                            <form th:action="@{/admin/service-orders/delete/{id}(id=${order.id})}" method="post" style="display:inline;">
+                                <input type="hidden" name="_method" value="delete">
+                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="15" class="text-center">Tidak ada pesanan servis yang ditemukan.</td> </tr>
+                </tbody>
+            </table>
+        </div> </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script th:inline="javascript">
+    // Custom Popup Functions
+    function createPopup(type, title, message) {
+        const existingPopup = document.querySelector('.popup-overlay');
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'popup-overlay';
+        
+        const icon = type === 'success' ? '✓' : '⚠';
+        const iconClass = type === 'success' ? 'success' : 'error';
+        
+        overlay.innerHTML = `
+            <div class="popup">
+                <button class="popup-close" onclick="closePopup()">&times;</button>
+                <div class="popup-icon ${iconClass}">
+                    ${icon}
+                </div>
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <button class="popup-button" onclick="closePopup()">OK</button>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        setTimeout(() => {
+            overlay.classList.add('show');
+ 
+</html>

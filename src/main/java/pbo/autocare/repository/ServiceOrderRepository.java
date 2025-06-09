@@ -7,6 +7,7 @@ import pbo.autocare.model.User; // Make sure 'User' is correctly imported and us
 import pbo.autocare.model.Vehicle;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -35,4 +36,7 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long
     List<ServiceOrder> findByService(ServiceItem service);
     List<ServiceOrder> findByVehicleType(Vehicle vehicleType);
     long countByCreatedAtAfter(Timestamp startOfMonthTimestamp);
+
+     @Query("SELECT so FROM ServiceOrder so JOIN FETCH so.vehicleType JOIN FETCH so.service")
+    List<ServiceOrder> findAllWithVehicleTypeAndService();
 }
