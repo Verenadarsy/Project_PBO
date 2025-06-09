@@ -10,16 +10,6 @@ import jakarta.validation.constraints.Size;
 
 public class ServiceOrderFormDTO {
 
-    private Long id; // ID untuk update, tidak perlu diisi saat membuat baru
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-    @NotNull(message = "User harus dipilih")
     private Long userId; // Hanya ID user yang diterima dari form
 
     @NotBlank(message = "Nama customer tidak boleh kosong")
@@ -55,18 +45,6 @@ public class ServiceOrderFormDTO {
 
     public void setDurationDays(Integer durationDays) {
         this.durationDays = durationDays;
-    }
-
-      // ADD THIS FIELD - serviceName from your HTML form
-    @NotBlank(message = "Nama servis tidak boleh kosong")
-    private String serviceName;
-    
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
     }
     @Min(value = 0, message = "Harga akhir tidak boleh negatif")
     private BigDecimal finalPrice;

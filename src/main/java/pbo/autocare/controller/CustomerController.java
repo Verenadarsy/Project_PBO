@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -27,9 +28,11 @@ import pbo.autocare.dto.ServiceOrderFormDTO;
 import pbo.autocare.model.Customer;
 import pbo.autocare.model.ServiceItem;
 import pbo.autocare.model.ServiceOrder;
+import pbo.autocare.model.Transaction;
 import pbo.autocare.model.User;
 import pbo.autocare.model.Vehicle;
 import pbo.autocare.repository.ServiceItemRepository;
+import pbo.autocare.repository.TransactionRepository;
 import pbo.autocare.repository.UserRepository;
 import pbo.autocare.repository.VehicleRepository;
 import pbo.autocare.service.ServiceOrderService;
@@ -77,36 +80,60 @@ public class CustomerController {
         return "service_order_form";
     }
 
-     @PostMapping("/save-reservation")
-    public String saveNewReservation(@ModelAttribute("serviceOrderFormDTO") @Valid ServiceOrderFormDTO serviceOrderFormDTO,
-                                     BindingResult bindingResult,
-                                     RedirectAttributes redirectAttributes,
-                                     Authentication authentication) {
+    @PostMapping("/save-reservation")
+    public String saveNewReservation(
+            @ModelAttribute("serviceOrderFormDTO") @Valid ServiceOrderFormDTO serviceOrderFormDTO,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Authentication authentication,
+            Model model) { // Model perlu ditambahkan sebagai parameter
 
-        // ... (error handling bindingResult.hasErrors()) ...
+        // --- BAGIAN SENSITIF 1: PENGECEKAN VALIDASI ---
+        if (bindingResult.hasErrors()) {
+            // Jika ada error validasi, masuk ke sini
+            System.out.println("--- Validation Errors Found! ---"); // Debug ini untuk melihat di log
+            bindingResult.getAllErrors().forEach(error -> {
+                // Debugging yang lebih detail untuk melihat error spesifik
+                if (error instanceof FieldError) {
+                    FieldError fieldError = (FieldError) error;
+                    System.out.println("Validation Error: Field '" + fieldError.getField() + "' - Message: " + fieldError.getDefaultMessage() + " - Rejected Value: " + fieldError.getRejectedValue());
+                } else {
+                    System.out.println("Validation Error: Object '" + error.getObjectName() + "' - Message: " + error.getDefaultMessage());
+                }
+            });
+            // --- PENTING: PASTIKAN SEMUA DATA DROPDOWN DIKEMBALIKAN KE MODEL ---
+            model.addAttribute("vehicles", serviceOrderService.getAllVehicles());
+            model.addAttribute("services", serviceOrderService.getAllServices());
+            model.addAttribute("serviceOrderFormDTO", serviceOrderFormDTO); // DTO dengan data yang sudah diisi pengguna + error
+            return "service_order_form"; // Render ulang form yang sama
+        }
 
         try {
-            // ************ PENTING: MENGAMBIL USER DARI SESI LOGIN ************
+            System.out.println("--- No Validation Errors, proceeding to save logic ---"); // Debug ini jika validasi sukses
+
             User currentUser = null;
             if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
                 String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-                Optional<User> userOptional = userRepository.findByUsername(username); // Memerlukan findByUsername di UserRepository
+                Optional<User> userOptional = userRepository.findByUsername(username);
                 if (userOptional.isPresent()) {
                     currentUser = userOptional.get();
                 }
             }
 
             if (currentUser == null) {
-                 // Ini akan terjadi jika pengguna tidak login atau sesi tidak valid
-                 redirectAttributes.addFlashAttribute("errorMessage", "Anda harus login untuk membuat reservasi.");
-                 return "redirect:/login"; // Redirect ke halaman login atau halaman lain yang sesuai
+                System.out.println("--- User not logged in or invalid session ---"); // Debug ini
+                redirectAttributes.addFlashAttribute("errorMessage", "Anda harus login untuk membuat reservasi.");
+                return "redirect:/login";
             }
-            // ************ AKHIR PENGAMBILAN USER ************
 
+            // --- BAGIAN SENSITIF 2: PENCARIAN ENTITAS TERKAIT ---
+            // Ini adalah tempat di mana NullPointerException atau IllegalArgumentException bisa terjadi
+            // jika ID kendaraan atau layanan yang dikirim dari form tidak valid/tidak ditemukan di DB.
             Optional<Vehicle> vehicleOptional = vehicleRepository.findById(serviceOrderFormDTO.getVehicleTypeId());
             Optional<ServiceItem> serviceOptional = serviceItemRepository.findById(serviceOrderFormDTO.getServiceId());
 
             if (vehicleOptional.isPresent() && serviceOptional.isPresent()) {
+                System.out.println("--- Vehicle and Service Found, converting DTO to ServiceOrder ---"); // Debug ini
                 ServiceItem selectedService = serviceOptional.get();
                 Vehicle selectedVehicle = vehicleOptional.get();
 
@@ -118,37 +145,44 @@ public class CustomerController {
                 serviceOrder.setCustomerContact(serviceOrderFormDTO.getCustomerContact());
                 serviceOrder.setCustomerAddress(serviceOrderFormDTO.getCustomerAddress());
                 serviceOrder.setVehicleModelName(serviceOrderFormDTO.getVehicleModelName());
-                serviceOrder.setVehicleType(selectedVehicle);
+                serviceOrder.setVehicleType(selectedVehicle); // Set objek Vehicle
                 serviceOrder.setLicensePlate(serviceOrderFormDTO.getLicensePlate());
-
-                // ************ PERUBAHAN DI SINI ************
-                serviceOrder.setService(selectedService); // Set objek ServiceItem untuk relasi FK
-                serviceOrder.setServiceName(selectedService.getServiceName()); // Set nama layanan ke kolom baru
-                // ************ AKHIR PERUBAHAN ************
-
+                serviceOrder.setService(selectedService); // Set objek ServiceItem
+                serviceOrder.setServiceName(selectedService.getServiceName());
                 serviceOrder.setFinalPrice(finalPrice);
+                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getDurationDays()); // Pastikan nama ini cocok dengan DTO
                 serviceOrder.setOrderNotes(serviceOrderFormDTO.getOrderNotes());
 
-                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getDurationDays()); // Jika ingin menyimpan durasi juga
-
+                // --- BAGIAN SENSITIF 3: PEMANGGILAN SERVICE UNTUK MENYIMPAN ---
+                // Ini adalah tempat di mana operasi penyimpanan sebenarnya dilakukan
                 serviceOrderService.saveServiceOrder(serviceOrder);
+                System.out.println("--- Service Order SAVED to database! ---"); // Debug ini jika berhasil
 
                 redirectAttributes.addFlashAttribute("successMessage", "Reservasi berhasil dibuat!");
-                return "redirect:/customer/list-reservations"; // Redirect ke halaman daftar reservasi
+                return "redirect:/customer/list-reservations";
             } else {
+                // Ini akan terpanggil jika vehicleId atau serviceId dari form tidak ditemukan di DB
+                System.out.println("--- Vehicle or Service NOT Found (IDs from DTO were invalid) ---"); // Debug ini
                 redirectAttributes.addFlashAttribute("errorMessage", "Error: Kendaraan atau Layanan tidak ditemukan. Mohon coba lagi.");
-                redirectAttributes.addFlashAttribute("vehicles", serviceOrderService.getAllVehicles());
-                redirectAttributes.addFlashAttribute("services", serviceOrderService.getAllServices());
-                return "redirect:/customer/new-reservation";
+                // Pastikan Anda mengembalikan semua model attributes yang dibutuhkan form jika kembali ke form yang sama
+                model.addAttribute("serviceOrderFormDTO", serviceOrderFormDTO);
+                model.addAttribute("vehicles", serviceOrderService.getAllVehicles());
+                model.addAttribute("services", serviceOrderService.getAllServices());
+                return "service_order_form"; // Render ulang form yang sama
             }
         } catch (Exception e) {
-            //e.printStackTrace();
+            // --- BAGIAN SENSITIF 4: PENANGANAN EXCEPTION UMUM ---
+            // Jika ada exception lain (misal dari ServiceOrderService.saveServiceOrder()), akan tertangkap di sini
+            System.err.println("--- General Exception during save: ---"); // Debug ini
+            e.printStackTrace(); // PRINT STACK TRACE LENGKAP
             redirectAttributes.addFlashAttribute("errorMessage", "Terjadi kesalahan server: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("vehicles", serviceOrderService.getAllVehicles());
-            redirectAttributes.addFlashAttribute("services", serviceOrderService.getAllServices());
-            return "redirect:/customer/new-reservation";
+            // Pastikan Anda mengembalikan semua model attributes yang dibutuhkan form jika kembali ke form yang sama
+            model.addAttribute("serviceOrderFormDTO", serviceOrderFormDTO);
+            model.addAttribute("vehicles", serviceOrderService.getAllVehicles());
+            model.addAttribute("services", serviceOrderService.getAllServices());
+            return "service_order_form"; // Render ulang form yang sama
         }
-    }
+}
 
      @GetMapping("/list-reservations")
     public String customerListReservations(Authentication authentication, Model model) {
@@ -168,11 +202,6 @@ public class CustomerController {
             return "redirect:/login";
         }
         return "customer/orderlist"; // Mengarahkan ke customer/orderlist.html
-    }
-
-    @GetMapping("/my-transcactions")
-    public String customerMyTransactions() {
-        return "customer/transactions";
     }
 
     @GetMapping("/profile")
@@ -339,4 +368,39 @@ public class CustomerController {
         redirectAttributes.addFlashAttribute("successMessage", "Password Anda berhasil diubah!");
         return "redirect:/customer/profile"; // Redirect kembali ke halaman profil setelah sukses
     }
+
+    // Di CustomerController.java (atau AdminServiceOrderController jika hanya admin yang bisa print struk)
+    // Asumsi ini adalah controller yang tepat
+
+    @Autowired // Pastikan Anda sudah mengautowire TransactionRepository
+    private TransactionRepository transactionRepository; // Anda perlu membuat ini jika belum ada
+
+    // Endpoint untuk menampilkan struk dari sebuah Transaction
+    // Dalam CustomerController.java
+
+// Endpoint ini tetap menerima ServiceOrder ID
+@GetMapping("/reservations/print/{serviceOrderId}")
+public String printReservationReceipt(@PathVariable Long serviceOrderId, Model model, RedirectAttributes redirectAttributes) {
+    Optional<ServiceOrder> serviceOrderOptional = serviceOrderService.getServiceOrderById(serviceOrderId); // Cari ServiceOrder
+
+    if (serviceOrderOptional.isPresent()) {
+        ServiceOrder serviceOrder = serviceOrderOptional.get();
+        // Cari Transaction yang terkait dengan ServiceOrder ini
+        // Anda perlu membuat metode di TransactionRepository seperti findByServiceOrder(ServiceOrder serviceOrder)
+        Optional<Transaction> transactionOptional = transactionRepository.findByServiceOrder(serviceOrder);
+
+        if (transactionOptional.isPresent()) {
+            Transaction transaction = transactionOptional.get();
+            model.addAttribute("transaction", transaction); // Pass objek Transaction ke view
+            model.addAttribute("currentDate", new java.util.Date());
+            return "customer/print_receipt";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Transaksi untuk order ini tidak ditemukan.");
+            return "redirect:/customer/list-reservations";
+        }
+    } else {
+        redirectAttributes.addFlashAttribute("errorMessage", "Order tidak ditemukan.");
+        return "redirect:/customer/list-reservations";
+    }
+}
 }

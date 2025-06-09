@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <html lang="id">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/css/orderlist.css"> <head>
-    <title>Daftar Pesanan Servis</title> </head>
-<body>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    </head>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/orderlist.css"> 
+    <title>Daftar Pesanan Servis</title> 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
 <body>
     <div class="container">
 
@@ -57,8 +57,9 @@
                         <td th:text="${order.orderNotes}"></td>
                         <td th:text="${#dates.format(order.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
                         <td th:text="${#dates.format(order.updatedAt, 'dd-MM-yyyy HH:mm')}"></td>
-                        <td><a href="/customer/my-transcactions" class="btn btn-sm btn-info">Detail</a></td>
-                    </tr>
+                        <td>
+                            <a th:href="@{/customer/reservations/print/{serviceOrderId}(serviceOrderId=${order.id})}" class="btn btn-sm btn-info" target="_blank">Cetak Struk</a>
+                        </td>
                     <tr th:if="${#lists.isEmpty(orders)}">
                         <td colspan="15" class="text-center">Tidak ada pesanan servis yang ditemukan.</td> </tr>
                 </tbody>

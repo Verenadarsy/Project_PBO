@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struk Transaksi #<span th:text="${transaction.id}"></span></title>
+    <link rel="stylesheet" th:href="@{/css/print-receipt.css}">
+    <style>
+        /* CSS umum untuk tampilan layar (sudah ada) */
+        body {
+            font-family: 'Courier New', Courier, monospace; /* Font khas struk */
+            font-size: 12px;
+            margin: 20px;
+            background-color: #f8f8f8; /* Warna background untuk tampilan layar */
+        }
+        .receipt-container {
+            width: 300px; /* Lebar struk, sesuaikan */
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px dashed #ccc; /* Batas putus-putus */
+            background-color: #fff;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .header-info, .order-details, .total-section, .footer-message {
+            margin-bottom: 10px;
+        }
+        .header-info p, .order-details p, .total-section p, .footer-message p {
+            margin: 2px 0;
+        }
+        .separator {
+            border-top: 1px dashed #000;
+            margin: 10px 0;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .item-list li {
+            margin-bottom: 5px;
+        }
+        .item-list .item-name {
+            font-weight: bold;
+        }
+        .item-list .item-price {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <h4 th:text="${'Autocare Bengkel '}"></h4>
+        <p class="text-center">Jalan Contoh No. 123, Bandung</p>
+        <p class="text-center">Telp: (022) 1234567</p>
+
+        <div class="separator"></div>
+
+        <div class="header-info">
+            <p>Tanggal Transaksi: <span th:text="${#dates.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></span></p>
+            <p>No. Transaksi: <span th:text="${transaction.id}"></span></p>
+            <p>Order ID Terkait: <span th:text="${transaction.serviceOrder.id}"></span></p>
+
+            <p>Nama Pemesan: <span th:text="${transaction.serviceOrder.customerName}"></span></p>
+            <p>Kontak: <span th:text="${transaction.serviceOrder.customerContact}"></span></p>
+        </div>
+
+        <div class="separator"></div>
+
+        <h4>Detail Layanan</h4>
+        <ul class="item-list">
+            <li>
+                <div class="flex-row">
+                    <span class="item-name" th:text="${transaction.serviceOrder.serviceName}">Nama Layanan</span>
+                    <span class="item-price" th:text="${#numbers.formatCurrency(transaction.amount)}">Rp 100.000,00</span>
+                </div>
+                <p>Model Kendaraan: <span th:text="${transaction.serviceOrder.vehicleModelName}"></span> (<span th:text="${transaction.serviceOrder.vehicleType.vehicleType}"></span>)</p>
+                <p>Plat Nomor: <span th:text="${transaction.serviceOrder.licensePlate}"></span></p>
+                <p>Durasi: <span th:text="${transaction.serviceOrder.selectedDurationDays}"></span> hari</p>
+                <p th:if="${transaction.serviceOrder.orderNotes != null and transaction.serviceOrder.orderNotes != ''}">Catatan: <span th:text="${transaction.serviceOrder.orderNotes}"></span></p>
+            </li>
+        </ul>
+
+        <div class="separator"></div>
+
+        <div class="total-section">
+            <div class="flex-row">
+                <strong>TOTAL:</strong>
+                <strong th:text="${#numbers.formatCurrency(transaction.amount)}">Rp 100.000,00</strong>
+            </div>
+            <p class="text-center">Metode Pembayaran: <span th:text="${transaction.paymentMethod}"></span></p>
+            <p class="text-center">Status Transaksi: <span th:text="${transaction.transactionStatus.name()}"></span></p>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="footer-message">
+            <p class="text-center">Terima kasih atas kepercayaan Anda!</p>
+            <p class="text-center">www.autocarebengkel.com</p>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>

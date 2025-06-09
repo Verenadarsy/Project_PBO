@@ -1,0 +1,26 @@
+/* /src/main/resources/static/css/print-receipt.css */
+
+/* Sembunyikan elemen yang tidak ingin dicetak */
+@media print {
+    body {
+        margin: 0;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 10px; /* Ukuran font lebih kecil untuk cetak */
+        color: #000;
+        background-color: #fff; /* Pastikan background putih saat dicetak */
+    }
+    .receipt-container {
+        width: 100%; /* Lebar penuh di halaman cetak */
+        border: none; /* Hapus border dashed saat dicetak */
+        padding: 0;
+        box-shadow: none; /* Hapus bayangan */
+    }
+    /* Contoh: sembunyikan tombol kembali jika ada */
+    .btn-back, a[href]:not(.print-only) {
+        display: none;
+    }
+    /* Pastikan gambar tidak ada di header/footer default browser */
+    @page {
+        margin: 0;
+    }
+}
