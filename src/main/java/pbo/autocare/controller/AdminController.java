@@ -18,14 +18,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import pbo.autocare.dto.CustomerFormDTO;
 import pbo.autocare.dto.TechnicianFormDTO;
-import pbo.autocare.model.Customer; 
+import pbo.autocare.model.Customer;
+// import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.Specialization;
+import pbo.autocare.model.Staff;
 import pbo.autocare.model.Technician;
 import pbo.autocare.model.User; 
 import pbo.autocare.repository.SpecializationRepository;
 import pbo.autocare.repository.UserRepository;
 import pbo.autocare.service.CustomerService;
-import pbo.autocare.service.UserServiceImpl; 
+// import pbo.autocare.service.ServiceItemService;
+// import pbo.autocare.service.ServiceOrderService;
+import pbo.autocare.service.UserServiceImpl;
+// import pbo.autocare.service.VehicleService; 
 
 @Controller
 @RequestMapping("/admin")
@@ -178,33 +183,7 @@ public class AdminController {
         model.addAttribute("backText", "Kembali ke Dashboard Admin");
         return "technician_list";
     }
-
-    @GetMapping("/staff")
-    public String listStaff(Model model) {
-        List<User> staffList = userService.getAllStaff();
-        model.addAttribute("staffs", staffList);
-        model.addAttribute("pageTitle", "Daftar Staff (Admin)");
-        model.addAttribute("headerTitle", "Daftar Staff (Admin)");
-        model.addAttribute("backLink", "/admin/dashboard");
-        model.addAttribute("backText", "Kembali ke Dashboard Admin");
-        return "staff_list";
-    }
-
-    @GetMapping("/newstaff")
-    public String registerstaff() {
-        return "register_staff";
-    }
     
-    @GetMapping("/serviceorders")
-    public String managementService() {
-        return "service_order_detail";
-    }
-    
-    @GetMapping("/transactions")
-    public String manageTransactions() {
-        return "admin_transactions";
-    }
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -410,4 +389,121 @@ public class AdminController {
         }
         return "redirect:/admin/technician";
     }
+
+    @GetMapping("/staff")
+        public String listStaff(Model model) {
+            List<User> staffList = userService.getAllStaff();
+            model.addAttribute("staffs", staffList);
+            model.addAttribute("pageTitle", "Daftar Staff (Admin)");
+            model.addAttribute("headerTitle", "Daftar Staff (Admin)");
+            model.addAttribute("backLink", "/admin/dashboard");
+            model.addAttribute("backText", "Kembali ke Dashboard Admin");
+        return "staff_list";
+    }
+
+    @GetMapping("/staff/new")
+    public String showAddStaffForm(Model model) {
+        model.addAttribute("staff", new Staff());
+        return "admin/EditStaffForm";
+    }
+
+    @PostMapping("/staff/save")
+    public String saveStaff(@ModelAttribute("staff") Staff staff, RedirectAttributes redirectAttributes) {
+        // UserService akan menyimpan Staff sebagai User dan menangani password encoding
+        userService.saveStaff(staff);
+        redirectAttributes.addFlashAttribute("message", "Staff account saved successfully!");
+        return "redirect:/admin/staff";
+    }
+
+    @GetMapping("/staff/edit/{id}")
+    public String showEditStaffForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<Staff> staff = userService.getStaffById(id); // Menggunakan getStaffById
+        if (staff.isPresent()) {
+            model.addAttribute("staff", staff.get());
+            return "admin/EditStaffForm";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Staff not found!");
+            return "redirect:/admin/staff";
+        }
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteStaff(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        userService.deleteStaff(id); // Menggunakan deleteStaff
+        redirectAttributes.addFlashAttribute("message", "Staff account deleted successfully!");
+        return "redirect:/admin/staff";
+    }
+
+    // @Autowired
+    // private ServiceOrderService serviceOrderService;
+
+    // @Autowired
+    // private VehicleService vehicleService;
+    
+    // @Autowired
+    // private ServiceItemService serviceItemService;
+
+    @GetMapping("/service-orders")
+    public String managementService() {
+        return "ServiceOrderList"; // Ganti dengan nama template yang sesuaiq
+    }
+    
+    @GetMapping("/transactions")
+    public String manageTransactions() {
+        return "admin_transactions";
+    }
+
+    // // Show form for creating a new service order
+    // // @GetMapping("/service-orders/new")
+    // // public String showCreateForm(Model model) {
+    // //         model.addAttribute("serviceOrder", new ServiceOrder());
+    // //     // Add lists of existing Users, Vehicles, and ServiceItems to populate dropdowns
+    // //         model.addAttribute("users", userService.getAllCustomers());
+    // //         model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
+    // //         model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
+    // //     return "ServiceOrderForm"; // Corresponds to src/main/resources/templates/service-orders/form.html
+    // // }
+
+    // // Handle creation of a new service order
+    // @PostMapping("/save")
+    // public String saveServiceOrder(@ModelAttribute("serviceOrder") ServiceOrder serviceOrder) {
+    //     // Important: You'll need to set the related User, Vehicle, and ServiceItem objects
+    //     // based on the IDs submitted from the form. This usually involves fetching them
+    //     // from their respective services.
+    //     // Example:
+    //     // User user = userService.getUserById(serviceOrder.getUser().getId()).orElseThrow(...);
+    //     // serviceOrder.setUser(user);
+
+    //     serviceOrderService.createServiceOrder(serviceOrder);
+    //     return "redirect:/service-orders"; // Redirect to the list page
+    // }
+
+    // // Show form for editing an existing service order
+    // @GetMapping("/edit/{id}")
+    // public String showEditForm(@PathVariable Long id, Model model) {
+    //     Optional<ServiceOrder> serviceOrder = serviceOrderService.getServiceOrderById(id);
+    //     if (serviceOrder.isPresent()) {
+    //         model.addAttribute("serviceOrder", serviceOrder.get());
+    //         // Add lists of existing Users, Vehicles, and ServiceItems to populate dropdowns
+    //         // model.addAttribute("users", userService.getAllUsers());
+    //         // model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
+    //         // model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
+    //         return "service-orders/form";
+    //     }
+    //     return "redirect:/service-orders"; // Not found, redirect to list
+    // }
+
+    // // Handle updating an existing service order
+    // // @PostMapping("/update/{id}") // or you can use a single /save and check for ID
+    // // public String updateServiceOrder(@PathVariable Long id, @ModelAttribute("serviceOrder") ServiceOrder serviceOrder) {
+    // //     serviceOrderService.updateServiceOrder(id, serviceOrder);
+    // //     return "redirect:/service-orders";
+    // // }
+
+    // // Handle deletion of a service order
+    // @GetMapping("/delete/{id}") // Often done with POST/DELETE requests in REST, but GET for simplicity in web
+    // public String deleteServiceOrder(@PathVariable Long id) {
+    //     serviceOrderService.deleteServiceOrder(id);
+    //     return "redirect:/service-orders";
+    // }
 }

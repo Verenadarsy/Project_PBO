@@ -16,7 +16,7 @@ public class Vehicle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "vehicle_type", nullable = false, unique = true)
     private String vehicleType; // Contoh: Sedan, Hatchback, MPV / Minibus
@@ -38,8 +38,8 @@ public class Vehicle {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
     public String getVehicleType() { return vehicleType; }
     public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
     public String getDescription() { return description; }

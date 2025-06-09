@@ -334,4 +334,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         // Anda perlu method di ServiceOrderRepository, misal findByCreatedAtAfter
         return serviceOrderRepository.countByCreatedAtAfter(new Timestamp(startDate.getTime()));
     }
+
+    public Optional<Staff> getStaffById(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent() && userOptional.get() instanceof Staff) {
+            return Optional.of((Staff) userOptional.get());
+        }
+        return Optional.empty();
+    }
+    
+    public Staff saveStaff(Staff staff) {
+        // Encode password sebelum menyimpan untuk staff baru atau jika password diubah
+        if (staff.getPassword() != null && !staff.getPassword().isEmpty()) {
+            staff.setPassword(passwordEncoder.encode(staff.getPassword()));
+        }
+        // UserRepository akan mengenali Staff sebagai User dan menyimpannya
+        return (Staff) userRepository.save(staff);
+    }
+
+    // Metode untuk menghapus Staff
+    public void deleteStaff(Long id) {
+        userRepository.deleteById(id); // UserRepository dapat menghapus Staff berdasarkan ID
+    }
 }

@@ -94,4 +94,42 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         // Panggil metode dari repository untuk menghitung order setelah tanggal ini
         return serviceOrderRepository.countByCreatedAtAfter(startOfMonthTimestamp);
     }
+
+    public List<ServiceOrder> getAllServiceOrders() {
+        return serviceOrderRepository.findAll();
+    }
+
+    public Optional<ServiceOrder> getServiceOrderById(Long id) {
+        return serviceOrderRepository.findById(id);
+    }
+
+    public void createServiceOrder(ServiceOrder serviceOrder) {
+    serviceOrderRepository.save(serviceOrder); // Call save, but don't return its result
+}
+
+    public ServiceOrder updateServiceOrder(Long id, ServiceOrder updatedServiceOrder) {
+        return serviceOrderRepository.findById(id)
+                .map(existingOrder -> {
+                    existingOrder.setUser(updatedServiceOrder.getUser());
+                    existingOrder.setCustomerName(updatedServiceOrder.getCustomerName());
+                    existingOrder.setCustomerContact(updatedServiceOrder.getCustomerContact());
+                    existingOrder.setCustomerAddress(updatedServiceOrder.getCustomerAddress());
+                    existingOrder.setVehicleModelName(updatedServiceOrder.getVehicleModelName());
+                    existingOrder.setVehicleType(updatedServiceOrder.getVehicleType());
+                    existingOrder.setLicensePlate(updatedServiceOrder.getLicensePlate());
+                    existingOrder.setService(updatedServiceOrder.getService());
+                    existingOrder.setFinalPrice(updatedServiceOrder.getFinalPrice());
+                    existingOrder.setSelectedDurationDays(updatedServiceOrder.getSelectedDurationDays());
+                    existingOrder.setServiceName(updatedServiceOrder.getServiceName());
+                    existingOrder.setOrderStatus(updatedServiceOrder.getOrderStatus());
+                    existingOrder.setOrderNotes(updatedServiceOrder.getOrderNotes());
+                    existingOrder.setUpdatedAt(new java.sql.Timestamp(System.currentTimeMillis())); // Update timestamp
+
+                    return serviceOrderRepository.save(existingOrder);
+                }).orElseThrow(() -> new RuntimeException("Service Order not found with id " + id));
+    }
+
+    public void deleteServiceOrder(Long id) {
+        serviceOrderRepository.deleteById(id);
+    }
 }

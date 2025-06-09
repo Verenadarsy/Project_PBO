@@ -19,4 +19,8 @@ public interface ServiceOrderService {
     void deleteById(Long id); // Jika ditambahkan
     void saveOrder(ServiceOrder serviceOrder);
     long countOrdersThisMonth();
+    List<ServiceOrder> getAllServiceOrders();
+    void createServiceOrder(ServiceOrder serviceOrder);
+    Optional<ServiceOrder> getServiceOrderById(Long id);
+    void deleteServiceOrder(Long id);
 }

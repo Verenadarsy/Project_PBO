@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${staff.id == null ? 'Tambah Staff Baru' : 'Edit Staff'}"></title>
+    <link rel="stylesheet" th:href="@{/css/EditCustomerForm.css}"> </head>
+<body>
+    <div class="container">
+        <h1 class="page-title" th:text="${staff.id == null ? 'Tambah Staff Baru' : 'Edit Staff'}"></h1>
+
+        <form th:action="@{/admin/staff/save}" th:object="${staff}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" th:field="*{username}" placeholder="Masukkan username unik (3-50 karakter)" required />
+            </div>
+
+            <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" th:field="*{password}"
+                th:required="${staff.id == null}"
+                th:placeholder="${staff.id != null ? 'Biarkan kosong jika tidak mengubah password' : 'Password harus minimal 6 karakter'}"/>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" th:field="*{email}" placeholder="Masukkan email" required />
+            </div>
+
+            <div class="form-group">
+                <label for="fullName">Nama Lengkap:</label>
+                <input type="text" id="fullName" th:field="*{fullName}" placeholder="Min. 3, Max. 100 karakter, sesuai dengan identitas resmi." required />
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Nomor Telepon:</label>
+                <input type="text" id="phoneNumber" th:field="*{phoneNumber}" placeholder="Hanya angka, 10-15 digit, dimulai dengan 08 atau +62." required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Simpan</button>
+            <a href="/admin/staff" class="btn btn-secondary">Batal</a>
+        </form>
+    </div>
+</body>
+</html>

@@ -9,6 +9,11 @@
     <div class="container">
         <h1 class="page-title">Daftar Akun Staff</h1>
         <div class="section-block">
+            <div class="action-buttons">
+                <a th:href="@{/admin/dashboard}" class="btn-back">Kembali ke Dashboard Admin</a>
+                <a th:href="@{/admin/staff/new}" class="btn-add">Tambah Staff</a>
+            </div>
+            
             <table class="data-table">
                 <thead>
                     <tr>
@@ -28,14 +33,20 @@
                         <td th:text="${staff.email}"></td>
                         <td th:text="${staff.fullName}"></td>
                         <td th:text="${staff.phoneNumber}"></td>
-                        <td>Aksi</td> </tr>
+                        <td>
+                            <div class="action-buttons">
+                                <a th:href="@{/admin/staff/edit/{id}(id=${staff.id})}" class="btn-edit">Edit</a>
+                                <form th:action="@{/admin/staff/delete/{id}(id=${staff.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn-delete" onclick="return confirm('Apakah Anda yakin ingin menghapus staff ini?');">Hapus</button>
+                                </form>
+                            </div>
+                        </td> </tr>
                     <tr th:if="${staffs.empty}" class="no-data">
                         <td colspan="7">Tidak ada data Staff.</td> </tr>
                 </tbody>
             </table>
         </div>
         <br>
-        <a href="/admin/dashboard" class="btn-back">Kembali ke Halaman Utama</a>
     </div>
 </body>
 </html>
