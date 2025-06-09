@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model; // Pastikan ini di-import
 import org.springframework.validation.BindingResult;
@@ -16,10 +17,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import pbo.autocare.dto.CustomerFormDTO;
-import pbo.autocare.model.Customer; // Import Customer
-import pbo.autocare.model.User;    // Import User
+import pbo.autocare.dto.TechnicianFormDTO;
+import pbo.autocare.model.Customer; 
+import pbo.autocare.model.Specialization;
+import pbo.autocare.model.Technician;
+import pbo.autocare.model.User; 
+import pbo.autocare.repository.SpecializationRepository;
+import pbo.autocare.repository.UserRepository;
 import pbo.autocare.service.CustomerService;
-import pbo.autocare.service.UserServiceImpl; // Menggunakan UserServiceImpl
+import pbo.autocare.service.UserServiceImpl; 
 
 @Controller
 @RequestMapping("/admin")
@@ -30,7 +36,7 @@ public class AdminController {
     @Autowired
     private CustomerService customerService;
 
-    public AdminController(UserServiceImpl userService) { // Constructor injection
+    public AdminController(UserServiceImpl userService) { 
         this.userService = userService;
     }
 
@@ -50,59 +56,50 @@ public class AdminController {
         return "admin_dashboard";
     }
 
-    // --- METODE INI ADALAH SATU-SATUNYA UNTUK MENAMPILKAN DAFTAR PELANGGAN ---
-    // PASTIKAN ANDA MENGHAPUS METHOD LAIN DENGAN @GetMapping("/customers") DARI FILE INI
     @GetMapping("/customers")
     public String listCustomers(Model model) {
-        List<Customer> customers = userService.getAllCustomers(); // Memanggil metode getAllCustomers dari UserServiceImpl
-        model.addAttribute("customers", customers); // Menambahkan daftar pelanggan ke model
+        List<Customer> customers = userService.getAllCustomers(); 
+        model.addAttribute("customers", customers);
 
-        // Atribut untuk penyesuaian tampilan HTML (seperti judul halaman, judul header, link kembali)
         model.addAttribute("pageTitle", "Daftar Pelanggan (Admin)");
         model.addAttribute("headerTitle", "Daftar Pelanggan (Admin)");
         model.addAttribute("backLink", "/admin/dashboard");
         model.addAttribute("backText", "Kembali ke Dashboard Admin");
 
-        return "admin/customer_list"; // Merujuk ke templates/admin/customer_list.html
+        return "admin/customer_list"; 
     }
-    // --- AKHIR DARI METODE LIST CUSTOMERS YANG BENAR ---
-// CREATE: Menampilkan form tambah pelanggan baru
+
     @GetMapping("/customers/new")
     public String showAddCustomerForm(Model model) {
         model.addAttribute("customerFormDTO", new CustomerFormDTO());
-        return "admin/EditCustomerForm"; // Menggunakan form yang sama (customer_form.html)
+        return "admin/EditCustomerForm"; 
     }
 
-    // UPDATE: Menampilkan form edit pelanggan
-    @GetMapping("/customers/edit/{id}") // URL untuk form edit, misal /admin/customers/edit/1
+    @GetMapping("/customers/edit/{id}") 
     public String showEditCustomerForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Customer> customer = customerService.findCustomerById(id);
         if (customer.isPresent()) {
-            // Mapping Entity ke DTO untuk mengisi form
             CustomerFormDTO customerFormDTO = new CustomerFormDTO(
                 customer.get().getId(),
                 customer.get().getUsername(),
-                null, // Jangan kirim password asli ke form untuk keamanan
+                null,
                 customer.get().getEmail(),
                 customer.get().getFullName(),
                 customer.get().getPhoneNumber()
             );
             model.addAttribute("customerFormDTO", customerFormDTO);
-            return "admin/EditCustomerForm"; // Menggunakan form yang sama (customer_form.html)
+            return "admin/EditCustomerForm"; 
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Pelanggan tidak ditemukan untuk diedit.");
-            return "redirect:/admin/customers"; // Redirect kembali ke daftar jika tidak ditemukan
+            return "redirect:/admin/customers"; 
         }
     }
 
-    // CREATE / UPDATE: Menyimpan pelanggan (baru atau diedit)
-    // Metode ini menangani kedua kasus: tambah baru (id == null) dan edit (id != null)
     @PostMapping("/customers/save")
     public String saveCustomer(@ModelAttribute("customerFormDTO") @Valid CustomerFormDTO customerFormDTO,
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes) {
 
-        // Tambahan validasi manual password saat create
         if (customerFormDTO.getId() == null &&
             (customerFormDTO.getPassword() == null || customerFormDTO.getPassword().isEmpty())) {
             bindingResult.rejectValue("password", "error.customerFormDTO", "Password tidak boleh kosong saat pendaftaran");
@@ -159,8 +156,6 @@ public class AdminController {
         }
     }
 
-
-    // DELETE: Menghapus pelanggan
     @PostMapping("/customers/delete/{id}")
     public String deleteCustomer(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -173,7 +168,6 @@ public class AdminController {
         return "redirect:/admin/customers";
     }
 
-
     @GetMapping("/technician")
     public String listTech(Model model) {
         List<User> techList = userService.getAllTechnicians();
@@ -182,7 +176,7 @@ public class AdminController {
         model.addAttribute("headerTitle", "Daftar Teknisi (Admin)");
         model.addAttribute("backLink", "/admin/dashboard");
         model.addAttribute("backText", "Kembali ke Dashboard Admin");
-        return "technician_list"; // Merujuk ke templates/technician_list.html
+        return "technician_list";
     }
 
     @GetMapping("/staff")
@@ -193,7 +187,7 @@ public class AdminController {
         model.addAttribute("headerTitle", "Daftar Staff (Admin)");
         model.addAttribute("backLink", "/admin/dashboard");
         model.addAttribute("backText", "Kembali ke Dashboard Admin");
-        return "staff_list"; // Merujuk ke templates/staff_list.html
+        return "staff_list";
     }
 
     @GetMapping("/newstaff")
@@ -211,18 +205,209 @@ public class AdminController {
         return "admin_transactions";
     }
 
-    @PostMapping("/transactions/add")
-    public String addTransaction() {
-        return "redirect:/admin/transactions";
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private SpecializationRepository specializationRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // ===========================================
+    // Create (Add) Teknisi
+    // URL: /admin/technicians/new
+    // ===========================================
+    @GetMapping("/technician/new")
+    public String showAddTechnicianForm(Model model) {
+        if (!model.containsAttribute("technicianFormDTO")) {
+             model.addAttribute("technicianFormDTO", new TechnicianFormDTO());
+        }
+        model.addAttribute("specializations", specializationRepository.findAll());
+        return "admin/EditTechForm"; 
     }
 
-    @PostMapping("/transactions/edit")
-    public String editTransaction() {
-        return "redirect:/admin/transactions";
+    // ===========================================
+    // Save (Create/Update) Teknisi
+    // URL: /admin/technicians/save
+    // ===========================================
+    @PostMapping("/technician/save") // Hanya satu endpoint POST untuk menyimpan
+    public String saveTechnician(@ModelAttribute("technicianFormDTO") @Valid TechnicianFormDTO technicianFormDTO,
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes) {
+
+        // --- Log error awal dari @Valid DTO ---
+        if (bindingResult.hasErrors()) {
+            System.out.println("--- INITIAL @VALID DTO ERRORS ---");
+            bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
+            bindingResult.getFieldErrors().forEach(error -> System.out.println("Field: " + error.getField() + ", Error: " + error.getDefaultMessage()));
+            System.out.println("--- END INITIAL @VALID DTO ERRORS ---");
+        }
+
+        // Ambil objek Technician yang ada (jika ini mode edit)
+        Technician currentTechnicianInDb = null;
+        if (technicianFormDTO.getId() != null) {
+            Optional<Technician> existingTechnicianOpt = userRepository.findTechnicianById(technicianFormDTO.getId());
+            if (existingTechnicianOpt.isPresent()) {
+                currentTechnicianInDb = existingTechnicianOpt.get();
+            } else {
+                bindingResult.rejectValue("id", "NotFound", "Teknisi dengan ID ini tidak ditemukan.");
+            }
+        }
+
+        // --- Logika Validasi Kustom Tambahan ---
+        // 1. Validasi Password
+        if (technicianFormDTO.getId() == null) { // Mode Create
+            if (technicianFormDTO.getPassword() == null || technicianFormDTO.getPassword().isEmpty()) {
+                bindingResult.rejectValue("password", "NotBlank", "Password tidak boleh kosong untuk akun baru.");
+            }
+        }
+        // Catatan: Untuk mode edit, @Size di DTO sudah menangani jika password diisi tapi terlalu pendek.
+        //           Jika password kosong di form edit, @Size tidak memicu error, yang memang kita inginkan.
+
+        // 2. Validasi Duplikasi Username
+        // Username sekarang bisa diedit.
+        if (userRepository.findByUsername(technicianFormDTO.getUsername()).isPresent()) {
+            User userWithSameUsername = userRepository.findByUsername(technicianFormDTO.getUsername()).get();
+            if (technicianFormDTO.getId() == null || !userWithSameUsername.getId().equals(technicianFormDTO.getId())) {
+                 // Jika ini mode create, atau mode update tapi username berbeda dan sudah ada yang punya
+                bindingResult.rejectValue("username", "Duplicate", "Username sudah terdaftar.");
+            }
+        }
+
+        // 3. Validasi Duplikasi Email
+        if (userRepository.findByEmail(technicianFormDTO.getEmail()).isPresent()) {
+            User userWithSameEmail = userRepository.findByEmail(technicianFormDTO.getEmail()).get();
+            if (technicianFormDTO.getId() == null || !userWithSameEmail.getId().equals(technicianFormDTO.getId())) {
+                 // Jika ini mode create, atau mode update tapi email berbeda dan sudah ada yang punya
+                bindingResult.rejectValue("email", "Duplicate", "Email sudah terdaftar.");
+            }
+        }
+        // --- AKHIR Validasi Kustom Tambahan ---
+
+
+        // --- Periksa BindingResult setelah SEMUA validasi (@Valid DTO dan kustom) ---
+        if (bindingResult.hasErrors()) {
+            System.out.println("--- FINAL VALIDATION ERRORS (all checks) ---");
+            bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
+            bindingResult.getFieldErrors().forEach(error -> System.out.println("Field: " + error.getField() + ", Error: " + error.getDefaultMessage()));
+            System.out.println("--- END FINAL VALIDATION ERRORS ---");
+
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.technicianFormDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("technicianFormDTO", technicianFormDTO); // Kirim kembali DTO yang diisi user
+            redirectAttributes.addFlashAttribute("errorMessage", "Data teknisi tidak valid. Mohon periksa kembali input Anda.");
+            redirectAttributes.addFlashAttribute("specializations", specializationRepository.findAll()); // Kirim ulang daftar spesialisasi
+
+            String redirectToUrl = (technicianFormDTO.getId() == null) ? "/admin/technician/new" : "/admin/technician/edit/" + technicianFormDTO.getId();
+            return "redirect:" + redirectToUrl;
+        }
+
+        // --- Logika Penyimpanan Jika Tidak Ada Error ---
+        // Validasi Spesialisasi ID (safety check jika ID tidak valid di DB)
+        Optional<Specialization> specializationOptional = specializationRepository.findById(technicianFormDTO.getSpecializationId());
+        if (!specializationOptional.isPresent()) {
+            bindingResult.rejectValue("specializationId", "NotFound", "Spesialisasi yang dipilih tidak ditemukan.");
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.technicianFormDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("technicianFormDTO", technicianFormDTO);
+            redirectAttributes.addFlashAttribute("errorMessage", "Data teknisi tidak valid. Spesialisasi tidak valid.");
+            redirectAttributes.addFlashAttribute("specializations", specializationRepository.findAll());
+            String redirectToUrl = (technicianFormDTO.getId() == null) ? "/admin/technician/new" : "/admin/technician/edit/" + technicianFormDTO.getId();
+            return "redirect:" + redirectToUrl;
+        }
+
+        Technician technicianToSave;
+
+        if (technicianFormDTO.getId() == null) { // Mode Create
+            technicianToSave = new Technician();
+            technicianToSave.setUsername(technicianFormDTO.getUsername()); // Set username saat create
+            technicianToSave.setPassword(passwordEncoder.encode(technicianFormDTO.getPassword())); // Enkripsi password
+            redirectAttributes.addFlashAttribute("successMessage", "Teknisi berhasil ditambahkan!");
+        } else { // Mode Update
+            if (currentTechnicianInDb == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Teknisi tidak ditemukan untuk diedit.");
+                return "redirect:/admin/technician";
+            }
+            technicianToSave = currentTechnicianInDb;
+
+            // ***** SALIN SEMUA FIELD DARI DTO KE ENTITAS YANG ADA *****
+            // Username: Karena sekarang bisa diubah, salin dari DTO.
+            technicianToSave.setUsername(technicianFormDTO.getUsername());
+            // Password: Salin kondisional.
+            if (technicianFormDTO.getPassword() != null && !technicianFormDTO.getPassword().isEmpty()) {
+                technicianToSave.setPassword(passwordEncoder.encode(technicianFormDTO.getPassword()));
+            }
+            // Email, FullName, PhoneNumber: Salin dari DTO.
+            technicianToSave.setEmail(technicianFormDTO.getEmail());
+            technicianToSave.setFullName(technicianFormDTO.getFullName());
+            technicianToSave.setPhoneNumber(technicianFormDTO.getPhoneNumber());
+            // **********************************************************
+
+            redirectAttributes.addFlashAttribute("successMessage", "Teknisi berhasil diperbarui!");
+        }
+
+        // Set specialization (dilakukan untuk create dan update)
+        technicianToSave.setSpecialization(specializationOptional.get());
+
+        userRepository.save(technicianToSave);
+
+        return "redirect:/admin/technician";
+
     }
 
-    @PostMapping("/transactions/delete")
-    public String deleteTransaction() {
-        return "redirect:/admin/transactions";
+    // ===========================================
+    // Update (Edit) Teknisi
+    // URL: /admin/technician/edit/{id}
+    // ===========================================
+    @GetMapping("/technician/edit/{id}")
+    public String showEditTechnicianForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<Technician> technicianOptional = userRepository.findTechnicianById(id);
+        if (technicianOptional.isPresent()) {
+            Technician technician = technicianOptional.get();
+            TechnicianFormDTO dto = new TechnicianFormDTO();
+            dto.setId(technician.getId());
+            dto.setUsername(technician.getUsername());
+            dto.setEmail(technician.getEmail());
+            dto.setFullName(technician.getFullName());
+            dto.setPhoneNumber(technician.getPhoneNumber());
+            if (technician.getSpecialization() != null) {
+                dto.setSpecializationId(technician.getSpecialization().getId());
+            }
+
+            // Gunakan model.addAttribute LANGSUNG karena kita tidak redirect di sini
+            model.addAttribute("technicianFormDTO", dto);
+            model.addAttribute("specializations", specializationRepository.findAll());
+
+            // Ambil pesan error/success dari redirectAttributes jika ada (setelah POST)
+            if (redirectAttributes.getFlashAttributes().containsKey("org.springframework.validation.BindingResult.technicianFormDTO")) {
+                model.addAttribute("org.springframework.validation.BindingResult.technicianFormDTO",
+                                   redirectAttributes.getFlashAttributes().get("org.springframework.validation.BindingResult.technicianFormDTO"));
+            }
+            if (redirectAttributes.getFlashAttributes().containsKey("errorMessage")) {
+                model.addAttribute("errorMessage", redirectAttributes.getFlashAttributes().get("errorMessage"));
+            }
+            if (redirectAttributes.getFlashAttributes().containsKey("successMessage")) {
+                 model.addAttribute("successMessage", redirectAttributes.getFlashAttributes().get("successMessage"));
+            }
+
+
+            return "admin/EditTechForm"; 
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Teknisi tidak ditemukan.");
+            return "redirect:/admin/technician";
+        }
+    }
+
+    // ===========================================
+    // Delete Teknisi
+    // URL: /admin/technicians/delete/{id}
+    // ===========================================
+    @PostMapping("/technician/delete/{id}")
+    public String deleteTechnician(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Optional<Technician> technicianOptional = userRepository.findTechnicianById(id);
+        if (technicianOptional.isPresent()) {
+            userRepository.delete(technicianOptional.get());
+            redirectAttributes.addFlashAttribute("successMessage", "Teknisi berhasil dihapus!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Teknisi tidak ditemukan.");
+        }
+        return "redirect:/admin/technician";
     }
 }

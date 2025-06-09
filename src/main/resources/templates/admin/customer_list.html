@@ -9,14 +9,18 @@
 <body>
     <div class="container">
         <h1 class="page-title">Daftar Akun Pelanggan</h1>
-        <div class="section-block">
-            <a th:href="@{/admin/customers/new}" class="btn-add">Tambah Pelanggan Baru</a> <br><br>
 
-            <div th:if="${errorMessage}" class="error-message">
+        <div th:if="${errorMessage}" class="error-message">
                 <span th:text="${errorMessage}"></span>
-            </div>
-            <div th:if="${successMessage}" class="success-message">
-                <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${successMessage}" class="success-message">
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div class="section-block">
+
+            <div class="button-container">
+                <a href="/admin/dashboard" class="btn-back">Kembali ke Halaman Utama</a>
+                <a th:href="@{/admin/customers/new}" class="btn-add">Tambah Pelanggan Baru</a>
             </div>
 
             <table class="data-table">
@@ -51,7 +55,6 @@
             </table>
         </div>
         <br>
-        <a href="/admin/dashboard" class="btn-back">Kembali ke Halaman Utama</a>
     </div>
 </body>
 </html>

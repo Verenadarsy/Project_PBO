@@ -6,7 +6,16 @@
     <link rel="stylesheet" th:href="@{/css/technician_list.css}">
 </head>
 <body>
-    <div class="container"> <h1 class="page-title">Daftar Akun Teknisi</h1> <div class="section-block"> <table class="data-table"> <thead>
+    <div class="container">
+        <h1 class="page-title">Daftar Akun Teknisi</h1>
+        <div class="section-block">
+
+            <div class="button-container">
+                <a href="/admin/dashboard" class="btn-back">Kembali ke Halaman Utama</a>
+                <a th:href="@{/admin/technician/new}" class="btn-add">Tambah Teknisi Baru</a>
+            </div>
+            <table class="data-table">
+                <thead>
                     <tr>
                         <th>No</th>
                         <th>ID</th>
@@ -27,11 +36,18 @@
                         <td th:text="${technician.fullName}"></td>
                         <td th:text="${technician.phoneNumber}"></td>
                         <td th:text="${technician.specialization != null ? technician.specialization.description : 'Tidak Ditentukan'}"></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a th:href="@{/admin/technician/edit/{id}(id=${technician.id})}" class="btn-edit">Edit</a>
+                                <form th:action="@{/admin/technician/delete/{id}(id=${technician.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn-delete" onclick="return confirm('Apakah Anda yakin ingin menghapus teknisi ini?');">Hapus</button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                     <tr th:if="${technicians.empty}" class="no-data"> <td colspan="6">Tidak ada data Teknisi.</td>
                     </tr>
                 </tbody>
             </table>
         </div> <br>
-        <a href="/admin/dashboard" class="btn-back">Kembali ke Halaman Utama</a> </div> </body>
 </html>
