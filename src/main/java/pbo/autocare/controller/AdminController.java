@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model; // Pastikan ini di-import
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -611,7 +610,7 @@ public class AdminController {
     }
 
     // Endpoint untuk menghapus Service Order (Admin)
-    @DeleteMapping("/service-orders/delete/{id}")
+    @PostMapping("/service-orders/delete/{id}")
     public String deleteServiceOrder(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             serviceOrderService.deleteServiceOrder(id);
