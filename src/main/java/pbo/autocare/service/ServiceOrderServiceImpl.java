@@ -111,7 +111,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             newTransaction.setAmount(savedServiceOrder.getFinalPrice()); // Ambil amount dari finalPrice ServiceOrder
             newTransaction.setTransactionDate(new Timestamp(System.currentTimeMillis()));
             // Payment method akan disetel ke "Unspecified" secara default saat transaksi baru dibuat
-            newTransaction.setPaymentMethod("Unspecified");
+            newTransaction.setPaymentMethod(Transaction.PaymentMethod.UNSPECIFIED);
             newTransaction.setTransactionStatus(Transaction.TransactionStatus.PENDING); // Set status PENDING
             newTransaction.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             newTransaction.setUpdatedAt(new Timestamp(System.currentTimeMillis()));

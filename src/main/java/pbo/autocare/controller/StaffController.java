@@ -13,7 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.Technician;
+import pbo.autocare.model.Transaction;
 import pbo.autocare.service.ServiceOrderService; // <-- PENTING: Import ini
+import pbo.autocare.service.TransactionService;
 
 import java.util.List; // <-- PENTING: Import ini
 import java.util.Optional; // <-- PENTING: Import ini
@@ -85,6 +87,82 @@ public class StaffController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Order tidak ditemukan.");
             return "redirect:/staff/orders"; // Kembali ke daftar order jika tidak ditemukan
+        }
+    }
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @GetMapping("/transaction")
+    public String showTransactions(Model model) {
+        List<Transaction> transactions = transactionService.getAllTransactions();
+        model.addAttribute("transactions", transactions);
+        return "staff/transaction";
+    }
+
+    @GetMapping("/transaction/edit/{id}")
+    public String showEditTransactionForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<Transaction> transaction = transactionService.getTransactionById(id);
+        if (transaction.isPresent()) {
+            model.addAttribute("transaction", transaction.get());
+            model.addAttribute("statusOptions", Transaction.TransactionStatus.values());
+            model.addAttribute("paymentMethodOptions", Transaction.PaymentMethod.values()); // Pass enum values for dropdown
+            return "staff/edit-transaction";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found!");
+            return "redirect:/staff/transaction";
+        }
+    }
+
+    @PostMapping("/transaction/update/{id}")
+    public String updateTransaction(@PathVariable("id") Long id,
+                                    @RequestParam("transactionStatus") String transactionStatusString,
+                                    @RequestParam("paymentMethod") String paymentMethodString, // Still receives String from form
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            Transaction.TransactionStatus newStatus = Transaction.TransactionStatus.valueOf(transactionStatusString);
+            // --- MODIFIKASI PENTING DI SINI ---
+            Transaction.PaymentMethod newPaymentMethod = Transaction.PaymentMethod.valueOf(paymentMethodString); // Convert String to PaymentMethod enum
+            // --- AKHIR MODIFIKASI PENTING ---
+
+            Transaction updatedTransaction = transactionService.updateTransactionStatusAndPaymentMethod(
+                    id, newStatus, newPaymentMethod); // Pass the enum to the service
+
+            if (updatedTransaction != null) {
+                redirectAttributes.addFlashAttribute("successMessage", "Transaction updated successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found for update!");
+            }
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Invalid transaction status or payment method provided! Error: " + e.getMessage());
+            // Log the error for debugging: System.err.println("Enum conversion error: " + e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating transaction: " + e.getMessage());
+            // Log the error for debugging: e.printStackTrace();
+        }
+        return "redirect:/staff/transaction";
+    }
+
+    @GetMapping("/transactions/print/{serviceOrderId}") // Ubah path agar tidak konflik jika ada di Customer
+    public String printReservationReceipt(@PathVariable Long serviceOrderId, Model model, RedirectAttributes redirectAttributes) {
+        Optional<ServiceOrder> serviceOrderOptional = serviceOrderService.getServiceOrderById(serviceOrderId);
+
+        if (serviceOrderOptional.isPresent()) {
+            ServiceOrder serviceOrder = serviceOrderOptional.get();
+            Optional<Transaction> transactionOptional = transactionService.getTransactionByServiceOrder(serviceOrder); // Panggil melalui service
+
+            if (transactionOptional.isPresent()) {
+                Transaction transaction = transactionOptional.get();
+                model.addAttribute("transaction", transaction);
+                model.addAttribute("currentDate", new java.util.Date()); // Untuk tanggal cetak
+                return "customer/print_receipt"; // Arahkan ke view khusus staf
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Transaksi untuk order ini tidak ditemukan.");
+                return "redirect:/staff/transaction"; // Redirect ke daftar transaksi staf
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Order tidak ditemukan.");
+            return "redirect:/staff/transaction"; // Redirect ke daftar transaksi staf
         }
     }
 }
