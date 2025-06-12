@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teknisi Dashboard - AutoCare Pro</title>
+    <title th:text="${pageTitle}"></title>
     <link rel="stylesheet" href="/css/technician.css">
 </head>
 <body>
@@ -17,29 +17,37 @@
         <div class="dashboard-header">
             <h1>Dashboard Teknisi</h1>
             <div class="welcome-message">
-                <p>Selamat Datang, Ahmad Fauzi!</p>
-                <span class="tech-badge">Teknisi Senior</span>
+                <p>Selamat Datang, <span th:text="${technician.fullName}">[Nama Teknisi]</span>!</p>
+                <span class="tech-badge" th:text="${specializationDesc}">[Spesialisasi]</span>
             </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <p th:text="${errorMessage}"></p>
         </div>
 
         <div class="dashboard-stats">
             <div class="stat-card">
-                <div class="stat-number">8</div>
+                <div class="stat-number" th:text="${todayCount}">0</div>
                 <div class="stat-label">Service Hari Ini</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">24</div>
+                <div class="stat-number" th:text="${thisMonthCount}">0</div>
                 <div class="stat-label">Service Bulan Ini</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">3</div>
+                <div class="stat-number" th:text="${inProgressCount}">0</div>
                 <div class="stat-label">Dalam Progress</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">5</div>
+                <div class="stat-number" th:text="${doneTodayCount}">0</div>
                 <div class="stat-label">Selesai Hari Ini</div>
             </div>
         </div>
+
 
         <div class="table-section">
             <h2 class="section-title">Daftar Service Orders</h2>
@@ -48,94 +56,46 @@
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>ID Order</th>
                             <th>Nama Pelanggan</th>
                             <th>Kendaraan</th>
                             <th>Plat Nomor</th>
                             <th>Layanan</th>
                             <th>Status</th>
                             <th>Durasi</th>
-                            <th>Tanggal</th>
+                            <th>Tanggal Order</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Budi Santoso</td>
-                            <td>Honda Civic 2020</td>
-                            <td>B 1234 ABC</td>
-                            <td>Service Berkala</td>
-                            <td><span class="status-progress">Dalam Progress</span></td>
-                            <td>2 Hari</td>
-                            <td>10-06-2025</td>
+                        <tr th:each="order, iStat : ${assignedOrders}">
+                            <td th:text="${iStat.count}">1</td>
+                            <td th:text="${order.id}">[Order ID]</td>
+                            <td th:text="${order.customerName}">[Nama Pelanggan]</td>
+                            <td th:text="${order.vehicleModelName} + ' (' + ${order.vehicleType.vehicleType} + ')'">[Kendaraan]</td>
+                            <td th:text="${order.licensePlate}">[Plat Nomor]</td>
+                            <td th:text="${order.service.serviceName}">[Layanan]</td>
                             <td>
-                                <button class="btn-action btn-update">Update Status</button>
+                                <span th:classappend="'status-' + ${#strings.toLowerCase(order.orderStatus.name())}"
+                                      th:text="${order.orderStatus}">[Status]</span>
+                            </td>
+                            <td th:text="${order.selectedDurationDays} + ' Hari'">[Durasi]</td>
+                            <td th:text="${#dates.format(order.createdAt, 'dd-MM-yyyy HH:mm')}">[Tanggal Order]</td>
+                            <td>
+                                <form th:action="@{/technician/dashboard/order/update-status/{id}(id=${order.id})}" method="post" class="status-update-form">
+                                    <select name="orderStatus">
+                                        <option th:each="status : ${orderStatuses}"
+                                                th:value="${status}"
+                                                th:text="${status}"
+                                                th:selected="${status == order.orderStatus}">
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="btn-action btn-update">Update</button>
+                                </form>
                             </td>
                         </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Siti Aminah</td>
-                            <td>Toyota Avanza 2019</td>
-                            <td>B 5678 DEF</td>
-                            <td>Ganti Oli</td>
-                            <td><span class="status-pending">Menunggu</span></td>
-                            <td>1 Hari</td>
-                            <td>10-06-2025</td>
-                            <td>
-                                <button class="btn-action btn-start">Mulai Service</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Agus Wijaya</td>
-                            <td>Suzuki Ertiga 2021</td>
-                            <td>B 9012 GHI</td>
-                            <td>Tune Up</td>
-                            <td><span class="status-completed">Selesai</span></td>
-                            <td>3 Hari</td>
-                            <td>09-06-2025</td>
-                            <td>
-                                <button class="btn-action btn-view">Lihat Detail</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Maya Sari</td>
-                            <td>Mitsubishi Xpander 2022</td>
-                            <td>B 3456 JKL</td>
-                            <td>AC Service</td>
-                            <td><span class="status-progress">Dalam Progress</span></td>
-                            <td>1 Hari</td>
-                            <td>10-06-2025</td>
-                            <td>
-                                <button class="btn-action btn-update">Update Status</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>Dedi Kurniawan</td>
-                            <td>Daihatsu Xenia 2020</td>
-                            <td>B 7890 MNO</td>
-                            <td>Brake Service</td>
-                            <td><span class="status-pending">Menunggu</span></td>
-                            <td>2 Hari</td>
-                            <td>11-06-2025</td>
-                            <td>
-                                <button class="btn-action btn-start">Mulai Service</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>Rina Pratiwi</td>
-                            <td>Nissan Grand Livina 2018</td>
-                            <td>B 2468 PQR</td>
-                            <td>Engine Check</td>
-                            <td><span class="status-progress">Dalam Progress</span></td>
-                            <td>3 Hari</td>
-                            <td>09-06-2025</td>
-                            <td>
-                                <button class="btn-action btn-update">Update Status</button>
-                            </td>
+                        <tr th:if="${assignedOrders.empty}">
+                            <td colspan="10" class="text-center">Tidak ada order yang ditugaskan kepada Anda.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -150,23 +110,25 @@
         </div>
     </div>
 
-    <script>
-        // Simple interaction for demo
-        document.querySelectorAll('.btn-action').forEach(button => {
-            button.addEventListener('click', function() {
-                const action = this.textContent.trim();
-                alert(`${action} akan diproses untuk service ini.`);
-            });
-        });
+    <script th:inline="javascript">
+        const successMessage = /*[[${successMessage}]]*/ null;
+        const errorMessage = /*[[${errorMessage}]]*/ null;
 
-        // Add some animation to stats
         document.addEventListener('DOMContentLoaded', function() {
+            if (successMessage) {
+                alert(successMessage);
+            }
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+
+            // Animasi untuk stats (tetap sama)
             const statNumbers = document.querySelectorAll('.stat-number');
             statNumbers.forEach(stat => {
                 const finalNumber = parseInt(stat.textContent);
                 let currentNumber = 0;
                 const increment = finalNumber / 20;
-                
+
                 const timer = setInterval(() => {
                     currentNumber += increment;
                     if (currentNumber >= finalNumber) {

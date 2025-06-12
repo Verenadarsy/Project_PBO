@@ -248,4 +248,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 });
         // Jika order tidak ditemukan, .map() akan mengembalikan Optional.empty()
     }
+
+    @Override // Ini adalah implementasi method baru
+    public List<ServiceOrder> getServiceOrdersByAssignedTechnician(Technician assignedTechnician) {
+        return serviceOrderRepository.findByAssignedTechnician(assignedTechnician);
+    }
 }

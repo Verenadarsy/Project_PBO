@@ -30,4 +30,5 @@ public interface ServiceOrderService {
     Optional<ServiceOrder> assignTechnicianToOrder(Long orderId, Long technicianId);
     List<Technician> getTechniciansByServiceSpecialization(Long id);
     Optional<ServiceOrder> updateOrderStatus(Long id, OrderStatus newStatus);
+    List<ServiceOrder> getServiceOrdersByAssignedTechnician(Technician assignedTechnician);
 }

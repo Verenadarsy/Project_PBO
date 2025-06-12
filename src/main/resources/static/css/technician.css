@@ -1,4 +1,4 @@
-/* technician_dashboard.css */
+/* technician.css - Complete styles for technician dashboard */
 
 * {
     margin: 0;
@@ -14,6 +14,7 @@ body {
     overflow-x: hidden;
 }
 
+/* Dashboard Container */
 .dashboard-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -21,6 +22,7 @@ body {
     min-height: 100vh;
 }
 
+/* Dashboard Header */
 .dashboard-header {
     text-align: center;
     margin-bottom: 50px;
@@ -57,6 +59,28 @@ body {
     color: white;
 }
 
+/* Flash Messages */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: rgba(212, 237, 218, 0.9);
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: rgba(248, 215, 218, 0.9);
+    border-color: #f5c6cb;
+}
+
+/* Dashboard Stats */
 .dashboard-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -93,6 +117,7 @@ body {
     font-size: 0.9rem;
 }
 
+/* Table Section */
 .table-section {
     background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(247, 147, 30, 0.05));
     border: 1px solid rgba(255, 107, 53, 0.2);
@@ -116,6 +141,7 @@ body {
 .table-container {
     overflow-x: auto;
     border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .service-table {
@@ -124,7 +150,6 @@ body {
     background: rgba(26, 26, 26, 0.8);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .service-table th,
@@ -156,16 +181,23 @@ body {
 
 .service-table tbody tr:hover {
     background: rgba(255, 107, 53, 0.1);
-    transform: scale(1.02);
-    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.1);
+    transform: scale(1.01);
+    box-shadow: 0 3px 10px rgba(255, 107, 53, 0.1);
 }
 
 .service-table td {
     color: #e0e0e0;
     font-size: 0.9rem;
+    vertical-align: middle;
 }
 
-/* Status Badges */
+.text-center {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}
+
+/* Status Styles */
 .status-pending {
     background: linear-gradient(45deg, #ffc107, #ffb300);
     color: #000;
@@ -173,15 +205,17 @@ body {
     border-radius: 15px;
     font-size: 0.8rem;
     font-weight: bold;
+    display: inline-block;
 }
 
-.status-progress {
+.status-in_progress {
     background: linear-gradient(45deg, #17a2b8, #20c997);
     color: white;
     padding: 4px 12px;
     border-radius: 15px;
     font-size: 0.8rem;
     font-weight: bold;
+    display: inline-block;
 }
 
 .status-completed {
@@ -191,11 +225,44 @@ body {
     border-radius: 15px;
     font-size: 0.8rem;
     font-weight: bold;
+    display: inline-block;
+}
+
+.status-cancelled {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Form Styles */
+.status-update-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-update-form select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.status-update-form select:focus {
+    border-color: #ff6b35;
 }
 
 /* Action Buttons */
 .btn-action {
-    padding: 6px 12px;
+    padding: 8px 15px;
     border: none;
     border-radius: 20px;
     font-size: 0.8rem;
@@ -203,17 +270,8 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     margin: 2px;
-}
-
-.btn-start {
-    background: linear-gradient(45deg, #28a745, #34ce57);
-    color: white;
-    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
-}
-
-.btn-start:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-update {
@@ -227,6 +285,17 @@ body {
     box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
 }
 
+.btn-start {
+    background: linear-gradient(45deg, #28a745, #34ce57);
+    color: white;
+    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+}
+
+.btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
 .btn-view {
     background: linear-gradient(45deg, #6c757d, #868e96);
     color: white;
@@ -238,6 +307,7 @@ body {
     box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
 }
 
+/* Logout Section */
 .logout-section {
     text-align: center;
     margin-top: 50px;
@@ -284,6 +354,7 @@ body {
     color: white;
 }
 
+/* Floating Elements */
 .floating-elements {
     position: fixed;
     width: 100%;
@@ -291,6 +362,8 @@ body {
     overflow: hidden;
     pointer-events: none;
     z-index: -1;
+    top: 0;
+    left: 0;
 }
 
 .floating-shape {
@@ -329,6 +402,7 @@ body {
     animation-delay: 4s;
 }
 
+/* Animations */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -340,13 +414,33 @@ body {
     }
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-20px) rotate(5deg); }
-    50% { transform: translateY(-10px) rotate(-3deg); }
-    75% { transform: translateY(-25px) rotate(7deg); }
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+    }
+    25% { 
+        transform: translateY(-20px) rotate(5deg); 
+    }
+    50% { 
+        transform: translateY(-10px) rotate(-3deg); 
+    }
+    75% { 
+        transform: translateY(-25px) rotate(7deg); 
+    }
+}
+
+/* Responsive Design */
 @media (max-width: 1200px) {
     .dashboard-container {
         padding: 30px 15px;
@@ -356,6 +450,10 @@ body {
     .service-table td {
         padding: 12px 8px;
         font-size: 0.85rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.5rem;
     }
 }
 
@@ -388,7 +486,16 @@ body {
     
     .btn-action {
         font-size: 0.75rem;
-        padding: 4px 8px;
+        padding: 6px 10px;
+    }
+    
+    .status-update-form {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .status-update-form select {
+        width: 100%;
     }
 }
 
@@ -403,5 +510,13 @@ body {
     
     .stat-card {
         padding: 20px 15px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .welcome-message p {
+        font-size: 1rem;
     }
 }

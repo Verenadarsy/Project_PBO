@@ -3,6 +3,7 @@ package pbo.autocare.repository;
 import pbo.autocare.model.ServiceItem;
 import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.ServiceOrder.OrderStatus;
+import pbo.autocare.model.Technician;
 import pbo.autocare.model.User; // Make sure 'User' is correctly imported and used in your ServiceOrder entity
 import pbo.autocare.model.Vehicle;
 
@@ -39,4 +40,5 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long
 
      @Query("SELECT so FROM ServiceOrder so JOIN FETCH so.vehicleType JOIN FETCH so.service")
     List<ServiceOrder> findAllWithVehicleTypeAndService();
+     List<ServiceOrder> findByAssignedTechnician(Technician assignedTechnician);
 }

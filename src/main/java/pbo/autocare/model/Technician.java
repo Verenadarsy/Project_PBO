@@ -2,6 +2,7 @@ package pbo.autocare.model;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn; // Import untuk relasi ManyToOne
 import jakarta.persistence.ManyToOne; // Import untuk anotasi JoinColumn
 
@@ -12,7 +13,7 @@ public class Technician extends User {
     // Deklarasi properti spesifik Technician: Spesialisasi
     // @ManyToOne menunjukkan relasi many Technicians to one Specialization
     // @JoinColumn mendefinisikan kolom foreign key di tabel 'users' (atau tabel Technician jika JOINED strategy)
-    @ManyToOne // Asumsi: Banyak Teknisi bisa memiliki satu Spesialisasi
+     @ManyToOne(fetch = FetchType.EAGER)  // Asumsi: Banyak Teknisi bisa memiliki satu Spesialisasi
     @JoinColumn(name = "specialization_id") // Nama kolom di database yang menyimpan ID spesialisasi
     private Specialization specialization; // Objek Specialization yang terkait dengan teknisi ini
 
