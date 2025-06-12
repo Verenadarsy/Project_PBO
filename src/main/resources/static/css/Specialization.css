@@ -1,0 +1,264 @@
+
+        /* --- General Body & Page Layout (konsisten dengan tema AutoCare Pro) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            background-color: #1a1a1a;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        /* --- Page Title --- */
+        h1 {
+            background: linear-gradient(45deg, #ffffff, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+
+        /* --- Messages Styling --- */
+        .message, .errorMessage {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .message {
+            background: linear-gradient(45deg, #28a745, #34ce57);
+            color: white;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+        }
+
+        .errorMessage {
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+            color: white;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+        }
+
+        /* --- Button Container --- */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        /* --- Button Styling --- */
+        .btn-back {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(255, 107, 53, 0.2);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(255, 107, 53, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-add {
+            display: inline-block;
+            background: linear-gradient(45deg, #28a745, #34ce57);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(40, 167, 69, 0.2);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(40, 167, 69, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-edit {
+            display: inline-block;
+            background: linear-gradient(45deg, #17a2b8, #20c997);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(23, 162, 184, 0.2);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-delete {
+            display: inline-block;
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        /* --- Table Styling --- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #444;
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+            color: #ffffff;
+        }
+
+        .data-table th {
+            background-color: #333;
+            font-weight: bold;
+            color: #ff6b35;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #383838;
+            cursor: pointer;
+        }
+
+        .data-table td {
+            font-size: 0.95rem;
+            color: #e0e0e0;
+        }
+
+        /* --- Action Buttons in Table --- */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .action-buttons form {
+            display: block;
+            margin: 0;
+        }
+
+        /* --- Empty State Styling --- */
+        .no-data td {
+            text-align: center !important;
+            font-style: italic !important;
+            color: #cccccc !important;
+            padding: 20px !important;
+            background-color: #333 !important;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 10px auto;
+                padding: 15px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .btn-add, .btn-back {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .data-table {
+                font-size: 0.85rem;
+                overflow-x: auto;
+                display: block;
+                white-space: nowrap;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 8px 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .data-table {
+                min-width: 700px;
+            }
+        }
+
+        /* --- Table Wrapper for Horizontal Scroll --- */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
