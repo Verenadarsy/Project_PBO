@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping; // Tetap sertakan jika ada @PostMapping
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -32,6 +33,7 @@ import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.Specialization;
 import pbo.autocare.model.Staff;
 import pbo.autocare.model.Technician;
+import pbo.autocare.model.Transaction;
 import pbo.autocare.model.User;
 import pbo.autocare.model.Vehicle;
 import pbo.autocare.repository.ServiceOrderRepository;
@@ -40,6 +42,7 @@ import pbo.autocare.repository.UserRepository;
 import pbo.autocare.service.CustomerService;
 import pbo.autocare.service.ServiceItemService;
 import pbo.autocare.service.ServiceOrderService;
+import pbo.autocare.service.TransactionService;
 import pbo.autocare.service.UserServiceImpl;
 import pbo.autocare.service.VehicleService; 
 
@@ -52,8 +55,9 @@ public class AdminController {
     @Autowired
     private CustomerService customerService;
 
-    public AdminController(UserServiceImpl userService) { 
+    public AdminController(UserServiceImpl userService, TransactionService transactionService) {
         this.userService = userService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping("/dashboard")
@@ -463,11 +467,6 @@ public class AdminController {
         model.addAttribute("orders", serviceOrders); // Pastikan nama atribut sama dengan di Thymeleaf
         return "admin/ServiceOrderList";
     }
-    
-    @GetMapping("/transactions")
-    public String manageTransactions() {
-        return "admin_transactions";
-    }
 
     @GetMapping("/service-orders/new")
     public String showAdminCreateForm(Model model) {
@@ -620,4 +619,76 @@ public class AdminController {
         }
         return "redirect:/admin/service-orders";
     }
+    
+    private final TransactionService transactionService;
+    
+    @GetMapping("/transaction")
+    public String showTransactions(Model model) {
+        List<Transaction> transactions = transactionService.getAllTransactions();
+        model.addAttribute("transactions", transactions);
+        return "admin/transaction"; // Use an admin-specific view path
+    }
+
+    @GetMapping("/transaction/edit/{id}")
+    public String showEditTransactionForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<Transaction> transaction = transactionService.getTransactionById(id);
+        if (transaction.isPresent()) {
+            model.addAttribute("transaction", transaction.get());
+            model.addAttribute("statusOptions", Transaction.TransactionStatus.values());
+            model.addAttribute("paymentMethodOptions", Transaction.PaymentMethod.values()); 
+            return "admin/edit-transaction"; // Use an admin-specific view path
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found!");
+            return "redirect:/admin/transaction";
+        }
+    }
+
+    @PostMapping("/transaction/update/{id}")
+    public String updateTransaction(@PathVariable("id") Long id,
+                                    @RequestParam("transactionStatus") String transactionStatusString,
+                                    @RequestParam("paymentMethod") String paymentMethodString,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            Transaction.TransactionStatus newStatus = Transaction.TransactionStatus.valueOf(transactionStatusString);
+            Transaction.PaymentMethod newPaymentMethod = Transaction.PaymentMethod.valueOf(paymentMethodString);
+
+            Transaction updatedTransaction = transactionService.updateTransactionStatusAndPaymentMethod(
+                    id, newStatus, newPaymentMethod);
+
+            if (updatedTransaction != null) {
+                redirectAttributes.addFlashAttribute("successMessage", "Transaction updated successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found for update!");
+            }
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Invalid transaction status or payment method provided! Error: " + e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating transaction: " + e.getMessage());
+        }
+        return "redirect:/admin/transaction";
+    }
+
+    @GetMapping("/transactions/print/{serviceOrderId}")
+    public String printReservationReceipt(@PathVariable Long serviceOrderId, Model model, RedirectAttributes redirectAttributes) {
+        Optional<ServiceOrder> serviceOrderOptional = serviceOrderService.getServiceOrderById(serviceOrderId);
+
+        if (serviceOrderOptional.isPresent()) {
+            ServiceOrder serviceOrder = serviceOrderOptional.get();
+            Optional<Transaction> transactionOptional = transactionService.getTransactionByServiceOrder(serviceOrder);
+
+            if (transactionOptional.isPresent()) {
+                Transaction transaction = transactionOptional.get();
+                model.addAttribute("transaction", transaction);
+                model.addAttribute("currentDate", new java.util.Date());
+                return "customer/print_receipt"; // Use an admin-specific print view
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Transaction for this order not found.");
+                return "redirect:/admin/transaction";
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Order not found.");
+            return "redirect:/admin/transaction";
+        }
+    }
+
 }

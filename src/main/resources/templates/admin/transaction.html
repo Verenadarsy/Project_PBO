@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/admintransaction.css">
+    <title>Staff Dashboard - Transactions</title>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>Transaction Management (Admin)</h2> 
+            <p>Monitor and manage all system transactions</p>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class="table-container">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Order ID</th>
+                        <th>Amount</th>
+                        <th>Transaction Date</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="transaction : ${transactions}">
+                        <td th:text="${transaction.id}"></td>
+                        <td th:text="${transaction.serviceOrder != null ? transaction.serviceOrder.id : 'N/A'}"></td>
+                        <td>
+                            <strong th:text="${'Rp' + #numbers.formatDecimal(transaction.amount, 0, 'POINT', 2, 'COMMA')}"></strong>
+                        </td>
+                        <td th:text="${#dates.format(transaction.transactionDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td>
+                            <span th:text="${transaction.paymentMethod}" style="text-transform: capitalize;"></span>
+                        </td>
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${transaction.transactionStatus == 'COMPLETED' ? 'status-completed' : 
+                                                 (transaction.transactionStatus == 'PENDING' ? 'status-pending' : 'status-failed')}"
+                                  th:text="${transaction.transactionStatus}">
+                            </span>
+                        </td>
+                        <td th:text="${#dates.format(transaction.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:text="${#dates.format(transaction.updatedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td>
+                            <a th:href="@{/admin/transaction/edit/{id}(id=${transaction.id})}" 
+                               class="btn-modern btn-edit">
+                                Edit
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${transactions.empty}">
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📊</div>
+                                <h3>No Transactions Found</h3>
+                                <p>There are currently no transactions to display.</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="back-section">
+            <a href="/admin/dashboard" class="btn-back">← Back to Admin Dashboard</a> 
+        </div>
+    </div>
+</body>
+</html>

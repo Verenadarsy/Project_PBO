@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/edittransadmin.css">
+    <title>Edit Transaction</title>
+</head>
+<body>
+    <!-- Floating background elements -->
+    <div class="floating-elements">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>Edit Transaction</h2>
+            <p>Modify transaction details and generate receipt</p>
+        </div>
+
+        <div class="form-container">
+            <!-- Transaction Info Card -->
+            <div class="transaction-info">
+                <h4>📊 Transaction Overview</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Transaction ID:</span>
+                        <span class="info-value" th:text="${transaction.id}">TX001</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Order ID:</span>
+                        <span class="info-value" th:text="${transaction.serviceOrder != null ? transaction.serviceOrder.id : 'N/A'}">ORD001</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Amount:</span>
+                        <span class="info-value" th:text="${'$' + transaction.amount}">$100.00</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date:</span>
+                        <span class="info-value" th:text="${#dates.format(transaction.transactionDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</span>
+                    </div>
+                </div>
+            </div>
+
+            <form th:action="@{/admin/transaction/update/{id}(id=${transaction.id})}" method="post">
+                <div class="form-group readonly-field">
+                    <label for="id">Transaction ID:</label>
+                    <input type="text" class="form-control" id="id" th:value="${transaction.id}" readonly>
+                </div>
+
+                <div class="form-group readonly-field">
+                    <label for="serviceOrderId">Service Order ID:</label>
+                    <input type="text" class="form-control" id="serviceOrderId"
+                           th:value="${transaction.serviceOrder != null ? transaction.serviceOrder.id : 'N/A'}" readonly>
+                </div>
+
+                <div class="form-group readonly-field">
+                    <label for="amount">Amount:</label>
+                    <input type="text" class="form-control" id="amount" th:value="${'$' + transaction.amount}" readonly>
+                </div>
+
+                <div class="form-group readonly-field">
+                    <label for="transactionDate">Transaction Date:</label>
+                    <input type="text" class="form-control" id="transactionDate"
+                           th:value="${#dates.format(transaction.transactionDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+                </div>
+
+                <div class="form-group editable-field">
+                    <label for="paymentMethod">Payment Method:</label>
+                    <select class="form-control" id="paymentMethod" name="paymentMethod" required>
+                        <option th:each="method : ${paymentMethodOptions}"
+                                th:value="${method}"
+                                th:text="${#strings.replace(method.name(), '_', ' ')}"
+                                th:selected="${method == transaction.paymentMethod}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group editable-field">
+                    <label for="transactionStatus">Transaction Status:</label>
+                    <select class="form-control" id="transactionStatus" name="transactionStatus" required>
+                        <option th:each="status : ${statusOptions}"
+                                th:value="${status}"
+                                th:text="${status}"
+                                th:selected="${status == transaction.transactionStatus}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn-modern btn-primary">💾 Update Transaction</button>
+                    <button type="button" class="btn-modern btn-print" onclick="showReceiptModal()">🖨️ Print Receipt</button>
+                    <a href="/admin/transaction" class="btn-modern btn-secondary">❌ Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="receipt-modal">
+        <div class="receipt-content">
+            <div class="receipt-header">
+                <h3>🧾 TRANSACTION RECEIPT</h3>
+                <p>Service Management System</p>
+                <small>Printed on: <span id="printDate"></span></small>
+            </div>
+            
+            <div class="receipt-body">
+                <div class="receipt-row">
+                    <span>Transaction ID:</span>
+                    <span th:text="${transaction.id}">TX001</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Order ID:</span>
+                    <span th:text="${transaction.serviceOrder != null ? transaction.serviceOrder.id : 'N/A'}">ORD001</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Date & Time:</span>
+                    <span th:text="${#dates.format(transaction.transactionDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Payment Method:</span>
+                    <span id="receiptPaymentMethod" th:text="${transaction.paymentMethod}">CREDIT_CARD</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Status:</span>
+                    <span id="receiptStatus" th:text="${transaction.transactionStatus}">COMPLETED</span>
+                </div>
+                <div class="receipt-row total">
+                    <span>Total Amount:</span>
+                    <span th:text="${'Rp' + transaction.amount}">$100.00</span>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #333;">
+                <small>Thank you for your business!</small><br>
+                <small>Keep this receipt for your records</small>
+            </div>
+
+            <div class="modal-buttons">
+                <a th:href="@{/admin/transactions/print/{serviceOrderId}(serviceOrderId=${transaction.serviceOrder.id})}" class="print-receipt" target="_blank"> 🖨️ Cetak Struk</a>
+                <button class="close-modal" onclick="closeReceiptModal()">❌ Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date for print
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            document.getElementById('printDate').textContent = now.toLocaleString();
+        });
+
+        function showReceiptModal() {
+            // Update receipt with current form values
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const status = document.getElementById('transactionStatus').value;
+            
+            document.getElementById('receiptPaymentMethod').textContent = paymentMethod.replace('_', ' ');
+            document.getElementById('receiptStatus').textContent = status;
+            
+            document.getElementById('receiptModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receiptModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function printReceipt() {
+            window.print();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('receiptModal');
+            if (event.target == modal) {
+                closeReceiptModal();
+            }
+        }
+
+        // Keyboard shortcut to close modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeReceiptModal();
+            }
+        });
+    </script>
+</body>
+</html>
