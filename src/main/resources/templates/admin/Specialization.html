@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Spesialisasi Teknisi</title>
+    <style>
+        /* --- Reset Default Bootstrap & Body Styling --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            margin: 0;
+            padding: 0 !important;
+            background: linear-gradient(135deg, #1a0f0a 0%, #2d1b12 50%, #3d2818 100%) !important;
+            color: #ffffff !important;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* --- Container Styling --- */
+        .container {
+            width: 95% !important;
+            max-width: 1400px !important;
+            margin: 40px auto !important;
+            background-color: #2d1b12 !important;
+            padding: 30px !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4) !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(156, 102, 68, 0.3) !important;
+        }
+
+        /* --- Page Title Styling --- */
+        h1 {
+            background: linear-gradient(45deg, #ffffff, #d4a574) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            font-size: 2.2rem !important;
+            margin-top: 0 !important;
+            margin-bottom: 25px !important;
+            text-align: center !important;
+            border-bottom: 2px solid #4a3426 !important;
+            padding-bottom: 15px !important;
+            font-weight: bold !important;
+        }
+
+        /* --- Alert Messages --- */
+        .message, .errorMessage {
+            border-radius: 8px !important;
+            padding: 15px 20px !important;
+            margin-bottom: 25px !important;
+            border: none !important;
+            font-weight: 500 !important;
+        }
+
+        .errorMessage {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+            border: 1px solid rgba(220, 53, 69, 0.3) !important;
+            color: #ff6b6b !important;
+        }
+
+        .message {
+            background-color: rgba(156, 102, 68, 0.1) !important;
+            border: 1px solid rgba(156, 102, 68, 0.3) !important;
+            color: #d4a574 !important;
+        }
+
+        /* --- Button Container --- */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        /* --- Button Styling --- */
+        .button {
+            display: inline-block !important;
+            font-weight: bold !important;
+            text-align: center !important;
+            text-decoration: none !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 12px 20px !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            margin-right: 8px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .button {
+            background: linear-gradient(45deg, #9c6644, #d4a574) !important;
+            color: white !important;
+            box-shadow: 0 4px 8px rgba(156, 102, 68, 0.3) !important;
+        }
+
+        .button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 12px rgba(156, 102, 68, 0.4) !important;
+            text-decoration: none !important;
+            color: white !important;
+        }
+
+        .button-danger {
+            background: linear-gradient(45deg, #dc3545, #e74c3c) !important;
+            color: white !important;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3) !important;
+        }
+
+        .button-danger:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4) !important;
+            text-decoration: none !important;
+            color: white !important;
+        }
+
+        .button-back {
+            background: linear-gradient(45deg, #6b4423, #8b5a3c) !important;
+            border: 1px solid rgba(107, 68, 35, 0.5) !important;
+        }
+
+        .button-back:hover {
+            background: linear-gradient(45deg, #8b5a3c, #a0684a) !important;
+        }
+
+        /* --- Table Styling --- */
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-top: 20px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            border-radius: 10px !important;
+            overflow: hidden !important;
+            background-color: transparent !important;
+        }
+
+        th, td {
+            border: 1px solid #4a3426 !important;
+            padding: 15px 12px !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+            color: #ffffff !important;
+            font-size: 0.9rem !important;
+            background-color: transparent !important;
+        }
+
+        th {
+            background: linear-gradient(45deg, #4a3426, #5c402e) !important;
+            font-weight: bold !important;
+            color: #d4a574 !important;
+            text-transform: uppercase !important;
+            font-size: 0.85rem !important;
+            letter-spacing: 0.5px !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10 !important;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: rgba(74, 52, 38, 0.3) !important;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: rgba(45, 27, 18, 0.5) !important;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(92, 64, 46, 0.4) !important;
+            transform: scale(1.01) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        tbody td {
+            color: #e8d5c4 !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* --- Form Styling for Inline Forms --- */
+        form {
+            display: inline !important;
+        }
+
+        /* --- Action Cell Styling --- */
+        td:last-child {
+            white-space: nowrap;
+        }
+
+        /* --- Empty State Styling --- */
+        .text-center {
+            text-align: center !important;
+            font-style: italic !important;
+            color: #cccccc !important;
+            padding: 30px !important;
+            background-color: rgba(74, 52, 38, 0.2) !important;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 1200px) {
+            .container {
+                width: 98% !important;
+                padding: 20px !important;
+            }
+            
+            th, td {
+                padding: 10px 8px !important;
+                font-size: 0.85rem !important;
+            }
+            
+            th {
+                font-size: 0.8rem !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px auto !important;
+                padding: 15px !important;
+            }
+            
+            h1 {
+                font-size: 1.8rem !important;
+            }
+            
+            table {
+                font-size: 0.8rem !important;
+            }
+            
+            th, td {
+                padding: 8px 6px !important;
+                font-size: 0.8rem !important;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .button {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 10px !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            table {
+                min-width: 1000px;
+            }
+            
+            th, td {
+                white-space: nowrap;
+                min-width: 80px;
+            }
+            
+            th:first-child,
+            td:first-child {
+                min-width: 40px;
+            }
+
+            .container {
+                overflow-x: auto;
+            }
+        }
+
+        /* --- Table Wrapper for Horizontal Scroll --- */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manajemen Spesialisasi Teknisi</h1>
+
+        <div th:if="${message}" class="message">
+            <p th:text="${message}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="errorMessage">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class="button-container">
+            <a th:href="@{/admin/dashboard}" class="button button-back">← Kembali</a>
+            <a th:href="@{/admin/specialize/new}" class="button">Tambah Spesialisasi Baru</a>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kode</th>
+                        <th>Deskripsi</th>
+                        <th>Jumlah Teknisi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="specialization : ${specializations}">
+                        <td th:text="${specialization.id}"></td>
+                        <td th:text="${specialization.code}"></td>
+                        <td th:text="${specialization.description}"></td>
+                        <td th:text="${specialization.technicianCount}"></td>
+                        <td>
+                            <a th:href="@{/admin/specialize/edit/{id}(id=${specialization.id})}" class="button">Edit</a>
+                            <form th:action="@{/admin/specialize/delete/{id}(id=${specialization.id})}" method="post" style="display:inline;">
+                                <button type="submit" class="button button-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus spesialisasi ini? Semua teknisi yang terkait harus dilepaskan terlebih dahulu.');">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

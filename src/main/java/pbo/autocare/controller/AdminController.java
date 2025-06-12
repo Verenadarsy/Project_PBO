@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import pbo.autocare.dto.AdminServiceOrderFormDTO;
 import pbo.autocare.dto.CustomerFormDTO;
+import pbo.autocare.dto.SpecializationListDTO;
 import pbo.autocare.dto.TechnicianFormDTO;
 import pbo.autocare.model.Customer;
 import pbo.autocare.model.ServiceItem;
@@ -42,6 +43,7 @@ import pbo.autocare.repository.UserRepository;
 import pbo.autocare.service.CustomerService;
 import pbo.autocare.service.ServiceItemService;
 import pbo.autocare.service.ServiceOrderService;
+import pbo.autocare.service.SpecializationService;
 import pbo.autocare.service.TransactionService;
 import pbo.autocare.service.UserServiceImpl;
 import pbo.autocare.service.VehicleService; 
@@ -55,9 +57,12 @@ public class AdminController {
     @Autowired
     private CustomerService customerService;
 
-    public AdminController(UserServiceImpl userService, TransactionService transactionService) {
+    private SpecializationService specializationService;
+
+    public AdminController(UserServiceImpl userService, TransactionService transactionService, SpecializationService specializationService) {
         this.userService = userService;
         this.transactionService = transactionService;
+        this.specializationService = specializationService;
     }
 
     @GetMapping("/dashboard")
@@ -689,6 +694,74 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "Order not found.");
             return "redirect:/admin/transaction";
         }
+    }
+
+    @GetMapping("/specialize")
+    public String listSpecializations(Model model) {
+        List<SpecializationListDTO> specializations = specializationService.getAllSpecializationsWithCount();
+        model.addAttribute("specializations", specializations);
+        return "admin/Specialization";
+    }
+
+    // Menampilkan form untuk menambah spesialisasi baru
+    @GetMapping("/specialize/new")
+    public String showCreateSpecializationForm(Model model) {
+        model.addAttribute("specialization", new Specialization()); // Tetap gunakan entitas Specialization untuk form input
+        model.addAttribute("pageTitle", "Tambah Spesialisasi Baru");
+        return "admin/Specializations_form";
+    }
+
+    // Menyimpan spesialisasi baru (atau update jika ada ID)
+    @PostMapping("/specialize/save")
+    public String saveSpecialization(@ModelAttribute("specialization") Specialization specialization,
+                                     RedirectAttributes redirectAttributes) {
+        specializationService.saveSpecialization(specialization);
+        redirectAttributes.addFlashAttribute("message", "Spesialisasi berhasil disimpan!");
+        return "redirect:/admin/specialize";
+    }
+
+    // Menampilkan form untuk mengedit spesialisasi
+    @GetMapping("/specialize/edit/{id}")
+    public String showEditSpecializationForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        // Ambil entitas Specialization asli untuk mengisi form edit
+        return specializationService.getSpecializationById(id) // <<< MENGGUNAKAN METODE INI
+                .map(specialization -> {
+                    model.addAttribute("specialization", specialization); // Add the entity to the model
+                    model.addAttribute("pageTitle", "Edit Spesialisasi");
+                    return "admin/Specializations_form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Spesialisasi tidak ditemukan!");
+                    return "redirect:/admin/specialize";
+                });
+    }
+
+    // Memperbarui spesialisasi yang sudah ada
+    @PostMapping("/specialize/update/{id}")
+    public String updateSpecialization(@PathVariable("id") Long id,
+                                       @ModelAttribute("specialization") Specialization specialization,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            specializationService.updateSpecialization(id, specialization);
+            redirectAttributes.addFlashAttribute("message", "Spesialisasi berhasil diperbarui!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal memperbarui spesialisasi: " + e.getMessage());
+        }
+        return "redirect:/admin/specialize";
+    }
+
+    // Menghapus spesialisasi
+    @PostMapping("/specialize/delete/{id}")
+    public String deleteSpecialization(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        try {
+            specializationService.deleteSpecialization(id);
+            redirectAttributes.addFlashAttribute("message", "Spesialisasi berhasil dihapus!");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage()); // Pesan jika masih ada teknisi
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus spesialisasi: " + e.getMessage());
+        }
+        return "redirect:/admin/specialize";
     }
 
 }

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        <!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Form Styling with Brown/Orange Theme */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            margin: 0;
+            padding: 0 !important;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%) !important;
+            color: #ffffff !important;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 95% !important;
+            max-width: 600px !important;
+            margin: 40px auto !important;
+            background-color: #1a1a1a !important;
+            padding: 40px !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(255, 107, 53, 0.2) !important;
+        }
+
+        h1 {
+            background: linear-gradient(45deg, #ffffff, #ff6b35) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            font-size: 2.2rem !important;
+            margin-top: 0 !important;
+            margin-bottom: 30px !important;
+            text-align: center !important;
+            border-bottom: 2px solid #333 !important;
+            padding-bottom: 15px !important;
+            font-weight: bold !important;
+        }
+
+        form {
+            background: linear-gradient(145deg, #2d2d2d, #1a1a1a) !important;
+            padding: 30px !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3) !important;
+            border: 1px solid rgba(255, 107, 53, 0.1) !important;
+            max-width: none !important;
+            margin: 0 !important;
+        }
+
+        form div {
+            margin-bottom: 25px !important;
+        }
+
+        form label {
+            display: block !important;
+            margin-bottom: 8px !important;
+            font-weight: bold !important;
+            color: #ff6b35 !important;
+            text-transform: uppercase !important;
+            font-size: 0.9rem !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        form input[type="text"], 
+        form textarea {
+            width: 100% !important;
+            padding: 15px !important;
+            border: 2px solid #444 !important;
+            border-radius: 8px !important;
+            font-size: 16px !important;
+            background-color: #333 !important;
+            color: #ffffff !important;
+            transition: all 0.3s ease !important;
+        }
+
+        form input[type="text"]:focus, 
+        form textarea:focus {
+            outline: none !important;
+            border-color: #ff6b35 !important;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3) !important;
+            background-color: #3a3a3a !important;
+        }
+
+        form input[type="text"]::placeholder, 
+        form textarea::placeholder {
+            color: #aaa !important;
+        }
+
+        form button {
+            display: inline-block !important;
+            font-weight: bold !important;
+            text-align: center !important;
+            text-decoration: none !important;
+            border: none !important;
+            border-radius: 50px !important;
+            padding: 15px 30px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            margin-right: 15px !important;
+            background: linear-gradient(45deg, #ff6b35, #f7931e) !important;
+            color: white !important;
+            box-shadow: 0 5px 10px rgba(255, 107, 53, 0.2) !important;
+        }
+
+        form button:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 15px rgba(255, 107, 53, 0.3) !important;
+        }
+
+        .button {
+            display: inline-block !important;
+            padding: 15px 30px !important;
+            background: linear-gradient(45deg, #6c757d, #5a6268) !important;
+            color: white !important;
+            text-decoration: none !important;
+            border-radius: 50px !important;
+            font-size: 1rem !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 5px 10px rgba(108, 117, 125, 0.2) !important;
+        }
+
+        .button:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 15px rgba(108, 117, 125, 0.3) !important;
+            text-decoration: none !important;
+            color: white !important;
+        }
+
+        .form-actions {
+            display: flex !important;
+            gap: 15px !important;
+            justify-content: center !important;
+            margin-top: 30px !important;
+            padding-top: 20px !important;
+            border-top: 1px solid #444 !important;
+        }
+
+        /* Hidden input styling */
+        input[type="hidden"] {
+            display: none !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto !important;
+                padding: 20px !important;
+                width: 98% !important;
+            }
+
+            form {
+                padding: 20px !important;
+            }
+
+            h1 {
+                font-size: 1.8rem !important;
+            }
+
+            .form-actions {
+                flex-direction: column !important;
+                align-items: center !important;
+            }
+
+            form button,
+            .button {
+                width: 100% !important;
+                margin-right: 0 !important;
+                margin-bottom: 10px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px auto !important;
+                padding: 15px !important;
+            }
+
+            form {
+                padding: 15px !important;
+            }
+
+            h1 {
+                font-size: 1.5rem !important;
+            }
+
+            form input[type="text"], 
+            form textarea {
+                padding: 12px !important;
+                font-size: 14px !important;
+            }
+
+            form button,
+            .button {
+                padding: 12px 25px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 th:text="${pageTitle}">Form Spesialisasi</h1>
+        <form th:action="${specialization.id == null ? '/admin/specialize/save' : '/admin/specialize/update/' + specialization.id}" th:object="${specialization}" method="post">
+            <input type="hidden" th:field="*{id}" />
+            
+            <div>
+                <label for="code">Kode Spesialisasi:</label>
+                <input type="text" id="code" th:field="*{code}" placeholder="Masukkan kode spesialisasi" required />
+            </div>
+            
+            <div>
+                <label for="description">Deskripsi:</label>
+                <textarea id="description" th:field="*{description}" placeholder="Masukkan deskripsi spesialisasi" required rows="5"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit">Simpan Data</button>
+                <a th:href="@{/admin/specialize}" class="button">Batal</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

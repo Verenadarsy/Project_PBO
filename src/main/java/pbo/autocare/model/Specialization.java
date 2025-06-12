@@ -1,21 +1,27 @@
 // src/main/java/pbo/autocare/model/Specialization.java
 package pbo.autocare.model;
 
-import jakarta.persistence.*; // Pastikan ini jakarta.persistence
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "specializations") // Nama tabel baru
+@Table(name = "specializations")
 public class Specialization {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Gunakan Long agar konsisten dengan User ID
+    private Long id;
 
-    @Column(unique = true, nullable = false, length = 10) // Contoh length untuk kode
+    @Column(unique = true, nullable = false, length = 10)
     private String code; // Ex: SB, PM, AC, TU, BR
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description; // Ex: Service Berkala, Perbaikan Mesin
+
+    // Kita akan mendapatkan jumlah teknisi dari query terpisah,
+    // jadi tidak perlu menyimpan koleksi teknisi di sini.
+    @Transient // Menandakan bahwa field ini tidak dipersistenkan ke database
+    private Long technicianCount; // Gunakan Long untuk konsistensi dengan ID
+
 
     // Default constructor diperlukan oleh JPA
     public Specialization() {}
@@ -39,12 +45,21 @@ public class Specialization {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
+    // Getter dan Setter untuk technicianCount (Transient)
+    public Long getTechnicianCount() {
+        return technicianCount;
+    }
+
+    public void setTechnicianCount(Long technicianCount) {
+        this.technicianCount = technicianCount;
+    }
+
     @Override
     public String toString() {
         return "Specialization{" +
-               "id=" + id +
-               ", code='" + code + '\'' +
-               ", description='" + description + '\'' +
-               '}';
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
