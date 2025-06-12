@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Tipe Kendaraan</title>
+    <link rel="stylesheet" th:href="@{/css/VehiclesList.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="section-block">
+            <h1 class="page-title">Manajemen Tipe Kendaraan</h1>
+
+            <!-- Success Message -->
+            <div th:if="${message}" class="success-message">
+                <p th:text="${message}"></p>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${errorMessage}" class="error-message">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <!-- Add Button -->
+            <div class="button-container">
+                <a th:href="@{/admin/dashboard}" class="btn-back">← Kembali ke Dashboard</a>
+                <a th:href="@{/admin/vehicles/new}" class="btn-add">Tambah Tipe Kendaraan Baru</a>
+            </div>
+
+            <!-- Vehicle Types Table -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipe Kendaraan</th>
+                        <th>Deskripsi</th>
+                        <th>Pengali Biaya Layanan Dasar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="vehicle : ${vehicles}">
+                        <td th:text="${vehicle.id}"></td>
+                        <td th:text="${vehicle.vehicleType}"></td>
+                        <td th:text="${vehicle.description}"></td>
+                        <td th:text="${vehicle.baseServiceCostMultiplier}"></td>
+                        <td>
+                            <a th:href="@{/admin/vehicles/edit/{id}(id=${vehicle.id})}" class="btn-edit">Edit</a>
+                            <form th:action="@{/admin/vehicles/delete/{id}(id=${vehicle.id})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Apakah Anda yakin ingin menghapus tipe kendaraan ini?');">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Empty state row (optional) -->
+                    <tr th:if="${#lists.isEmpty(vehicles)}" class="no-data">
+                        <td colspan="5">Tidak ada data tipe kendaraan</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

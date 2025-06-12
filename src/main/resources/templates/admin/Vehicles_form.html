@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}"></title>
+    <link rel="stylesheet" th:href="@{/css/Vehicles_form.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <a th:href="@{/admin/vehicles}" class="back-button">Kembali</a>
+            <h1 th:text="${pageTitle}">Form Kendaraan</h1>
+            <div></div> <!-- Spacer for flex layout -->
+        </div>
+
+        <form th:action="${vehicle.id == null ? '/admin/vehicles/save' : '/admin/vehicles/update/' + vehicle.id}" th:object="${vehicle}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <div>
+                <label for="vehicleType">
+                    <span class="vehicle-icon"></span>
+                    Tipe Kendaraan:
+                </label>
+                <input type="text" id="vehicleType" th:field="*{vehicleType}" placeholder="Contoh: Mobil, Motor, Truk" required />
+                <div class="field-description">Masukkan jenis kendaraan yang akan dilayani</div>
+            </div>
+
+            <div>
+                <label for="description">Deskripsi Kendaraan:</label>
+                <textarea id="description" th:field="*{description}" rows="4" placeholder="Masukkan deskripsi detail tentang tipe kendaraan ini..."></textarea>
+                <div class="field-description">Berikan penjelasan singkat tentang karakteristik kendaraan ini</div>
+            </div>
+
+            <div>
+                <label for="baseServiceCostMultiplier">Pengali Biaya Layanan Dasar:</label>
+                <input type="number" id="baseServiceCostMultiplier" th:field="*{baseServiceCostMultiplier}" step="0.01" min="0" placeholder="1.00" required />
+                <div class="field-description">Faktor pengali untuk menghitung biaya layanan (contoh: 1.5 = 150% dari harga dasar)</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Simpan Data</button>
+                <a th:href="@{/admin/vehicles}" class="button">Batal</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

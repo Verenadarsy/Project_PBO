@@ -895,4 +895,73 @@ public class AdminController {
         return "redirect:/admin/services";
     }
 
+    @GetMapping("/vehicles")
+    public String listVehicles(Model model) {
+        List<Vehicle> vehicles = vehicleService.getAllVehicles();
+        model.addAttribute("vehicles", vehicles);
+        return "admin/VehiclesList"; // Path template Thymeleaf
+    }
+
+    // Menampilkan form untuk menambah Vehicle baru
+    @GetMapping("/vehicles/new")
+    public String showCreateVehicleForm(Model model) {
+        model.addAttribute("vehicle", new Vehicle());
+        model.addAttribute("pageTitle", "Tambah Tipe Kendaraan Baru");
+        return "admin/Vehicles_form"; // Path template Thymeleaf
+    }
+
+    // Menangani penyimpanan Vehicle baru
+    @PostMapping("/vehicles/save")
+    public String saveVehicle(@ModelAttribute("vehicle") Vehicle vehicle,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            vehicleService.saveVehicle(vehicle);
+            redirectAttributes.addFlashAttribute("message", "Tipe kendaraan berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan tipe kendaraan: " + e.getMessage());
+        }
+        return "redirect:/admin/vehicles";
+    }
+
+    // Menampilkan form untuk mengedit Vehicle
+    @GetMapping("/vehicles/edit/{id}")
+    public String showEditVehicleForm(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) { // ID Integer
+        return vehicleService.getVehicleById(id)
+                .map(vehicle -> {
+                    model.addAttribute("vehicle", vehicle);
+                    model.addAttribute("pageTitle", "Edit Tipe Kendaraan");
+                    return "admin/Vehicles_form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Tipe kendaraan tidak ditemukan!");
+                    return "redirect:/admin/vehicles";
+                });
+    }
+
+    // Menangani pembaruan Vehicle
+    @PostMapping("/vehicles/update/{id}")
+    public String updateVehicle(@PathVariable("id") Integer id, // ID Integer
+                                @ModelAttribute("vehicle") Vehicle vehicle,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            vehicleService.updateVehicle(id, vehicle);
+            redirectAttributes.addFlashAttribute("message", "Tipe kendaraan berhasil diperbarui!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal memperbarui tipe kendaraan: " + e.getMessage());
+        }
+        return "redirect:/admin/vehicles";
+    }
+
+    // Menghapus Vehicle
+    @PostMapping("/vehicles/delete/{id}")
+    public String deleteVehicle(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) { // ID Integer
+        try {
+            vehicleService.deleteVehicle(id);
+            redirectAttributes.addFlashAttribute("message", "Tipe kendaraan berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus tipe kendaraan: " + e.getMessage());
+        }
+        return "redirect:/admin/vehicles";
+    }
+
 }

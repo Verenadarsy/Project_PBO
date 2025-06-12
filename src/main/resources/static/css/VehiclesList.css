@@ -1,0 +1,305 @@
+
+        /* customer_list.css - Applied to Vehicle Management */
+
+        /* --- General Body & Page Layout (konsisten dengan tema AutoCare Pro) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            background-color: #1a1a1a;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        /* --- Page Title / Header --- */
+        .page-title {
+            background: linear-gradient(45deg, #ffffff, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2rem;
+            margin-top: 30px;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+
+        /* --- Section Block --- */
+        .section-block {
+            background-color: #212121;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 107, 53, 0.1);
+        }
+
+        /* --- Add Button Styling --- */
+        .btn-add {
+            display: inline-block;
+            background: linear-gradient(45deg, #28a745, #34ce57);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(40, 167, 69, 0.2);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(40, 167, 69, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-back {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(255, 107, 53, 0.2);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(255, 107, 53, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        /* --- Message Styling --- */
+        .error-message {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #ff6b6b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .success-message {
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            color: #51cf66;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        /* --- Table Styling for Vehicle List --- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #444;
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+            color: #ffffff;
+        }
+
+        .data-table th {
+            background-color: #333;
+            font-weight: bold;
+            color: #ff6b35;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #383838;
+            cursor: pointer;
+        }
+
+        .data-table td {
+            font-size: 0.95rem;
+            color: #e0e0e0;
+        }
+
+        /* --- Styling for "Tidak ada data" message --- */
+        .data-table tbody tr.no-data td {
+            text-align: center;
+            font-style: italic;
+            color: #cccccc;
+            padding: 20px;
+            background-color: #333;
+        }
+
+        /* --- Action Buttons in Table --- */
+        .btn-edit {
+            display: inline-block;
+            background: linear-gradient(45deg, #17a2b8, #20c997);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(23, 162, 184, 0.2);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-delete {
+            display: inline-block;
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        /* --- Back Button Styling --- */
+        .btn-back {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(255, 107, 53, 0.2);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(255, 107, 53, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* --- Form Styling (for inline delete form) --- */
+        form[style*="display:inline"] {
+            display: inline-block;
+            margin: 0;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 10px auto;
+                padding: 15px;
+            }
+            
+            .data-table {
+                font-size: 0.85rem;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 8px 10px;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .btn-back, .btn-add {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .btn-edit, .btn-delete {
+                font-size: 0.8rem;
+                padding: 4px 8px;
+                margin-right: 4px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .section-block {
+                overflow-x: auto;
+                padding: 15px;
+            }
+            
+            .data-table {
+                min-width: 700px;
+            }
+            
+            .btn-edit, .btn-delete {
+                display: block;
+                margin: 2px 0;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .data-table td:last-child {
+                min-width: 120px;
+            }
+        }
