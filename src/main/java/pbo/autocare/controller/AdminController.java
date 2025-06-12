@@ -29,9 +29,11 @@ import pbo.autocare.dto.CustomerFormDTO;
 import pbo.autocare.dto.SpecializationListDTO;
 import pbo.autocare.dto.TechnicianFormDTO;
 import pbo.autocare.model.Customer;
+import pbo.autocare.model.Generalservice;
 import pbo.autocare.model.ServiceItem;
 import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.Specialization;
+import pbo.autocare.model.SpecializedService;
 import pbo.autocare.model.Staff;
 import pbo.autocare.model.Technician;
 import pbo.autocare.model.Transaction;
@@ -762,6 +764,135 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus spesialisasi: " + e.getMessage());
         }
         return "redirect:/admin/specialize";
+    }
+
+     @GetMapping("/services")
+    public String listServiceItems(Model model) {
+        List<ServiceItem> serviceItems = serviceItemService.getAllServiceItems();
+        model.addAttribute("serviceItems", serviceItems);
+        return "admin/ServicesList";
+    }
+
+    // --- Tambah Layanan ---
+    // Endpoint baru untuk menampilkan form tambah Generalservice
+    @GetMapping("/services/new/general")
+    public String showCreateGeneralServiceForm(Model model) {
+        model.addAttribute("serviceItem", new Generalservice());
+        model.addAttribute("specializations", serviceItemService.getAllSpecializations());
+        model.addAttribute("pageTitle", "Tambah Layanan Umum Baru");
+        model.addAttribute("serviceType", "General"); // Indikator untuk form
+        return "admin/services_form";
+    }
+
+    // Endpoint baru untuk menampilkan form tambah SpecializedService
+    @GetMapping("/services/new/specialized")
+    public String showCreateSpecializedServiceForm(Model model) {
+        model.addAttribute("serviceItem", new SpecializedService());
+        model.addAttribute("specializations", serviceItemService.getAllSpecializations());
+        model.addAttribute("pageTitle", "Tambah Layanan Spesialis Baru");
+        model.addAttribute("serviceType", "Spesialis"); // Indikator untuk form
+        return "admin/Services_form";
+    }
+
+    // Endpoint yang menangani penyimpanan layanan (baik General maupun Spesialis)
+    // Sekarang, kita akan menggunakan objek @ModelAttribute yang sudah merupakan instance subclass
+    @PostMapping("/services/save/general")
+    public String saveGeneralService(@ModelAttribute("serviceItem") Generalservice generalservice,
+                                     RedirectAttributes redirectAttributes) {
+        serviceItemService.saveServiceItem(generalservice);
+        redirectAttributes.addFlashAttribute("message", "Layanan Umum berhasil disimpan!");
+        return "redirect:/admin/services";
+    }
+
+    @PostMapping("/services/save/specialized")
+    public String saveSpecializedService(@ModelAttribute("serviceItem") SpecializedService specializedService,
+                                         RedirectAttributes redirectAttributes) {
+        serviceItemService.saveServiceItem(specializedService);
+        redirectAttributes.addFlashAttribute("message", "Layanan Spesialis berhasil disimpan!");
+        return "redirect:/admin/services";
+    }
+
+
+    // --- Edit Layanan ---
+    @GetMapping("/services/edit/{id}")
+    public String showEditServiceItemForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        return serviceItemService.getServiceItemById(id)
+                .map(serviceItem -> {
+                    model.addAttribute("serviceItem", serviceItem);
+                    model.addAttribute("specializations", serviceItemService.getAllSpecializations());
+                    model.addAttribute("pageTitle", "Edit Layanan");
+                    model.addAttribute("serviceType", serviceItem.getServiceType()); // Gunakan tipe yang sudah ada
+                    return "admin/Services_form";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Layanan tidak ditemukan!");
+                    return "redirect:/admin/services";
+                });
+    }
+
+    // Endpoint yang menangani pembaruan layanan (baik General maupun Spesialis)
+    // Kita perlu memeriksa jenis instance dan memperbarui properti yang relevan.
+    @PostMapping("/services/update/{id}")
+    public String updateServiceItem(@PathVariable("id") Long id,
+                                    @ModelAttribute("serviceItem") ServiceItem serviceItem, // Menerima ServiceItem generik
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            ServiceItem existingServiceItem = serviceItemService.getServiceItemById(id)
+                                                    .orElseThrow(() -> new RuntimeException("Layanan tidak ditemukan dengan ID: " + id));
+
+            // Penting: Dengan SINGLE_TABLE inheritance, mengubah tipe layanan (misalnya dari General ke Spesialis)
+            // setelah dibuat TIDAK didukung langsung oleh JPA melalui update.
+            // Jika Anda ingin mengubah jenis layanan, Anda harus menghapus yang lama dan membuat yang baru.
+            // Untuk saat ini, kita akan mengasumsikan jenis layanan TIDAK berubah saat mengedit.
+            // Kita hanya akan memperbarui properti yang relevan berdasarkan jenis yang sudah ada.
+
+            // Salin properti umum
+            existingServiceItem.setServiceName(serviceItem.getServiceName());
+            existingServiceItem.setServiceCategory(serviceItem.getServiceCategory());
+            existingServiceItem.setBasePrice(serviceItem.getBasePrice());
+            existingServiceItem.setRequiredSpecialization(serviceItem.getRequiredSpecialization());
+
+            // Salin properti spesifik subclass
+            if (existingServiceItem instanceof Generalservice && serviceItem instanceof Generalservice) {
+                Generalservice existingGeneral = (Generalservice) existingServiceItem;
+                Generalservice incomingGeneral = (Generalservice) serviceItem;
+                existingGeneral.setGeneralDurationDaysMin(incomingGeneral.getGeneralDurationDaysMin());
+                existingGeneral.setGeneralDurationDaysMax(incomingGeneral.getGeneralDurationDaysMax());
+                // Pastikan special duration diset 0
+                existingGeneral.setSpecialDurationDaysMin(0);
+                existingGeneral.setSpecialDurationDaysMax(0);
+            } else if (existingServiceItem instanceof SpecializedService && serviceItem instanceof SpecializedService) {
+                SpecializedService existingSpecialized = (SpecializedService) existingServiceItem;
+                SpecializedService incomingSpecialized = (SpecializedService) serviceItem;
+                existingSpecialized.setSpecialDurationDaysMin(incomingSpecialized.getSpecialDurationDaysMin());
+                existingSpecialized.setSpecialDurationDaysMax(incomingSpecialized.getSpecialDurationDaysMax());
+                // Pastikan general duration diset 0
+                existingSpecialized.setGeneralDurationDaysMin(0);
+                existingSpecialized.setGeneralDurationDaysMax(0);
+            } else {
+                // Ini akan terjadi jika serviceType diubah di form dan dikirim sebagai subclass yang berbeda,
+                // atau jika ada kesalahan dalam transmisi data.
+                // Anda mungkin ingin melempar exception atau memberikan pesan error.
+                throw new RuntimeException("Tipe layanan tidak dapat diubah setelah dibuat, atau tipe tidak cocok.");
+            }
+
+            serviceItemService.saveServiceItem(existingServiceItem);
+            redirectAttributes.addFlashAttribute("message", "Layanan berhasil diperbarui!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal memperbarui layanan: " + e.getMessage());
+        }
+        return "redirect:/admin/services";
+    }
+
+    @PostMapping("/services/delete/{id}")
+    public String deleteServiceItem(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        try {
+            serviceItemService.deleteServiceItem(id);
+            redirectAttributes.addFlashAttribute("message", "Layanan berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus layanan: " + e.getMessage());
+        }
+        return "redirect:/admin/services";
     }
 
 }
