@@ -1,6 +1,6 @@
-package pbo.autocare.config; // Pastikan package name Anda benar
+package pbo.autocare.config;
 
-import pbo.autocare.service.UserServiceImpl; // Import UserServiceImpl
+import pbo.autocare.service.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,24 +15,16 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // HAPUS INJEKSI UserServiceImpl DARI CONSTRUCTOR
-    // private final UserServiceImpl userService;
-    // public SecurityConfig(UserServiceImpl userService) {
-    //     this.userService = userService;
-    // }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Mengkonfigurasi AuthenticationProvider untuk menggunakan UserDetailsService kustom
-    // Injeksi UserServiceImpl dilakukan LANGSUNG DI PARAMETER METHOD BEAN ini
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserServiceImpl userService) { // UserServiceImpl DIINJEK DI SINI
+    public DaoAuthenticationProvider authenticationProvider(UserServiceImpl userService) {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-        auth.setUserDetailsService(userService); // Menggunakan UserServiceImpl sebagai UserDetailsService
-        auth.setPasswordEncoder(passwordEncoder()); // Menggunakan PasswordEncoder yang sudah didefinisikan
+        auth.setUserDetailsService(userService);
+        auth.setPasswordEncoder(passwordEncoder());
         return auth;
     }
 
@@ -75,8 +67,9 @@ public class SecurityConfig {
             } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
                 response.sendRedirect("/customer/dashboard");
             } else {
-                response.sendRedirect("/"); // Fallback ke landing page
+                response.sendRedirect("/"); 
             }
         };
     }
 }
+

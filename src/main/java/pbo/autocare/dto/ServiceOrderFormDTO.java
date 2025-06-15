@@ -1,8 +1,6 @@
-// src/main/java/pbo/autocare.dto/ServiceOrderFormDTO.java
 package pbo.autocare.dto;
 
 import java.math.BigDecimal;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public class ServiceOrderFormDTO {
 
-    private Long userId; // Hanya ID user yang diterima dari form
+    private Long userId; 
 
     @NotBlank(message = "Nama customer tidak boleh kosong")
     @Size(min = 3, max = 100, message = "Nama customer harus antara 3 dan 100 karakter")
@@ -20,23 +18,23 @@ public class ServiceOrderFormDTO {
     @Size(min = 10, max = 15, message = "Kontak customer harus antara 10 dan 15 digit")
     private String customerContact;
 
-    private String customerAddress; // Opsional
+    private String customerAddress;
 
     @NotBlank(message = "Model kendaraan tidak boleh kosong")
     private String vehicleModelName;
 
     @NotNull(message = "Jenis kendaraan harus dipilih")
-    private Integer vehicleTypeId; // Hanya ID jenis kendaraan
+    private Integer vehicleTypeId;
 
     @NotBlank(message = "Plat nomor tidak boleh kosong")
     @Size(min = 3, max = 20, message = "Plat nomor harus antara 3 dan 20 karakter")
     private String licensePlate;
 
     @NotNull(message = "Layanan harus dipilih")
-    private Long serviceId; // Hanya ID layanan
+    private Long serviceId; 
 
     @NotNull(message = "Durasi hari diperlukan.")
-    @Min(value = 1, message = "Durasi minimal 1 hari.") // Tambahkan ini
+    @Min(value = 1, message = "Durasi minimal 1 hari.")
     private Integer durationDays;
 
     public Integer getDurationDays() {
@@ -49,12 +47,10 @@ public class ServiceOrderFormDTO {
     @Min(value = 0, message = "Harga akhir tidak boleh negatif")
     private BigDecimal finalPrice;
 
-    private String orderNotes; // Opsional
+    private String orderNotes;
 
-    // Konstruktor default
     public ServiceOrderFormDTO() {}
 
-    // Getters and Setters
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
     public String getCustomerName() { return customerName; }

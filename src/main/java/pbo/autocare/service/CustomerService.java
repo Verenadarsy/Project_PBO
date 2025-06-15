@@ -1,4 +1,3 @@
-// src/main/java/pbo/autocare/service/CustomerService.java
 package pbo.autocare.service;
 
 import pbo.autocare.model.Customer;
@@ -10,5 +9,4 @@ public interface CustomerService {
     Optional<Customer> findCustomerById(Long id);
     Customer saveCustomer(Customer customer);
     void deleteCustomerById(Long id);
-    // Tambahkan method lain jika diperlukan, misal untuk update
 }

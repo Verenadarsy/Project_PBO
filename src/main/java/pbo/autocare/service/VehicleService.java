@@ -1,10 +1,9 @@
 package pbo.autocare.service;
 
-import pbo.autocare.model.Vehicle; // Import model Vehicle
+import pbo.autocare.model.Vehicle; 
 import java.util.List;
 import java.util.Optional;
 
-// Ini adalah antarmuka Service
 public interface VehicleService {
 
     Vehicle saveVehicle(Vehicle vehicle);

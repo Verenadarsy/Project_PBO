@@ -1,9 +1,8 @@
-// src/main/java/pbo/autocare/service/TransactionService.java
 package pbo.autocare.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pbo.autocare.model.ServiceOrder; // Import
+import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.Transaction;
 import pbo.autocare.repository.TransactionRepository;
 
@@ -25,7 +24,6 @@ public class TransactionService {
         return transactionRepository.findById(id);
     }
 
-    // Tambahkan method ini:
     public Optional<Transaction> getTransactionByServiceOrder(ServiceOrder serviceOrder) {
         return transactionRepository.findByServiceOrder(serviceOrder);
     }

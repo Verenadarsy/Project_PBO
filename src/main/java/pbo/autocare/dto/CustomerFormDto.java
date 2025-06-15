@@ -1,4 +1,3 @@
-// src/main/java/pbo/autocare/dto/CustomerFormDTO.java
 package pbo.autocare.dto;
 
 import jakarta.validation.constraints.Email;
@@ -7,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public class CustomerFormDTO {
 
-    private Long id; // Untuk edit (nullable)
+    private Long id; 
 
     @NotBlank(message = "Username tidak boleh kosong")
     @Size(min = 3, max = 50, message = "Username harus antara 3 dan 50 karakter")
@@ -27,7 +26,7 @@ public class CustomerFormDTO {
     @Size(min = 10, max = 15, message = "Nomor telepon harus antara 10 dan 15 digit")
     private String phoneNumber;
 
-    // Constructors
+
     public CustomerFormDTO() {}
 
     public CustomerFormDTO(Long id, String username, String password, String email, String fullName, String phoneNumber) {
@@ -39,7 +38,6 @@ public class CustomerFormDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
@@ -53,3 +51,5 @@ public class CustomerFormDTO {
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 }
+
+

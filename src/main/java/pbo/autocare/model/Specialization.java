@@ -1,4 +1,3 @@
-// src/main/java/pbo/autocare/model/Specialization.java
 package pbo.autocare.model;
 
 import jakarta.persistence.*;
@@ -12,18 +11,14 @@ public class Specialization {
     private Long id;
 
     @Column(unique = true, nullable = false, length = 10)
-    private String code; // Ex: SB, PM, AC, TU, BR
+    private String code; 
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String description; // Ex: Service Berkala, Perbaikan Mesin
+    private String description; 
 
-    // Kita akan mendapatkan jumlah teknisi dari query terpisah,
-    // jadi tidak perlu menyimpan koleksi teknisi di sini.
-    @Transient // Menandakan bahwa field ini tidak dipersistenkan ke database
-    private Long technicianCount; // Gunakan Long untuk konsistensi dengan ID
+    @Transient 
+    private Long technicianCount; 
 
-
-    // Default constructor diperlukan oleh JPA
     public Specialization() {}
 
     public Specialization(String code, String description) {
@@ -37,7 +32,6 @@ public class Specialization {
         this.description = description;
     }
 
-    // Getters dan Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getCode() { return code; }
@@ -45,7 +39,6 @@ public class Specialization {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    // Getter dan Setter untuk technicianCount (Transient)
     public Long getTechnicianCount() {
         return technicianCount;
     }

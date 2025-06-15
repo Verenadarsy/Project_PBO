@@ -1,46 +1,43 @@
-// src/main/java/pbo/autocare/controller/StaffController.java
 package pbo.autocare.controller;
 
-import org.springframework.beans.factory.annotation.Autowired; // <-- PENTING: Import ini
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model; // <-- PENTING: Import ini
+import org.springframework.ui.Model; 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping; // <-- PENTING: Untuk update status dan assign teknisi
+import org.springframework.web.bind.annotation.PostMapping; 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam; // <-- PENTING: Untuk menerima parameter form
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.Technician;
 import pbo.autocare.model.Transaction;
-import pbo.autocare.service.ServiceOrderService; // <-- PENTING: Import ini
+import pbo.autocare.service.ServiceOrderService; 
 import pbo.autocare.service.TransactionService;
 
-import java.util.List; // <-- PENTING: Import ini
-import java.util.Optional; // <-- PENTING: Import ini
+import java.util.List;
+import java.util.Optional; 
 
 @Controller
 @RequestMapping("/staff")
 public class StaffController {
 
-    @Autowired // <-- PENTING: Suntikkan ServiceOrderService di sini
+    @Autowired 
     private ServiceOrderService serviceOrderService;
 
     @GetMapping("/dashboard")
     public String staffDashboard() {
-        return "staff_dashboard"; // Mengarahkan ke staff_dashboard.html
+        return "staff_dashboard";
     }
-
-    // --- BARU DITAMBAHKAN/DIKOREKSI DARI SEBELUMNYA ---
 
     @GetMapping("/orders")
     public String listServiceOrders(Model model) {
         List<ServiceOrder> orders = serviceOrderService.getAllServiceOrders();
         model.addAttribute("orders", orders);
         model.addAttribute("orderStatuses", ServiceOrder.OrderStatus.values());
-        model.addAttribute("allTechnicians", serviceOrderService.getAllTechnicians()); // Mungkin tidak dipakai langsung di tabel, tapi bagus untuk konteks
-        return "staff/serviceOrders"; // Mengarahkan ke template HTML daftar order
+        model.addAttribute("allTechnicians", serviceOrderService.getAllTechnicians()); 
+        return "staff/serviceOrders"; 
     }
 
     @PostMapping("/orders/update-status/{id}")
@@ -53,7 +50,7 @@ public class StaffController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Order tidak ditemukan.");
         }
-        // Redirect ke halaman detail order, bukan ke daftar semua order (lebih UX friendly)
+
         return "redirect:/staff/orders/detail/" + id;
     }
 
@@ -67,7 +64,7 @@ public class StaffController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Gagal menugaskan teknisi. Order atau teknisi tidak ditemukan.");
         }
-        // Redirect ke halaman detail order
+
         return "redirect:/staff/orders/detail/" + orderId;
     }
 
@@ -79,14 +76,13 @@ public class StaffController {
             model.addAttribute("order", order);
             model.addAttribute("orderStatuses", ServiceOrder.OrderStatus.values());
 
-            // Panggil method yang sudah disesuaikan untuk mendapatkan teknisi yang relevan
             List<Technician> availableTechnicians = serviceOrderService.getTechniciansByServiceSpecialization(order.getService().getId());
             model.addAttribute("availableTechnicians", availableTechnicians);
 
             return "staff/serviceOrderDetail";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Order tidak ditemukan.");
-            return "redirect:/staff/orders"; // Kembali ke daftar order jika tidak ditemukan
+            return "redirect:/staff/orders"; 
         }
     }
 
@@ -106,7 +102,7 @@ public class StaffController {
         if (transaction.isPresent()) {
             model.addAttribute("transaction", transaction.get());
             model.addAttribute("statusOptions", Transaction.TransactionStatus.values());
-            model.addAttribute("paymentMethodOptions", Transaction.PaymentMethod.values()); // Pass enum values for dropdown
+            model.addAttribute("paymentMethodOptions", Transaction.PaymentMethod.values());
             return "staff/edit-transaction";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found!");
@@ -117,16 +113,14 @@ public class StaffController {
     @PostMapping("/transaction/update/{id}")
     public String updateTransaction(@PathVariable("id") Long id,
                                     @RequestParam("transactionStatus") String transactionStatusString,
-                                    @RequestParam("paymentMethod") String paymentMethodString, // Still receives String from form
+                                    @RequestParam("paymentMethod") String paymentMethodString, 
                                     RedirectAttributes redirectAttributes) {
         try {
             Transaction.TransactionStatus newStatus = Transaction.TransactionStatus.valueOf(transactionStatusString);
-            // --- MODIFIKASI PENTING DI SINI ---
-            Transaction.PaymentMethod newPaymentMethod = Transaction.PaymentMethod.valueOf(paymentMethodString); // Convert String to PaymentMethod enum
-            // --- AKHIR MODIFIKASI PENTING ---
+            Transaction.PaymentMethod newPaymentMethod = Transaction.PaymentMethod.valueOf(paymentMethodString); 
 
             Transaction updatedTransaction = transactionService.updateTransactionStatusAndPaymentMethod(
-                    id, newStatus, newPaymentMethod); // Pass the enum to the service
+                    id, newStatus, newPaymentMethod); 
 
             if (updatedTransaction != null) {
                 redirectAttributes.addFlashAttribute("successMessage", "Transaction updated successfully!");
@@ -135,34 +129,34 @@ public class StaffController {
             }
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Invalid transaction status or payment method provided! Error: " + e.getMessage());
-            // Log the error for debugging: System.err.println("Enum conversion error: " + e.getMessage());
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error updating transaction: " + e.getMessage());
-            // Log the error for debugging: e.printStackTrace();
+
         }
         return "redirect:/staff/transaction";
     }
 
-    @GetMapping("/transactions/print/{serviceOrderId}") // Ubah path agar tidak konflik jika ada di Customer
+    @GetMapping("/transactions/print/{serviceOrderId}") 
     public String printReservationReceipt(@PathVariable Long serviceOrderId, Model model, RedirectAttributes redirectAttributes) {
         Optional<ServiceOrder> serviceOrderOptional = serviceOrderService.getServiceOrderById(serviceOrderId);
 
         if (serviceOrderOptional.isPresent()) {
             ServiceOrder serviceOrder = serviceOrderOptional.get();
-            Optional<Transaction> transactionOptional = transactionService.getTransactionByServiceOrder(serviceOrder); // Panggil melalui service
+            Optional<Transaction> transactionOptional = transactionService.getTransactionByServiceOrder(serviceOrder); 
 
             if (transactionOptional.isPresent()) {
                 Transaction transaction = transactionOptional.get();
                 model.addAttribute("transaction", transaction);
-                model.addAttribute("currentDate", new java.util.Date()); // Untuk tanggal cetak
-                return "customer/print_receipt"; // Arahkan ke view khusus staf
+                model.addAttribute("currentDate", new java.util.Date()); 
+                return "customer/print_receipt"; 
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Transaksi untuk order ini tidak ditemukan.");
-                return "redirect:/staff/transaction"; // Redirect ke daftar transaksi staf
+                return "redirect:/staff/transaction"; 
             }
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Order tidak ditemukan.");
-            return "redirect:/staff/transaction"; // Redirect ke daftar transaksi staf
+            return "redirect:/staff/transaction"; 
         }
     }
 }

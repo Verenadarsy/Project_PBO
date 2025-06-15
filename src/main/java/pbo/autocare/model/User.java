@@ -1,12 +1,12 @@
 package pbo.autocare.model;
 
-import java.sql.Timestamp; // Pastikan ini jakarta.persistence jika SB 3+
+import java.sql.Timestamp; 
 
-import org.springframework.data.annotation.CreatedDate;     // <-- TAMBAHKAN INI
-import org.springframework.data.annotation.LastModifiedDate;  // <-- TAMBAHKAN INI
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;   // <-- TAMBAHKAN INI
+import org.springframework.data.annotation.CreatedDate;    
+import org.springframework.data.annotation.LastModifiedDate;  
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;   
 
-import jakarta.persistence.Column;      // <-- TAMBAHKAN INI
+import jakarta.persistence.Column;    
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
@@ -23,42 +23,39 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "users") // Nama tabel di database sesuai screenshot kamu
+@Table(name = "users") 
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING) // Kolom untuk membedakan tipe user
-@EntityListeners(AuditingEntityListener.class) // Aktifkan Auditing untuk @CreatedDate/@LastModifiedDate
-public abstract class User { // Kelas abstrak untuk konsep umum
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING) 
+@EntityListeners(AuditingEntityListener.class) 
+public abstract class User { 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Username tidak boleh kosong") // <-- TAMBAHKAN VALIDASI INI
-    @Size(min = 3, max = 50, message = "Username harus antara 3 dan 50 karakter") // <-- TAMBAHKAN VALIDASI INI
+    @NotBlank(message = "Username tidak boleh kosong")
+    @Size(min = 3, max = 50, message = "Username harus antara 3 dan 50 karakter") 
     @Column(unique = true, nullable = false)
     private String username;
 
     @Column(nullable = false)
-    private String password; // Password akan disimpan ter-enkripsi
+    private String password;
 
-    // --- PROPERTI YANG PERLU VALIDASI DAN NULLABLE=FALSE ---
-    @NotBlank(message = "Email tidak boleh kosong") // <-- TAMBAHKAN VALIDASI INI
-    @Email(message = "Format email tidak valid") // <-- TAMBAHKAN VALIDASI INI
-    @Column(name = "email", nullable = false, unique = true) // <-- TAMBAHKAN nullable=false DAN unique=true
+    @NotBlank(message = "Email tidak boleh kosong") 
+    @Email(message = "Format email tidak valid")
+    @Column(name = "email", nullable = false, unique = true) 
     private String email;
 
-    @NotBlank(message = "Nama lengkap tidak boleh kosong") // <-- TAMBAHKAN VALIDASI INI
-    @Size(min = 3, max = 100, message = "Nama lengkap harus antara 3 dan 100 karakter") // <-- TAMBAHKAN VALIDASI INI
-    @Column(name = "full_name", nullable = false) // <-- TAMBAHKAN nullable=false
+    @NotBlank(message = "Nama lengkap tidak boleh kosong") 
+    @Size(min = 3, max = 100, message = "Nama lengkap harus antara 3 dan 100 karakter")
+    @Column(name = "full_name", nullable = false) 
     private String fullName;
 
-    @NotBlank(message = "Nomor telepon tidak boleh kosong") // <-- TAMBAHKAN VALIDASI INI
-    @Pattern(regexp = "^[0-9]{10,15}$", message = "Nomor telepon harus berupa angka antara 10 dan 15 digit") // <-- TAMBAHKAN VALIDASI INI
-    @Column(name = "phone_number", nullable = false) // <-- TAMBAHKAN nullable=false
+    @NotBlank(message = "Nomor telepon tidak boleh kosong")
+    @Pattern(regexp = "^[0-9]{10,15}$", message = "Nomor telepon harus berupa angka antara 10 dan 15 digit") 
+    @Column(name = "phone_number", nullable = false) 
     private String phoneNumber;
-    // --- AKHIR PROPERTI YANG PERLU VALIDASI DAN NULLABLE=FALSE ---
 
-    // created_at dan updated_at sudah benar dengan anotasi auditing dan nullable=false
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
@@ -67,7 +64,7 @@ public abstract class User { // Kelas abstrak untuk konsep umum
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
-    @Column(name = "user_type", insertable = false, updatable = false) // 'insertable=false' dan 'updatable=false' agar Hibernate tidak mencoba mengelola kolom ini secara manual, karena sudah dikelola oleh @DiscriminatorColumn.
+    @Column(name = "user_type", insertable = false, updatable = false) 
     private String userType;
 
     public User(String userType) {
@@ -78,18 +75,13 @@ public abstract class User { // Kelas abstrak untuk konsep umum
         this.userType = userType;
     }
 
-    // Constructor default diperlukan oleh JPA
     public User() {}
 
-    // Konstruktor dasar untuk semua tipe user
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        // created_at dan updated_at akan diisi otomatis oleh Spring Data JPA Auditing
     }
 
-    // Konstruktor yang lebih lengkap untuk kemudahan subclass/saat membuat user baru
-    // Subclass seperti Customer akan memanggil super(username, password, email, fullName, phoneNumber)
     public User(String username, String password, String email, String fullName, String phoneNumber) {
         this.username = username;
         this.password = password;
@@ -98,7 +90,6 @@ public abstract class User { // Kelas abstrak untuk konsep umum
         this.phoneNumber = phoneNumber;
     }
 
-    // Constructor paling lengkap, termasuk ID (untuk loading dari DB atau untuk testing/data seeding)
     public User(Long id, String username, String password, String email, String fullName, String phoneNumber) {
         this.id = id;
         this.username = username;
@@ -108,8 +99,6 @@ public abstract class User { // Kelas abstrak untuk konsep umum
         this.phoneNumber = phoneNumber;
     }
 
-
-    // Getters dan Setters (Enkapsulasi)
     public Long getId() {
         return id;
     }
@@ -170,15 +159,12 @@ public abstract class User { // Kelas abstrak untuk konsep umum
         return updatedAt;
     }
 
-    // Metode untuk mendapatkan userType (role) secara dinamis
-    // Ini bukan field yang dipersistenkan, tapi metode untuk mendapatkan nilai discriminator
-    // Pastikan kelas Admin, Technician, Staff, Customer ada di package yang sama atau diimpor
     public String getUserType() {
         if (this instanceof Admin) return "ADMIN";
         if (this instanceof Technician) return "TECHNICIAN";
         if (this instanceof Staff) return "STAFF";
         if (this instanceof Customer) return "CUSTOMER";
-        return "UNKNOWN"; // Fallback jika tidak ada yang cocok
+        return "UNKNOWN"; 
     }
 
     @Override
@@ -186,7 +172,7 @@ public abstract class User { // Kelas abstrak untuk konsep umum
         return "User{" +
                "id=" + id +
                ", username='" + username + '\'' +
-               ", userType='" + getUserType() + '\'' + // Menggunakan method dinamis
+               ", userType='" + getUserType() + '\'' + 
                '}';
     }
 }

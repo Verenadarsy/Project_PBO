@@ -1,4 +1,3 @@
-// pbo.autocare.service.ServiceOrderService.java (interface)
 package pbo.autocare.service;
 
 import pbo.autocare.model.ServiceOrder;
@@ -16,9 +15,9 @@ public interface ServiceOrderService {
     List<Vehicle> getAllVehicles();
     List<ServiceItem> getAllServices();
     ServiceOrder saveServiceOrder(ServiceOrder serviceOrder);
-    Optional<ServiceOrder> findById(Long id); // Jika ditambahkan
-    List<ServiceOrder> findAll(); // Jika ditambahkan
-    void deleteById(Long id); // Jika ditambahkan
+    Optional<ServiceOrder> findById(Long id); 
+    List<ServiceOrder> findAll(); 
+    void deleteById(Long id); 
     void saveOrder(ServiceOrder serviceOrder);
     long countOrdersThisMonth();
     List<ServiceOrder> getAllServiceOrders();

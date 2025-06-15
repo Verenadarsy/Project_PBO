@@ -1,4 +1,3 @@
-// src/main/java/pbo/autocare/dto/TechnicianFormDTO.java
 package pbo.autocare.dto;
 
 import jakarta.validation.constraints.Email;
@@ -9,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public class TechnicianFormDTO {
 
-    private Long id; // Untuk kasus edit
+    private Long id;
 
     @NotBlank(message = "Username tidak boleh kosong")
     @Size(min = 3, max = 50, message = "Username harus antara 3 dan 50 karakter")
@@ -32,7 +31,6 @@ public class TechnicianFormDTO {
     @NotNull(message = "Spesialisasi harus dipilih")
     private Long specializationId;
 
-    // Getters and Setters (tidak berubah)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }

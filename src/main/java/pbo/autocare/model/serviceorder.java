@@ -1,9 +1,8 @@
-// src/main/java/pbo/autocare/model/ServiceOrder.java
 package pbo.autocare.model;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
-import java.math.BigDecimal; // Tambahkan ini
+import java.math.BigDecimal; 
 
 @Entity
 @Table(name = "service_orders")
@@ -38,13 +37,12 @@ public class ServiceOrder {
 
     @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
-    private ServiceItem service; // <-- Objek ServiceItem yang terelasi
+    private ServiceItem service;
 
-    // Ubah double ke BigDecimal untuk finalPrice
     @Column(name = "final_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal finalPrice; // <-- UBAH double ke BigDecimal
+    private BigDecimal finalPrice;
 
-    @Column(name = "selected_duration_days") // Nama kolom di database, bisa disesuaikan
+    @Column(name = "selected_duration_days") 
     private Integer selectedDurationDays;
 
     public Integer getSelectedDurationDays() {
@@ -55,7 +53,7 @@ public class ServiceOrder {
         this.selectedDurationDays = selectedDurationDays;
     }
 
-    @Column(name = "service_name", nullable = false, length = 255) // Ini adalah kolom biasa, bukan FK lagi
+    @Column(name = "service_name", nullable = false, length = 255) 
     private String serviceName; 
     
     public String getServiceName() {
@@ -84,15 +82,15 @@ public class ServiceOrder {
     }
 
      @ManyToOne
-    @JoinColumn(name = "assigned_technician_id") // Kolom FK ke tabel teknisi
+    @JoinColumn(name = "assigned_technician_id") 
     private Technician assignedTechnician;
 
     public Technician getAssignedTechnician() {
         return assignedTechnician;
     }
 
-     public void setAssignedTechnician(Technician assignedTechnician) {
-         this.assignedTechnician = assignedTechnician;
+    public void setAssignedTechnician(Technician assignedTechnician) {
+        this.assignedTechnician = assignedTechnician;
      }
 
     public ServiceOrder() {
@@ -101,19 +99,17 @@ public class ServiceOrder {
         this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
-    // Constructor untuk membuat Order baru
     public ServiceOrder(User user, String customerName, String customerContact, String customerAddress,
                         String vehicleModelName, Vehicle vehicleType, String licensePlate,
-                        ServiceItem service, BigDecimal finalPrice, String orderNotes) { // <-- UBAH double ke BigDecimal
+                        ServiceItem service, BigDecimal finalPrice, String orderNotes) { 
         this(null, user, customerName, customerContact, customerAddress,
              vehicleModelName, vehicleType, licensePlate, service, finalPrice,
              OrderStatus.PENDING, orderNotes, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
     }
 
-    // Constructor lengkap
     public ServiceOrder(Long id, User user, String customerName, String customerContact, String customerAddress,
                         String vehicleModelName, Vehicle vehicleType, String licensePlate,
-                        ServiceItem service, BigDecimal finalPrice, OrderStatus orderStatus, String orderNotes, // <-- UBAH double ke BigDecimal
+                        ServiceItem service, BigDecimal finalPrice, OrderStatus orderStatus, String orderNotes, 
                         Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.user = user;
@@ -131,7 +127,6 @@ public class ServiceOrder {
         this.updatedAt = updatedAt;
     }
 
-    // Getters dan Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public User getUser() { return user; }
@@ -150,8 +145,8 @@ public class ServiceOrder {
     public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
     public ServiceItem getService() { return service; }
     public void setService(ServiceItem service) { this.service = service; }
-    public BigDecimal getFinalPrice() { return finalPrice; } // <-- UBAH double ke BigDecimal
-    public void setFinalPrice(BigDecimal finalPrice) { this.finalPrice = finalPrice; } // <-- UBAH double ke BigDecimal
+    public BigDecimal getFinalPrice() { return finalPrice; } 
+    public void setFinalPrice(BigDecimal finalPrice) { this.finalPrice = finalPrice; }
     public OrderStatus getOrderStatus() { return orderStatus; }
     public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
     public String getOrderNotes() { return orderNotes; }

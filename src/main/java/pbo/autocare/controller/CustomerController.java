@@ -1,12 +1,10 @@
-// src/main/java/pbo/autocare/controller/CustomerController.java
-
 package pbo.autocare.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired; // Tambahkan import ini
+import org.springframework.beans.factory.annotation.Autowired; 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,7 +54,7 @@ public class CustomerController {
     @Autowired
     private pbo.autocare.repository.ServiceOrderRepository serviceOrderRepository;
 
-    @Autowired // <-- TAMBAHKAN INI UNTUK INJEKSI PASSWORDENCODER
+    @Autowired 
     private PasswordEncoder passwordEncoder;
 
     @GetMapping("/dashboard")
@@ -68,11 +66,6 @@ public class CustomerController {
     @GetMapping("/new-reservation")
     public String newTransactionForm(Authentication authentication, Model model) {
         ServiceOrderFormDTO dto = new ServiceOrderFormDTO();
-
-        // Tidak perlu set userId ke DTO lagi jika kita akan mengambilnya langsung dari Authentication
-        // Namun, jika form HTML Anda memiliki th:field="*{userId}" (input hidden), biarkan saja.
-        // Spring akan mengisi DTO.userId dengan null jika tidak ada input hidden.
-        // Yang penting, kita tidak AKAN MENGANDALKAN DTO.userId di metode POST.
 
         model.addAttribute("serviceOrderFormDTO", dto);
         model.addAttribute("vehicles", serviceOrderService.getAllVehicles());
@@ -86,14 +79,13 @@ public class CustomerController {
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Authentication authentication,
-            Model model) { // Model perlu ditambahkan sebagai parameter
+            Model model) {
 
-        // --- BAGIAN SENSITIF 1: PENGECEKAN VALIDASI ---
         if (bindingResult.hasErrors()) {
-            // Jika ada error validasi, masuk ke sini
-            System.out.println("--- Validation Errors Found! ---"); // Debug ini untuk melihat di log
+
+            System.out.println("--- Validation Errors Found! ---");
             bindingResult.getAllErrors().forEach(error -> {
-                // Debugging yang lebih detail untuk melihat error spesifik
+
                 if (error instanceof FieldError) {
                     FieldError fieldError = (FieldError) error;
                     System.out.println("Validation Error: Field '" + fieldError.getField() + "' - Message: " + fieldError.getDefaultMessage() + " - Rejected Value: " + fieldError.getRejectedValue());
@@ -101,15 +93,15 @@ public class CustomerController {
                     System.out.println("Validation Error: Object '" + error.getObjectName() + "' - Message: " + error.getDefaultMessage());
                 }
             });
-            // --- PENTING: PASTIKAN SEMUA DATA DROPDOWN DIKEMBALIKAN KE MODEL ---
+
             model.addAttribute("vehicles", serviceOrderService.getAllVehicles());
             model.addAttribute("services", serviceOrderService.getAllServices());
-            model.addAttribute("serviceOrderFormDTO", serviceOrderFormDTO); // DTO dengan data yang sudah diisi pengguna + error
-            return "service_order_form"; // Render ulang form yang sama
+            model.addAttribute("serviceOrderFormDTO", serviceOrderFormDTO); 
+            return "service_order_form"; 
         }
 
         try {
-            System.out.println("--- No Validation Errors, proceeding to save logic ---"); // Debug ini jika validasi sukses
+            System.out.println("--- No Validation Errors, proceeding to save logic ---"); 
 
             User currentUser = null;
             if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
@@ -121,19 +113,16 @@ public class CustomerController {
             }
 
             if (currentUser == null) {
-                System.out.println("--- User not logged in or invalid session ---"); // Debug ini
+                System.out.println("--- User not logged in or invalid session ---");
                 redirectAttributes.addFlashAttribute("errorMessage", "Anda harus login untuk membuat reservasi.");
                 return "redirect:/login";
             }
 
-            // --- BAGIAN SENSITIF 2: PENCARIAN ENTITAS TERKAIT ---
-            // Ini adalah tempat di mana NullPointerException atau IllegalArgumentException bisa terjadi
-            // jika ID kendaraan atau layanan yang dikirim dari form tidak valid/tidak ditemukan di DB.
             Optional<Vehicle> vehicleOptional = vehicleRepository.findById(serviceOrderFormDTO.getVehicleTypeId());
             Optional<ServiceItem> serviceOptional = serviceItemRepository.findById(serviceOrderFormDTO.getServiceId());
 
             if (vehicleOptional.isPresent() && serviceOptional.isPresent()) {
-                System.out.println("--- Vehicle and Service Found, converting DTO to ServiceOrder ---"); // Debug ini
+                System.out.println("--- Vehicle and Service Found, converting DTO to ServiceOrder ---");
                 ServiceItem selectedService = serviceOptional.get();
                 Vehicle selectedVehicle = vehicleOptional.get();
 
@@ -145,42 +134,39 @@ public class CustomerController {
                 serviceOrder.setCustomerContact(serviceOrderFormDTO.getCustomerContact());
                 serviceOrder.setCustomerAddress(serviceOrderFormDTO.getCustomerAddress());
                 serviceOrder.setVehicleModelName(serviceOrderFormDTO.getVehicleModelName());
-                serviceOrder.setVehicleType(selectedVehicle); // Set objek Vehicle
+                serviceOrder.setVehicleType(selectedVehicle);
                 serviceOrder.setLicensePlate(serviceOrderFormDTO.getLicensePlate());
-                serviceOrder.setService(selectedService); // Set objek ServiceItem
+                serviceOrder.setService(selectedService);
                 serviceOrder.setServiceName(selectedService.getServiceName());
                 serviceOrder.setFinalPrice(finalPrice);
-                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getDurationDays()); // Pastikan nama ini cocok dengan DTO
+                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getDurationDays());
                 serviceOrder.setOrderNotes(serviceOrderFormDTO.getOrderNotes());
 
-                // --- BAGIAN SENSITIF 3: PEMANGGILAN SERVICE UNTUK MENYIMPAN ---
-                // Ini adalah tempat di mana operasi penyimpanan sebenarnya dilakukan
                 serviceOrderService.saveServiceOrder(serviceOrder);
-                System.out.println("--- Service Order SAVED to database! ---"); // Debug ini jika berhasil
+                System.out.println("--- Service Order SAVED to database! ---"); 
 
                 redirectAttributes.addFlashAttribute("successMessage", "Reservasi berhasil dibuat!");
                 return "redirect:/customer/list-reservations";
             } else {
-                // Ini akan terpanggil jika vehicleId atau serviceId dari form tidak ditemukan di DB
-                System.out.println("--- Vehicle or Service NOT Found (IDs from DTO were invalid) ---"); // Debug ini
+
+                System.out.println("--- Vehicle or Service NOT Found (IDs from DTO were invalid) ---");
                 redirectAttributes.addFlashAttribute("errorMessage", "Error: Kendaraan atau Layanan tidak ditemukan. Mohon coba lagi.");
-                // Pastikan Anda mengembalikan semua model attributes yang dibutuhkan form jika kembali ke form yang sama
+
                 model.addAttribute("serviceOrderFormDTO", serviceOrderFormDTO);
                 model.addAttribute("vehicles", serviceOrderService.getAllVehicles());
                 model.addAttribute("services", serviceOrderService.getAllServices());
-                return "service_order_form"; // Render ulang form yang sama
+                return "service_order_form"; 
             }
         } catch (Exception e) {
-            // --- BAGIAN SENSITIF 4: PENANGANAN EXCEPTION UMUM ---
-            // Jika ada exception lain (misal dari ServiceOrderService.saveServiceOrder()), akan tertangkap di sini
-            System.err.println("--- General Exception during save: ---"); // Debug ini
-            e.printStackTrace(); // PRINT STACK TRACE LENGKAP
+
+            System.err.println("--- General Exception during save: ---"); 
+            e.printStackTrace(); 
             redirectAttributes.addFlashAttribute("errorMessage", "Terjadi kesalahan server: " + e.getMessage());
-            // Pastikan Anda mengembalikan semua model attributes yang dibutuhkan form jika kembali ke form yang sama
+
             model.addAttribute("serviceOrderFormDTO", serviceOrderFormDTO);
             model.addAttribute("vehicles", serviceOrderService.getAllVehicles());
             model.addAttribute("services", serviceOrderService.getAllServices());
-            return "service_order_form"; // Render ulang form yang sama
+            return "service_order_form";
         }
 }
 
@@ -201,7 +187,7 @@ public class CustomerController {
         } else {
             return "redirect:/login";
         }
-        return "customer/orderlist"; // Mengarahkan ke customer/orderlist.html
+        return "customer/orderlist"; 
     }
 
     @GetMapping("/profile")
@@ -267,13 +253,8 @@ public class CustomerController {
             if (existingUser instanceof Customer) {
                 Customer currentCustomer = (Customer) existingUser;
 
-                // ***** Hanya update field yang diizinkan *****
                 currentCustomer.setFullName(updatedCustomer.getFullName());
                 currentCustomer.setPhoneNumber(updatedCustomer.getPhoneNumber());
-                // Jangan update currentCustomer.setUsername(updatedCustomer.getUsername());
-                // Jangan update currentCustomer.setEmail(updatedCustomer.getEmail());
-                // Jangan update currentCustomer.setPassword(updatedCustomer.getPassword());
-                // Jangan update currentCustomer.setId(updatedCustomer.getId());
 
                 userRepository.save(currentCustomer);
                 redirectAttributes.addFlashAttribute("updateSuccess", "Profil Anda berhasil diperbarui!");
@@ -288,7 +269,7 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/profile/change-password") // URL akan menjadi /customer/change-password
+    @GetMapping("/profile/change-password") 
     public String showChangePasswordForm(Model model, RedirectAttributes redirectAttributes) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -297,16 +278,15 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        // Pastikan model memiliki objek DTO untuk form
-        if (!model.containsAttribute("changePasswordDTO")) { // Menggunakan changePasswordDTO
-            model.addAttribute("changePasswordDTO", new ChangePasswordDTO()); // Menggunakan ChangePasswordDTO
+        if (!model.containsAttribute("changePasswordDTO")) { 
+            model.addAttribute("changePasswordDTO", new ChangePasswordDTO()); 
         }
 
-        return "customer/change_password"; // Nama file Thymeleaf: customer/change_password.html (dengan underscore)
+        return "customer/change_password"; 
     }
 
-    @PostMapping("/profile/change-password") // URL akan menjadi /customer/change-password
-    public String changePassword(@ModelAttribute("changePasswordDTO") @Valid ChangePasswordDTO changePasswordDTO, // Menggunakan ChangePasswordDTO
+    @PostMapping("/profile/change-password") 
+    public String changePassword(@ModelAttribute("changePasswordDTO") @Valid ChangePasswordDTO changePasswordDTO, 
                                 BindingResult bindingResult,
                                 RedirectAttributes redirectAttributes,
                                 Authentication authentication) {
@@ -321,77 +301,64 @@ public class CustomerController {
 
         if (!userOptional.isPresent()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Pengguna tidak ditemukan.");
-            return "redirect:/customer/profile/change-password"; // Redirect ke GET request yang sama
+            return "redirect:/customer/profile/change-password"; 
         }
 
         User currentUser = userOptional.get();
 
-        // 1. Validasi BindingResult (dari @Valid di DTO)
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult); // Konsisten
-            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO); // Konsisten
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult); 
+            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO); 
             redirectAttributes.addFlashAttribute("errorMessage", "Silakan periksa kembali input Anda.");
-            return "redirect:/customer/profile/change-password"; // Redirect ke GET request yang sama
+            return "redirect:/customer/profile/change-password"; 
         }
 
-        // 2. Verifikasi Password Lama
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), currentUser.getPassword())) {
-            bindingResult.addError(new FieldError("changePasswordDTO", "oldPassword", "Password lama salah.")); // Konsisten
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult); // Konsisten
-            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO); // Konsisten
+            bindingResult.addError(new FieldError("changePasswordDTO", "oldPassword", "Password lama salah.")); 
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult); 
+            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO); 
             redirectAttributes.addFlashAttribute("errorMessage", "Password lama yang Anda masukkan salah.");
-            return "redirect:/customer/profile/change-password"; // Redirect ke GET request yang sama
+            return "redirect:/customer/profile/change-password"; 
         }
 
-        // 3. Verifikasi Password Baru dan Konfirmasi Password
         if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
-            bindingResult.addError(new FieldError("changePasswordDTO", "confirmPassword", "Konfirmasi password tidak cocok dengan password baru.")); // Konsisten
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult); // Konsisten
-            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO); // Konsisten
+            bindingResult.addError(new FieldError("changePasswordDTO", "confirmPassword", "Konfirmasi password tidak cocok dengan password baru."));
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO);
             redirectAttributes.addFlashAttribute("errorMessage", "Konfirmasi password baru tidak cocok.");
-            return "redirect:/customer/profile/change-password"; // Redirect ke GET request yang sama
+            return "redirect:/customer/profile/change-password"; 
         }
 
-        // 4. Pastikan password baru tidak sama dengan password lama (opsional tapi bagus)
         if (passwordEncoder.matches(changePasswordDTO.getNewPassword(), currentUser.getPassword())) {
-            bindingResult.addError(new FieldError("changePasswordDTO", "newPassword", "Password baru tidak boleh sama dengan password lama.")); // Konsisten
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult); // Konsisten
-            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO); // Konsisten
+            bindingResult.addError(new FieldError("changePasswordDTO", "newPassword", "Password baru tidak boleh sama dengan password lama.")); 
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordDTO", bindingResult); 
+            redirectAttributes.addFlashAttribute("changePasswordDTO", changePasswordDTO);
             redirectAttributes.addFlashAttribute("errorMessage", "Password baru tidak boleh sama dengan yang sudah ada.");
-            return "redirect:/customer/profile/change-password"; // Redirect ke GET request yang sama
+            return "redirect:/customer/profile/change-password";
         }
 
-        // 5. Enkripsi dan Simpan Password Baru
         currentUser.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
         userRepository.save(currentUser);
 
         redirectAttributes.addFlashAttribute("successMessage", "Password Anda berhasil diubah!");
-        return "redirect:/customer/profile"; // Redirect kembali ke halaman profil setelah sukses
+        return "redirect:/customer/profile"; 
     }
 
-    // Di CustomerController.java (atau AdminServiceOrderController jika hanya admin yang bisa print struk)
-    // Asumsi ini adalah controller yang tepat
+    @Autowired 
+    private TransactionRepository transactionRepository;
 
-    @Autowired // Pastikan Anda sudah mengautowire TransactionRepository
-    private TransactionRepository transactionRepository; // Anda perlu membuat ini jika belum ada
-
-    // Endpoint untuk menampilkan struk dari sebuah Transaction
-    // Dalam CustomerController.java
-
-// Endpoint ini tetap menerima ServiceOrder ID
 @GetMapping("/reservations/print/{serviceOrderId}")
 public String printReservationReceipt(@PathVariable Long serviceOrderId, Model model, RedirectAttributes redirectAttributes) {
-    Optional<ServiceOrder> serviceOrderOptional = serviceOrderService.getServiceOrderById(serviceOrderId); // Cari ServiceOrder
+    Optional<ServiceOrder> serviceOrderOptional = serviceOrderService.getServiceOrderById(serviceOrderId); 
 
     if (serviceOrderOptional.isPresent()) {
         ServiceOrder serviceOrder = serviceOrderOptional.get();
-        // Cari Transaction yang terkait dengan ServiceOrder ini
-        // Anda perlu membuat metode di TransactionRepository seperti findByServiceOrder(ServiceOrder serviceOrder)
+
         Optional<Transaction> transactionOptional = transactionRepository.findByServiceOrder(serviceOrder);
 
         if (transactionOptional.isPresent()) {
             Transaction transaction = transactionOptional.get();
-            model.addAttribute("transaction", transaction); // Pass objek Transaction ke view
+            model.addAttribute("transaction", transaction);
             model.addAttribute("currentDate", new java.util.Date());
             return "customer/print_receipt";
         } else {

@@ -1,4 +1,3 @@
-// src/main/java/pbo/autocare/controller/TechnicianController.java
 package pbo.autocare.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/technician")
-public class TechnicianController { // Nama kelas TechnicianController (sesuai yang Anda berikan)
+public class TechnicianController { 
 
     @Autowired
     private ServiceOrderService serviceOrderService;
@@ -45,7 +44,6 @@ public class TechnicianController { // Nama kelas TechnicianController (sesuai y
         Technician currentTechnician = (Technician) loggedInUser;
         List<ServiceOrder> assignedOrders = serviceOrderService.getServiceOrdersByAssignedTechnician(currentTechnician);
 
-        // Statistik
         LocalDate today = LocalDate.now();
         LocalDate firstDayOfMonth = today.withDayOfMonth(1);
 
@@ -70,7 +68,6 @@ public class TechnicianController { // Nama kelas TechnicianController (sesuai y
                             order.getUpdatedAt().toLocalDateTime().toLocalDate().equals(today))
             .count();
 
-        // Atribut ke view
         String specializationDesc = (currentTechnician.getSpecialization() != null)
                 ? currentTechnician.getSpecialization().getDescription()
                 : "Unspecified";
@@ -88,7 +85,6 @@ public class TechnicianController { // Nama kelas TechnicianController (sesuai y
 
         return "technician_dashboard";
     }
-
 
     @PostMapping("/dashboard/order/update-status/{id}")
     public String updateOrderStatus(@PathVariable Long id,
@@ -128,7 +124,7 @@ public class TechnicianController { // Nama kelas TechnicianController (sesuai y
             redirectAttributes.addFlashAttribute("errorMessage", "Order tidak ditemukan.");
         }
 
-        return "redirect:/technician/dashboard"; // Pastikan path ini sesuai dengan routing-mu
+        return "redirect:/technician/dashboard";
     }
 
 }

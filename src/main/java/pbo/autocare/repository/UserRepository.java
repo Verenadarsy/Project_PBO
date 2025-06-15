@@ -14,10 +14,7 @@ import pbo.autocare.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
-
-    // --- PENTING: Metode ini HARUS ada untuk findByEmail di UserServiceImpl ---
     Optional<User> findByEmail(String email);
-    // -----------------------------------------------------------------------
 
     @Query(value = "SELECT * FROM users WHERE user_type = ?1", nativeQuery = true)
     List<User> findByUserType(String userType);
@@ -26,6 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Technician> findAllTechnicians();
 
     Optional<Technician> findTechnicianById(Long id);
-
     long countByUserType(String userType);
 }

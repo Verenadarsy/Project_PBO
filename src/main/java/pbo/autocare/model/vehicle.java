@@ -1,9 +1,8 @@
-// src/main/java/pbo/autocare/model/Vehicle.java (Contoh)
 package pbo.autocare.model;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column; // Tambahkan ini
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "vehicles") // Asumsi nama tabel adalah 'vehicles'
+@Table(name = "vehicles")
 public class Vehicle {
 
     @Id
@@ -19,16 +18,14 @@ public class Vehicle {
     private Integer id;
 
     @Column(name = "vehicle_type", nullable = false, unique = true)
-    private String vehicleType; // Contoh: Sedan, Hatchback, MPV / Minibus
+    private String vehicleType; 
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    // Menggunakan BigDecimal untuk multiplier agar konsisten dengan basePrice
     @Column(name = "base_service_cost_multiplier", nullable = false, precision = 4, scale = 2)
-    private BigDecimal baseServiceCostMultiplier; // Akan disimpan sebagai decimal di DB
+    private BigDecimal baseServiceCostMultiplier; 
 
-    // Constructors
     public Vehicle() {}
 
     public Vehicle(String vehicleType, String description, BigDecimal baseServiceCostMultiplier) {
@@ -37,7 +34,6 @@ public class Vehicle {
         this.baseServiceCostMultiplier = baseServiceCostMultiplier;
     }
 
-    // Getters and Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getVehicleType() { return vehicleType; }

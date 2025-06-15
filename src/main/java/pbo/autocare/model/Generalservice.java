@@ -1,7 +1,6 @@
 package pbo.autocare.model;
 
 import java.math.BigDecimal;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -35,10 +34,9 @@ public class Generalservice extends ServiceItem {
 
     @Override
     public BigDecimal calculateFinalPrice(Vehicle vehicle) {
-        // Logika perhitungan untuk General Service
-        // basePrice * baseServiceCostMultiplier
+
         if (this.getBasePrice() == null || vehicle == null || vehicle.getBaseServiceCostMultiplier() == null) {
-            return BigDecimal.ZERO; // Atau throw exception jika data tidak lengkap
+            return BigDecimal.ZERO; 
         }
         return this.getBasePrice().multiply(vehicle.getBaseServiceCostMultiplier());
     }
@@ -50,6 +48,6 @@ public class Generalservice extends ServiceItem {
 
     @Override
     public String getServiceType() {
-        return "General"; // Kembalikan tipe layanan sebagai "General"
+        return "General"; 
     }
 }

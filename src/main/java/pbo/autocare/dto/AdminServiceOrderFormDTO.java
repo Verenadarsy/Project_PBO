@@ -1,4 +1,3 @@
-// pbo.autocare.dto.AdminServiceOrderFormDTO.java
 package pbo.autocare.dto;
 
 import java.math.BigDecimal;
@@ -9,10 +8,10 @@ import jakarta.validation.constraints.Size;
 
 public class AdminServiceOrderFormDTO {
 
-    private Long id; // Diperlukan untuk mode edit pada admin form
+    private Long id;
 
     @NotNull(message = "User harus dipilih")
-    private Long userId; // Admin memilih user dari dropdown
+    private Long userId;
 
     @NotBlank(message = "Nama customer tidak boleh kosong")
     @Size(min = 3, max = 100, message = "Nama customer harus antara 3 dan 100 karakter")
@@ -22,13 +21,13 @@ public class AdminServiceOrderFormDTO {
     @Size(min = 10, max = 15, message = "Kontak customer harus antara 10 dan 15 digit")
     private String customerContact;
 
-    private String customerAddress; // Opsional
+    private String customerAddress; 
 
     @NotBlank(message = "Model kendaraan tidak boleh kosong")
     private String vehicleModelName;
 
     @NotNull(message = "Jenis kendaraan harus dipilih")
-    private Integer vehicleTypeId; // Pastikan ini Long untuk ID entity
+    private Integer vehicleTypeId; 
 
     @NotBlank(message = "Plat nomor tidak boleh kosong")
     @Size(min = 3, max = 20, message = "Plat nomor harus antara 3 dan 20 karakter")
@@ -37,24 +36,20 @@ public class AdminServiceOrderFormDTO {
     @NotNull(message = "Layanan harus dipilih")
     private Long serviceId;
 
-    // Pastikan nama field ini: 'serviceName' untuk form admin
     @NotBlank(message = "Nama servis tidak boleh kosong")
-    private String serviceName; // Field baru untuk admin form
+    private String serviceName; 
 
-    // Pastikan nama field ini: 'selectedDurationDays' untuk form admin
     @NotNull(message = "Durasi hari diperlukan.")
-    @Min(value = 0, message = "Durasi minimal 0 hari.") // Atau 1, sesuai kebutuhan admin
+    @Min(value = 0, message = "Durasi minimal 0 hari.") 
     private Integer selectedDurationDays;
 
     @Min(value = 0, message = "Harga akhir tidak boleh negatif")
-    private BigDecimal finalPrice; // Diperlukan karena ada hidden input dan JS mengupdate ini
+    private BigDecimal finalPrice; 
 
-    private String orderNotes; // Opsional
+    private String orderNotes;
 
-    // Constructor default
     public AdminServiceOrderFormDTO() {}
 
-    // Getters and Setters untuk semua field ini
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getUserId() { return userId; }

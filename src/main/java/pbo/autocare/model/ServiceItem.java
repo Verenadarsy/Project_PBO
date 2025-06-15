@@ -2,7 +2,7 @@ package pbo.autocare.model;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
-import java.math.BigDecimal; // <-- Tambahkan ini jika menggunakan BigDecimal
+import java.math.BigDecimal; 
 
 @Entity
 @Table(name = "services")
@@ -19,9 +19,8 @@ public abstract class ServiceItem {
     @Column(name = "service_category")
     protected String serviceCategory;
 
-    // Gunakan BigDecimal untuk basePrice
-    @Column(name = "base_price", precision = 10, scale = 2) // Contoh presisi dan skala
-    protected BigDecimal basePrice; // <-- UBAH double ke BigDecimal
+    @Column(name = "base_price", precision = 10, scale = 2)
+    protected BigDecimal basePrice; 
 
     @Column(name = "general_duration_days_min")
     protected int generalDurationDaysMin;
@@ -45,12 +44,11 @@ public abstract class ServiceItem {
     @Column(name = "updated_at")
     protected Timestamp updatedAt;
 
-    public abstract String getServiceType(); // <--- TAMBAHKAN INI
+    public abstract String getServiceType(); 
 
     public ServiceItem() {}
 
-    // Constructor: Perhatikan perubahan tipe data basePrice ke BigDecimal
-    public ServiceItem(Long id, String serviceName, String serviceCategory, BigDecimal basePrice, // <--- UBAH double ke BigDecimal
+    public ServiceItem(Long id, String serviceName, String serviceCategory, BigDecimal basePrice, 
                        int generalDurationDaysMin, int generalDurationDaysMax,
                        int specialDurationDaysMin, int specialDurationDaysMax,
                        Specialization requiredSpecialization) {
@@ -65,19 +63,17 @@ public abstract class ServiceItem {
         this.requiredSpecialization = requiredSpecialization;
     }
 
-    // Abstract method untuk perhitungan harga akhir
-    public abstract BigDecimal calculateFinalPrice(Vehicle vehicle); // <-- UBAH double ke BigDecimal
+    public abstract BigDecimal calculateFinalPrice(Vehicle vehicle);
     public abstract String getEstimatedDuration();
 
-    // Getters dan Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getServiceName() { return serviceName; }
     public void setServiceName(String serviceName) { this.serviceName = serviceName; }
     public String getServiceCategory() { return serviceCategory; }
     public void setServiceCategory(String serviceCategory) { this.serviceCategory = serviceCategory; }
-    public BigDecimal getBasePrice() { return basePrice; } // <-- UBAH double ke BigDecimal
-    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; } // <-- UBAH double ke BigDecimal
+    public BigDecimal getBasePrice() { return basePrice; } 
+    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; } 
     public int getGeneralDurationDaysMin() { return generalDurationDaysMin; }
     public void setGeneralDurationDaysMin(int generalDurationDaysMin) { this.generalDurationDaysMin = generalDurationDaysMin; }
     public int getGeneralDurationDaysMax() { return generalDurationDaysMax; }

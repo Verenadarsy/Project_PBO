@@ -1,10 +1,9 @@
 package pbo.autocare;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication; // Pastikan ini diimport
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
 import pbo.autocare.repository.UserRepository;
 import pbo.autocare.service.UserServiceImpl;
 
@@ -16,19 +15,18 @@ public class AutocareApplication {
     }
  
     @Bean
-    public CommandLineRunner demoData(UserServiceImpl userService, UserRepository userRepository) { // UserRepository DIINJEK DI SINI
+    public CommandLineRunner demoData(UserServiceImpl userService, UserRepository userRepository) { 
         return args -> {
-            // Membuat superakun jika belum ada
-            if (!userRepository.existsByUsername("admin")) { // PERBAIKAN DI SINI
+
+            if (!userRepository.existsByUsername("admin")) { 
                 userService.createSuperUser("admin", "adminpass", "ADMIN");
             }
-            if (!userRepository.existsByUsername("teknisi1")) { // PERBAIKAN DI SINI
+            if (!userRepository.existsByUsername("teknisi1")) { 
                 userService.createSuperUser("teknisi1", "teknisipass", "TECHNICIAN");
             }
-            if (!userRepository.existsByUsername("staff1")) { // PERBAIKAN DI SINI
+            if (!userRepository.existsByUsername("staff1")) { 
                 userService.createSuperUser("staff1", "staffpass", "STAFF");
             }
-            // Customer akan register sendiri via form
         };
     }
 

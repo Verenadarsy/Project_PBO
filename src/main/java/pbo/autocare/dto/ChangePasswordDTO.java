@@ -1,4 +1,3 @@
-// src/main/java/pbo/autocare/dto/ChangePasswordDTO.java
 package pbo.autocare.dto;
 
 import jakarta.validation.constraints.NotBlank;

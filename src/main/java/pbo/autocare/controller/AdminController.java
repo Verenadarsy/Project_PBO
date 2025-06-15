@@ -5,19 +5,16 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model; // Pastikan ini di-import
+import org.springframework.ui.Model; 
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping; // Tetap sertakan jika ada @PostMapping
+import org.springframework.web.bind.annotation.PostMapping; 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
@@ -213,10 +210,6 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // ===========================================
-    // Create (Add) Teknisi
-    // URL: /admin/technicians/new
-    // ===========================================
     @GetMapping("/technician/new")
     public String showAddTechnicianForm(Model model) {
         if (!model.containsAttribute("technicianFormDTO")) {
@@ -226,16 +219,11 @@ public class AdminController {
         return "admin/EditTechForm"; 
     }
 
-    // ===========================================
-    // Save (Create/Update) Teknisi
-    // URL: /admin/technicians/save
-    // ===========================================
-    @PostMapping("/technician/save") // Hanya satu endpoint POST untuk menyimpan
+    @PostMapping("/technician/save")
     public String saveTechnician(@ModelAttribute("technicianFormDTO") @Valid TechnicianFormDTO technicianFormDTO,
                                  BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes) {
 
-        // --- Log error awal dari @Valid DTO ---
         if (bindingResult.hasErrors()) {
             System.out.println("--- INITIAL @VALID DTO ERRORS ---");
             bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
@@ -243,7 +231,6 @@ public class AdminController {
             System.out.println("--- END INITIAL @VALID DTO ERRORS ---");
         }
 
-        // Ambil objek Technician yang ada (jika ini mode edit)
         Technician currentTechnicianInDb = null;
         if (technicianFormDTO.getId() != null) {
             Optional<Technician> existingTechnicianOpt = userRepository.findTechnicianById(technicianFormDTO.getId());
@@ -254,38 +241,28 @@ public class AdminController {
             }
         }
 
-        // --- Logika Validasi Kustom Tambahan ---
-        // 1. Validasi Password
-        if (technicianFormDTO.getId() == null) { // Mode Create
+        if (technicianFormDTO.getId() == null) {
             if (technicianFormDTO.getPassword() == null || technicianFormDTO.getPassword().isEmpty()) {
                 bindingResult.rejectValue("password", "NotBlank", "Password tidak boleh kosong untuk akun baru.");
             }
         }
-        // Catatan: Untuk mode edit, @Size di DTO sudah menangani jika password diisi tapi terlalu pendek.
-        //           Jika password kosong di form edit, @Size tidak memicu error, yang memang kita inginkan.
 
-        // 2. Validasi Duplikasi Username
-        // Username sekarang bisa diedit.
         if (userRepository.findByUsername(technicianFormDTO.getUsername()).isPresent()) {
             User userWithSameUsername = userRepository.findByUsername(technicianFormDTO.getUsername()).get();
             if (technicianFormDTO.getId() == null || !userWithSameUsername.getId().equals(technicianFormDTO.getId())) {
-                 // Jika ini mode create, atau mode update tapi username berbeda dan sudah ada yang punya
+
                 bindingResult.rejectValue("username", "Duplicate", "Username sudah terdaftar.");
             }
         }
 
-        // 3. Validasi Duplikasi Email
         if (userRepository.findByEmail(technicianFormDTO.getEmail()).isPresent()) {
             User userWithSameEmail = userRepository.findByEmail(technicianFormDTO.getEmail()).get();
             if (technicianFormDTO.getId() == null || !userWithSameEmail.getId().equals(technicianFormDTO.getId())) {
-                 // Jika ini mode create, atau mode update tapi email berbeda dan sudah ada yang punya
+
                 bindingResult.rejectValue("email", "Duplicate", "Email sudah terdaftar.");
             }
         }
-        // --- AKHIR Validasi Kustom Tambahan ---
 
-
-        // --- Periksa BindingResult setelah SEMUA validasi (@Valid DTO dan kustom) ---
         if (bindingResult.hasErrors()) {
             System.out.println("--- FINAL VALIDATION ERRORS (all checks) ---");
             bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
@@ -293,16 +270,14 @@ public class AdminController {
             System.out.println("--- END FINAL VALIDATION ERRORS ---");
 
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.technicianFormDTO", bindingResult);
-            redirectAttributes.addFlashAttribute("technicianFormDTO", technicianFormDTO); // Kirim kembali DTO yang diisi user
+            redirectAttributes.addFlashAttribute("technicianFormDTO", technicianFormDTO);
             redirectAttributes.addFlashAttribute("errorMessage", "Data teknisi tidak valid. Mohon periksa kembali input Anda.");
-            redirectAttributes.addFlashAttribute("specializations", specializationRepository.findAll()); // Kirim ulang daftar spesialisasi
+            redirectAttributes.addFlashAttribute("specializations", specializationRepository.findAll());
 
             String redirectToUrl = (technicianFormDTO.getId() == null) ? "/admin/technician/new" : "/admin/technician/edit/" + technicianFormDTO.getId();
             return "redirect:" + redirectToUrl;
         }
 
-        // --- Logika Penyimpanan Jika Tidak Ada Error ---
-        // Validasi Spesialisasi ID (safety check jika ID tidak valid di DB)
         Optional<Specialization> specializationOptional = specializationRepository.findById(technicianFormDTO.getSpecializationId());
         if (!specializationOptional.isPresent()) {
             bindingResult.rejectValue("specializationId", "NotFound", "Spesialisasi yang dipilih tidak ditemukan.");
@@ -316,35 +291,32 @@ public class AdminController {
 
         Technician technicianToSave;
 
-        if (technicianFormDTO.getId() == null) { // Mode Create
+        if (technicianFormDTO.getId() == null) { 
             technicianToSave = new Technician();
-            technicianToSave.setUsername(technicianFormDTO.getUsername()); // Set username saat create
-            technicianToSave.setPassword(passwordEncoder.encode(technicianFormDTO.getPassword())); // Enkripsi password
+            technicianToSave.setUsername(technicianFormDTO.getUsername());
+            technicianToSave.setPassword(passwordEncoder.encode(technicianFormDTO.getPassword()));
             redirectAttributes.addFlashAttribute("successMessage", "Teknisi berhasil ditambahkan!");
-        } else { // Mode Update
+        } else { 
             if (currentTechnicianInDb == null) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Teknisi tidak ditemukan untuk diedit.");
                 return "redirect:/admin/technician";
             }
             technicianToSave = currentTechnicianInDb;
 
-            // ***** SALIN SEMUA FIELD DARI DTO KE ENTITAS YANG ADA *****
-            // Username: Karena sekarang bisa diubah, salin dari DTO.
             technicianToSave.setUsername(technicianFormDTO.getUsername());
-            // Password: Salin kondisional.
+
             if (technicianFormDTO.getPassword() != null && !technicianFormDTO.getPassword().isEmpty()) {
                 technicianToSave.setPassword(passwordEncoder.encode(technicianFormDTO.getPassword()));
             }
-            // Email, FullName, PhoneNumber: Salin dari DTO.
+     
             technicianToSave.setEmail(technicianFormDTO.getEmail());
             technicianToSave.setFullName(technicianFormDTO.getFullName());
             technicianToSave.setPhoneNumber(technicianFormDTO.getPhoneNumber());
-            // **********************************************************
+
 
             redirectAttributes.addFlashAttribute("successMessage", "Teknisi berhasil diperbarui!");
         }
 
-        // Set specialization (dilakukan untuk create dan update)
         technicianToSave.setSpecialization(specializationOptional.get());
 
         userRepository.save(technicianToSave);
@@ -353,10 +325,6 @@ public class AdminController {
 
     }
 
-    // ===========================================
-    // Update (Edit) Teknisi
-    // URL: /admin/technician/edit/{id}
-    // ===========================================
     @GetMapping("/technician/edit/{id}")
     public String showEditTechnicianForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Technician> technicianOptional = userRepository.findTechnicianById(id);
@@ -372,11 +340,9 @@ public class AdminController {
                 dto.setSpecializationId(technician.getSpecialization().getId());
             }
 
-            // Gunakan model.addAttribute LANGSUNG karena kita tidak redirect di sini
             model.addAttribute("technicianFormDTO", dto);
             model.addAttribute("specializations", specializationRepository.findAll());
 
-            // Ambil pesan error/success dari redirectAttributes jika ada (setelah POST)
             if (redirectAttributes.getFlashAttributes().containsKey("org.springframework.validation.BindingResult.technicianFormDTO")) {
                 model.addAttribute("org.springframework.validation.BindingResult.technicianFormDTO",
                                    redirectAttributes.getFlashAttributes().get("org.springframework.validation.BindingResult.technicianFormDTO"));
@@ -396,10 +362,6 @@ public class AdminController {
         }
     }
 
-    // ===========================================
-    // Delete Teknisi
-    // URL: /admin/technicians/delete/{id}
-    // ===========================================
     @PostMapping("/technician/delete/{id}")
     public String deleteTechnician(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Optional<Technician> technicianOptional = userRepository.findTechnicianById(id);
@@ -431,7 +393,7 @@ public class AdminController {
 
     @PostMapping("/staff/save")
     public String saveStaff(@ModelAttribute("staff") Staff staff, RedirectAttributes redirectAttributes) {
-        // UserService akan menyimpan Staff sebagai User dan menangani password encoding
+
         userService.saveStaff(staff);
         redirectAttributes.addFlashAttribute("message", "Staff account saved successfully!");
         return "redirect:/admin/staff";
@@ -439,7 +401,7 @@ public class AdminController {
 
     @GetMapping("/staff/edit/{id}")
     public String showEditStaffForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        Optional<Staff> staff = userService.getStaffById(id); // Menggunakan getStaffById
+        Optional<Staff> staff = userService.getStaffById(id);
         if (staff.isPresent()) {
             model.addAttribute("staff", staff.get());
             return "admin/EditStaffForm";
@@ -451,7 +413,7 @@ public class AdminController {
 
     @GetMapping("/delete/{id}")
     public String deleteStaff(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        userService.deleteStaff(id); // Menggunakan deleteStaff
+        userService.deleteStaff(id);
         redirectAttributes.addFlashAttribute("message", "Staff account deleted successfully!");
         return "redirect:/admin/staff";
     }
@@ -468,41 +430,39 @@ public class AdminController {
     @Autowired
     private ServiceOrderRepository serviceOrderRepository;
 
-    @GetMapping("/service-orders") // Or whatever path maps to this list
+    @GetMapping("/service-orders")
     public String listServiceOrders(Model model) {
         List<ServiceOrder> serviceOrders = serviceOrderRepository.findAllWithVehicleTypeAndService();
-        model.addAttribute("orders", serviceOrders); // Pastikan nama atribut sama dengan di Thymeleaf
+        model.addAttribute("orders", serviceOrders);
         return "admin/ServiceOrderList";
     }
 
     @GetMapping("/service-orders/new")
     public String showAdminCreateForm(Model model) {
-        AdminServiceOrderFormDTO dto = new AdminServiceOrderFormDTO(); // Gunakan DTO baru
-        model.addAttribute("serviceOrderFormDTO", dto); // Nama atribut di model tetap sama
+        AdminServiceOrderFormDTO dto = new AdminServiceOrderFormDTO();
+        model.addAttribute("serviceOrderFormDTO", dto);
         model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
         model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
         return "admin/EditServiceOrderForm";
     }
 
-    // For editing:
     @PostMapping("/service-orders/save")
     public String saveServiceOrder(@ModelAttribute("serviceOrderFormDTO") @Valid AdminServiceOrderFormDTO serviceOrderFormDTO,
                                    BindingResult bindingResult,
                                    RedirectAttributes redirectAttributes,
-                                   Model model) { // Tambahkan Model model di sini untuk re-add attributes jika ada error
+                                   Model model) {
 
-        // 1. Validasi DTO
         if (bindingResult.hasErrors()) {
-            // Jika ada error validasi, tambahkan kembali data yang dibutuhkan form
+
             model.addAttribute("users", userService.getAllUsers());
             model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
             model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
-            return "admin/EditServiceOrderForm"; // Kembali ke form dengan pesan error
+            return "admin/EditServiceOrderForm";
         }
 
         try {
-            // Mengambil User dari ID yang dipilih di form (tanpa sesi login)
+
             User selectedUser = userService.getCustomerById(serviceOrderFormDTO.getUserId())
                                         .orElseThrow(() -> new IllegalArgumentException("User dengan ID " + serviceOrderFormDTO.getUserId() + " tidak ditemukan."));
 
@@ -513,19 +473,17 @@ public class AdminController {
                 ServiceItem selectedServiceItem = serviceOptional.get();
                 Vehicle selectedVehicle = vehicleOptional.get();
 
-                // Lakukan perhitungan harga akhir
                 BigDecimal finalPrice = selectedServiceItem.calculateFinalPrice(selectedVehicle);
-                // Set harga akhir ke DTO agar bisa disimpan (jika finalPrice di DTO digunakan untuk submit)
                 serviceOrderFormDTO.setFinalPrice(finalPrice);
 
 
                 ServiceOrder serviceOrder = new ServiceOrder();
-                // Jika ini mode edit, set ID dari DTO agar ServiceOrderService tahu itu update
+
                 if (serviceOrderFormDTO.getId() != null) {
                     serviceOrder.setId(serviceOrderFormDTO.getId());
                 }
 
-                serviceOrder.setUser(selectedUser); // Set user dari pilihan dropdown
+                serviceOrder.setUser(selectedUser); 
                 serviceOrder.setCustomerName(serviceOrderFormDTO.getCustomerName());
                 serviceOrder.setCustomerContact(serviceOrderFormDTO.getCustomerContact());
                 serviceOrder.setCustomerAddress(serviceOrderFormDTO.getCustomerAddress());
@@ -533,61 +491,55 @@ public class AdminController {
                 serviceOrder.setVehicleType(selectedVehicle);
                 serviceOrder.setLicensePlate(serviceOrderFormDTO.getLicensePlate());
                 serviceOrder.setService(selectedServiceItem);
-                serviceOrder.setServiceName(selectedServiceItem.getServiceName()); // Mengambil dari DTO
-                serviceOrder.setFinalPrice(finalPrice); // Menggunakan harga yang dihitung di backend
+                serviceOrder.setServiceName(selectedServiceItem.getServiceName());
+                serviceOrder.setFinalPrice(finalPrice);
                 serviceOrder.setOrderNotes(serviceOrderFormDTO.getOrderNotes());
-                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getSelectedDurationDays()); // Menggunakan field dari DTO
+                serviceOrder.setSelectedDurationDays(serviceOrderFormDTO.getSelectedDurationDays());
 
-                // Handle creation vs. update
                 if (serviceOrder.getId() == null) {
                     serviceOrder.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-                    serviceOrder.setOrderStatus(ServiceOrder.OrderStatus.PENDING); // Set status awal
+                    serviceOrder.setOrderStatus(ServiceOrder.OrderStatus.PENDING); 
                     serviceOrderService.createServiceOrder(serviceOrder);
                     redirectAttributes.addFlashAttribute("successMessage", "Order Servis berhasil dibuat!");
                 } else {
-                    // Ketika update, pastikan field-field yang tidak ada di DTO (misal created_at)
-                    // dipertahankan dari objek asli sebelum update.
-                    // Anda mungkin perlu mengambil ServiceOrder asli terlebih dahulu.
+                    
                     ServiceOrder existingOrder = serviceOrderService.getServiceOrderById(serviceOrder.getId())
                                                                   .orElseThrow(() -> new IllegalArgumentException("Order Servis tidak ditemukan untuk update."));
-                    serviceOrder.setCreatedAt(existingOrder.getCreatedAt()); // Pertahankan created_at
-                    serviceOrder.setOrderStatus(existingOrder.getOrderStatus()); // Pertahankan status jika tidak diubah di form
+                    serviceOrder.setCreatedAt(existingOrder.getCreatedAt());
+                    serviceOrder.setOrderStatus(existingOrder.getOrderStatus());
                     serviceOrder.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
                     serviceOrderService.updateServiceOrder(serviceOrder.getId(), serviceOrder);
                     redirectAttributes.addFlashAttribute("successMessage", "Order Servis berhasil diupdate!");
                 }
 
 
-                return "redirect:/admin/service-orders"; // Redirect ke halaman daftar admin
+                return "redirect:/admin/service-orders";
             } else {
-                // Jika kendaraan atau layanan tidak ditemukan (meskipun harusnya sudah divalidasi oleh @NotNull di DTO)
-                // Ini adalah fallback untuk kasus data tidak konsisten.
+
                 redirectAttributes.addFlashAttribute("errorMessage", "Error: Kendaraan atau Layanan tidak ditemukan. Mohon coba lagi.");
-                return "redirect:/admin/service-orders/new"; // Atau kembali ke form dengan data sebelumnya
+                return "redirect:/admin/service-orders/new"; 
             }
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Kesalahan data: " + e.getMessage());
-            // Jika ada error, kembali ke form dengan data yang sudah diisi
+
             model.addAttribute("users", userService.getAllUsers());
             model.addAttribute("vehicleTypes", vehicleService.getAllVehicles());
             model.addAttribute("serviceItems", serviceItemService.getAllServiceItems());
-            return "admin/EditServiceOrderForm"; // Kembali ke form dengan pesan error
+            return "admin/EditServiceOrderForm"; 
         } catch (Exception e) {
-            e.printStackTrace(); // Penting untuk debugging
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Terjadi kesalahan server: " + e.getMessage());
-            // Redirect ke halaman daftar admin atau error page
+  
             return "redirect:/admin/service-orders";
         }
     }
 
-    // Endpoint untuk menampilkan form edit Service Order (Admin)
     @GetMapping("/service-orders/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         ServiceOrder serviceOrder = serviceOrderService.getServiceOrderById(id)
                                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Service Order not found"));
 
-        // Konversi ServiceOrder entity ke AdminServiceOrderFormDTO
-        AdminServiceOrderFormDTO dto = convertServiceOrderToAdminDto(serviceOrder); // Implementasi ini
+        AdminServiceOrderFormDTO dto = convertServiceOrderToAdminDto(serviceOrder);
 
         model.addAttribute("serviceOrderFormDTO", dto);
         model.addAttribute("users", userService.getAllUsers());
@@ -596,7 +548,6 @@ public class AdminController {
         return "admin/EditServiceOrderForm";
     }
 
-    // Metode konversi dari ServiceOrder ke AdminServiceOrderFormDTO
     private AdminServiceOrderFormDTO convertServiceOrderToAdminDto(ServiceOrder serviceOrder) {
         AdminServiceOrderFormDTO dto = new AdminServiceOrderFormDTO();
         dto.setId(serviceOrder.getId());
@@ -608,14 +559,13 @@ public class AdminController {
         dto.setVehicleTypeId(serviceOrder.getVehicleType() != null ? serviceOrder.getVehicleType().getId() : null);
         dto.setLicensePlate(serviceOrder.getLicensePlate());
         dto.setServiceId(serviceOrder.getService() != null ? serviceOrder.getService().getId() : null);
-        dto.setServiceName(serviceOrder.getServiceName()); // Ambil serviceName dari entity
-        dto.setSelectedDurationDays(serviceOrder.getSelectedDurationDays()); // Ambil selectedDurationDays dari entity
+        dto.setServiceName(serviceOrder.getServiceName()); 
+        dto.setSelectedDurationDays(serviceOrder.getSelectedDurationDays());
         dto.setFinalPrice(serviceOrder.getFinalPrice());
         dto.setOrderNotes(serviceOrder.getOrderNotes());
         return dto;
     }
 
-    // Endpoint untuk menghapus Service Order (Admin)
     @PostMapping("/service-orders/delete/{id}")
     public String deleteServiceOrder(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -633,7 +583,7 @@ public class AdminController {
     public String showTransactions(Model model) {
         List<Transaction> transactions = transactionService.getAllTransactions();
         model.addAttribute("transactions", transactions);
-        return "admin/transaction"; // Use an admin-specific view path
+        return "admin/transaction";
     }
 
     @GetMapping("/transaction/edit/{id}")
@@ -643,7 +593,7 @@ public class AdminController {
             model.addAttribute("transaction", transaction.get());
             model.addAttribute("statusOptions", Transaction.TransactionStatus.values());
             model.addAttribute("paymentMethodOptions", Transaction.PaymentMethod.values()); 
-            return "admin/edit-transaction"; // Use an admin-specific view path
+            return "admin/edit-transaction"; 
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found!");
             return "redirect:/admin/transaction";
@@ -687,7 +637,7 @@ public class AdminController {
                 Transaction transaction = transactionOptional.get();
                 model.addAttribute("transaction", transaction);
                 model.addAttribute("currentDate", new java.util.Date());
-                return "customer/print_receipt"; // Use an admin-specific print view
+                return "customer/print_receipt"; 
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Transaction for this order not found.");
                 return "redirect:/admin/transaction";
@@ -705,15 +655,13 @@ public class AdminController {
         return "admin/Specialization";
     }
 
-    // Menampilkan form untuk menambah spesialisasi baru
     @GetMapping("/specialize/new")
     public String showCreateSpecializationForm(Model model) {
-        model.addAttribute("specialization", new Specialization()); // Tetap gunakan entitas Specialization untuk form input
+        model.addAttribute("specialization", new Specialization()); 
         model.addAttribute("pageTitle", "Tambah Spesialisasi Baru");
         return "admin/Specializations_form";
     }
 
-    // Menyimpan spesialisasi baru (atau update jika ada ID)
     @PostMapping("/specialize/save")
     public String saveSpecialization(@ModelAttribute("specialization") Specialization specialization,
                                      RedirectAttributes redirectAttributes) {
@@ -722,13 +670,12 @@ public class AdminController {
         return "redirect:/admin/specialize";
     }
 
-    // Menampilkan form untuk mengedit spesialisasi
     @GetMapping("/specialize/edit/{id}")
     public String showEditSpecializationForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        // Ambil entitas Specialization asli untuk mengisi form edit
-        return specializationService.getSpecializationById(id) // <<< MENGGUNAKAN METODE INI
+
+        return specializationService.getSpecializationById(id) 
                 .map(specialization -> {
-                    model.addAttribute("specialization", specialization); // Add the entity to the model
+                    model.addAttribute("specialization", specialization);
                     model.addAttribute("pageTitle", "Edit Spesialisasi");
                     return "admin/Specializations_form";
                 })
@@ -738,7 +685,6 @@ public class AdminController {
                 });
     }
 
-    // Memperbarui spesialisasi yang sudah ada
     @PostMapping("/specialize/update/{id}")
     public String updateSpecialization(@PathVariable("id") Long id,
                                        @ModelAttribute("specialization") Specialization specialization,
@@ -752,14 +698,13 @@ public class AdminController {
         return "redirect:/admin/specialize";
     }
 
-    // Menghapus spesialisasi
     @PostMapping("/specialize/delete/{id}")
     public String deleteSpecialization(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             specializationService.deleteSpecialization(id);
             redirectAttributes.addFlashAttribute("message", "Spesialisasi berhasil dihapus!");
         } catch (IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage()); // Pesan jika masih ada teknisi
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage()); 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus spesialisasi: " + e.getMessage());
         }
@@ -773,29 +718,24 @@ public class AdminController {
         return "admin/ServicesList";
     }
 
-    // --- Tambah Layanan ---
-    // Endpoint baru untuk menampilkan form tambah Generalservice
     @GetMapping("/services/new/general")
     public String showCreateGeneralServiceForm(Model model) {
         model.addAttribute("serviceItem", new Generalservice());
         model.addAttribute("specializations", serviceItemService.getAllSpecializations());
         model.addAttribute("pageTitle", "Tambah Layanan Umum Baru");
-        model.addAttribute("serviceType", "General"); // Indikator untuk form
+        model.addAttribute("serviceType", "General"); 
         return "admin/services_form";
     }
 
-    // Endpoint baru untuk menampilkan form tambah SpecializedService
     @GetMapping("/services/new/specialized")
     public String showCreateSpecializedServiceForm(Model model) {
         model.addAttribute("serviceItem", new SpecializedService());
         model.addAttribute("specializations", serviceItemService.getAllSpecializations());
         model.addAttribute("pageTitle", "Tambah Layanan Spesialis Baru");
-        model.addAttribute("serviceType", "Spesialis"); // Indikator untuk form
+        model.addAttribute("serviceType", "Spesialis"); 
         return "admin/Services_form";
     }
 
-    // Endpoint yang menangani penyimpanan layanan (baik General maupun Spesialis)
-    // Sekarang, kita akan menggunakan objek @ModelAttribute yang sudah merupakan instance subclass
     @PostMapping("/services/save/general")
     public String saveGeneralService(@ModelAttribute("serviceItem") Generalservice generalservice,
                                      RedirectAttributes redirectAttributes) {
@@ -812,8 +752,6 @@ public class AdminController {
         return "redirect:/admin/services";
     }
 
-
-    // --- Edit Layanan ---
     @GetMapping("/services/edit/{id}")
     public String showEditServiceItemForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         return serviceItemService.getServiceItemById(id)
@@ -821,7 +759,7 @@ public class AdminController {
                     model.addAttribute("serviceItem", serviceItem);
                     model.addAttribute("specializations", serviceItemService.getAllSpecializations());
                     model.addAttribute("pageTitle", "Edit Layanan");
-                    model.addAttribute("serviceType", serviceItem.getServiceType()); // Gunakan tipe yang sudah ada
+                    model.addAttribute("serviceType", serviceItem.getServiceType()); 
                     return "admin/Services_form";
                 })
                 .orElseGet(() -> {
@@ -830,29 +768,19 @@ public class AdminController {
                 });
     }
 
-    // Endpoint yang menangani pembaruan layanan (baik General maupun Spesialis)
-    // Kita perlu memeriksa jenis instance dan memperbarui properti yang relevan.
     @PostMapping("/services/update/{id}")
     public String updateServiceItem(@PathVariable("id") Long id,
-                                    @ModelAttribute("serviceItem") ServiceItem serviceItem, // Menerima ServiceItem generik
+                                    @ModelAttribute("serviceItem") ServiceItem serviceItem,
                                     RedirectAttributes redirectAttributes) {
         try {
             ServiceItem existingServiceItem = serviceItemService.getServiceItemById(id)
                                                     .orElseThrow(() -> new RuntimeException("Layanan tidak ditemukan dengan ID: " + id));
 
-            // Penting: Dengan SINGLE_TABLE inheritance, mengubah tipe layanan (misalnya dari General ke Spesialis)
-            // setelah dibuat TIDAK didukung langsung oleh JPA melalui update.
-            // Jika Anda ingin mengubah jenis layanan, Anda harus menghapus yang lama dan membuat yang baru.
-            // Untuk saat ini, kita akan mengasumsikan jenis layanan TIDAK berubah saat mengedit.
-            // Kita hanya akan memperbarui properti yang relevan berdasarkan jenis yang sudah ada.
-
-            // Salin properti umum
             existingServiceItem.setServiceName(serviceItem.getServiceName());
             existingServiceItem.setServiceCategory(serviceItem.getServiceCategory());
             existingServiceItem.setBasePrice(serviceItem.getBasePrice());
             existingServiceItem.setRequiredSpecialization(serviceItem.getRequiredSpecialization());
 
-            // Salin properti spesifik subclass
             if (existingServiceItem instanceof Generalservice && serviceItem instanceof Generalservice) {
                 Generalservice existingGeneral = (Generalservice) existingServiceItem;
                 Generalservice incomingGeneral = (Generalservice) serviceItem;
@@ -870,9 +798,7 @@ public class AdminController {
                 existingSpecialized.setGeneralDurationDaysMin(0);
                 existingSpecialized.setGeneralDurationDaysMax(0);
             } else {
-                // Ini akan terjadi jika serviceType diubah di form dan dikirim sebagai subclass yang berbeda,
-                // atau jika ada kesalahan dalam transmisi data.
-                // Anda mungkin ingin melempar exception atau memberikan pesan error.
+
                 throw new RuntimeException("Tipe layanan tidak dapat diubah setelah dibuat, atau tipe tidak cocok.");
             }
 
@@ -899,18 +825,16 @@ public class AdminController {
     public String listVehicles(Model model) {
         List<Vehicle> vehicles = vehicleService.getAllVehicles();
         model.addAttribute("vehicles", vehicles);
-        return "admin/VehiclesList"; // Path template Thymeleaf
+        return "admin/VehiclesList"; 
     }
 
-    // Menampilkan form untuk menambah Vehicle baru
     @GetMapping("/vehicles/new")
     public String showCreateVehicleForm(Model model) {
         model.addAttribute("vehicle", new Vehicle());
         model.addAttribute("pageTitle", "Tambah Tipe Kendaraan Baru");
-        return "admin/Vehicles_form"; // Path template Thymeleaf
+        return "admin/Vehicles_form";
     }
 
-    // Menangani penyimpanan Vehicle baru
     @PostMapping("/vehicles/save")
     public String saveVehicle(@ModelAttribute("vehicle") Vehicle vehicle,
                               RedirectAttributes redirectAttributes) {
@@ -923,9 +847,8 @@ public class AdminController {
         return "redirect:/admin/vehicles";
     }
 
-    // Menampilkan form untuk mengedit Vehicle
     @GetMapping("/vehicles/edit/{id}")
-    public String showEditVehicleForm(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) { // ID Integer
+    public String showEditVehicleForm(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
         return vehicleService.getVehicleById(id)
                 .map(vehicle -> {
                     model.addAttribute("vehicle", vehicle);
@@ -938,9 +861,8 @@ public class AdminController {
                 });
     }
 
-    // Menangani pembaruan Vehicle
     @PostMapping("/vehicles/update/{id}")
-    public String updateVehicle(@PathVariable("id") Integer id, // ID Integer
+    public String updateVehicle(@PathVariable("id") Integer id, 
                                 @ModelAttribute("vehicle") Vehicle vehicle,
                                 RedirectAttributes redirectAttributes) {
         try {
@@ -952,9 +874,8 @@ public class AdminController {
         return "redirect:/admin/vehicles";
     }
 
-    // Menghapus Vehicle
     @PostMapping("/vehicles/delete/{id}")
-    public String deleteVehicle(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) { // ID Integer
+    public String deleteVehicle(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) { 
         try {
             vehicleService.deleteVehicle(id);
             redirectAttributes.addFlashAttribute("message", "Tipe kendaraan berhasil dihapus!");

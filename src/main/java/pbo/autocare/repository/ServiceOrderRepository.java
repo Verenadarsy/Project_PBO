@@ -4,7 +4,7 @@ import pbo.autocare.model.ServiceItem;
 import pbo.autocare.model.ServiceOrder;
 import pbo.autocare.model.ServiceOrder.OrderStatus;
 import pbo.autocare.model.Technician;
-import pbo.autocare.model.User; // Make sure 'User' is correctly imported and used in your ServiceOrder entity
+import pbo.autocare.model.User; 
 import pbo.autocare.model.Vehicle;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,18 +16,8 @@ import java.util.List;
 
 @Repository
 public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long> {
-    // Other methods...
 
-    // Use findByUser_Username to query by the username of the associated User object
-    List<ServiceOrder> findByUser_Username(String username); // <--- CORRECTED LINE
-
-    // If you explicitly have a 'customer' field in ServiceOrder and 'username' in Customer:
-    // List<ServiceOrder> findByCustomer_Username(String username);
-
-    // Remove the old problematic line:
-    // List<ServiceOrder> findByCustomerUsername(String username); // <-- DELETE THIS LINE
-
-    // Other methods you have:
+    List<ServiceOrder> findByUser_Username(String username); 
     List<ServiceOrder> findByUser(User user);
     List<ServiceOrder> findByUserId(Long userId);
     List<ServiceOrder> findByOrderStatus(OrderStatus orderStatus);
@@ -38,7 +28,7 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long
     List<ServiceOrder> findByVehicleType(Vehicle vehicleType);
     long countByCreatedAtAfter(Timestamp startOfMonthTimestamp);
 
-     @Query("SELECT so FROM ServiceOrder so JOIN FETCH so.vehicleType JOIN FETCH so.service")
+    @Query("SELECT so FROM ServiceOrder so JOIN FETCH so.vehicleType JOIN FETCH so.service")
     List<ServiceOrder> findAllWithVehicleTypeAndService();
-     List<ServiceOrder> findByAssignedTechnician(Technician assignedTechnician);
+    List<ServiceOrder> findByAssignedTechnician(Technician assignedTechnician);
 }
